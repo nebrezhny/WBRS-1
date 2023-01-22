@@ -24,7 +24,8 @@ class ProfilePage extends StatefulWidget {
   String hobbi;
   bool deti;
   String pol;
-  ProfilePage({Key? key,
+  ProfilePage({
+    Key? key,
     required this.email,
     required this.userName,
     required this.about,
@@ -34,56 +35,47 @@ class ProfilePage extends StatefulWidget {
     required this.rost,
     required this.city,
     required this.hobbi,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  FirebaseStorage storage=FirebaseStorage.instance;
-  String imageUrl=" ";
+  FirebaseStorage storage = FirebaseStorage.instance;
+  String imageUrl = " ";
   XFile? _image;
-  TextEditingController? name=TextEditingController();
+  TextEditingController? name = TextEditingController();
   late User? user = FirebaseAuth.instance.currentUser;
   void pickUploadImage() async {
-    final image=await ImagePicker().pickImage(
+    final image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
 
-
-    Reference ref = FirebaseStorage.instance.ref().child("profilepic${FirebaseAuth.instance.currentUser?.uid}.jpg");
-
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("profilepic${FirebaseAuth.instance.currentUser?.uid}.jpg");
 
     await ref.putFile(File(image!.path));
-    ref.getDownloadURL().then((value){
+    ref.getDownloadURL().then((value) {
       setState(() {
-        imageUrl=value;
+        imageUrl = value;
       });
     });
   }
+
   AuthService authService = AuthService();
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
-
-
     return Stack(
       children: [
         Container(
-          decoration: const BoxDecoration(
-            boxShadow: [BoxShadow(
+          decoration: const BoxDecoration(boxShadow: [
+            BoxShadow(
               color: Colors.green,
-
-            )]
-          ),
+            )
+          ]),
           child: Image.asset(
             "assets/fon.jpg",
             height: MediaQuery.of(context).size.height,
@@ -101,7 +93,9 @@ class _ProfilePageState extends State<ProfilePage> {
             title: const Text(
               "Профиль",
               style: TextStyle(
-                  color: Colors.white, fontSize: 27, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           drawer: const MyDrawer(),
@@ -115,20 +109,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Stack(
                     children: [
-                      (FirebaseAuth.instance.currentUser!.photoURL=="")?ClipRRect(
-                          borderRadius: BorderRadius.circular(100.0),
-                          child: Image.asset(
-                            "assets/profile.png",
-                            fit: BoxFit.cover,
-                            height: 100.0,
-                            width: 100.0,))
-                          :ClipRRect(
-                          borderRadius: BorderRadius.circular(100.0),
-                          child: Image.network(
-                            FirebaseAuth.instance.currentUser!.photoURL.toString(),
-                            fit: BoxFit.cover,
-                            height: 200.0,
-                            width: 200.0,)),
+                      (FirebaseAuth.instance.currentUser!.photoURL == "")
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(100.0),
+                              child: Image.asset(
+                                "assets/profile.png",
+                                fit: BoxFit.cover,
+                                height: 100.0,
+                                width: 100.0,
+                              ))
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(100.0),
+                              child: Image.network(
+                                FirebaseAuth.instance.currentUser!.photoURL
+                                    .toString(),
+                                fit: BoxFit.cover,
+                                height: 200.0,
+                                width: 200.0,
+                              )),
                       // Positioned(
                       //   bottom: 0,
                       //     right: 4,
@@ -162,10 +160,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       //         ),
                       //       ),
                       //     ),)
-
                     ],
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   SizedBox(
                     height: 140,
                     child: Row(
@@ -175,73 +174,90 @@ class _ProfilePageState extends State<ProfilePage> {
                         Column(
                           children: [
                             Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.5),
-                                    spreadRadius: 7,
-                                    blurRadius: 7, // changes position of shadow
-                                  ),
-                                ],
-                                borderRadius: const BorderRadius.all(Radius.circular(50.0))
-                              ),
-                                child: IconButton(onPressed: (){}, icon: const Icon(Icons.settings,size: 35,color: Colors.blueGrey,))
-                            ),
-                            const Text("Настройки",style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 14
-                            ),),
-                            const SizedBox(height: 50,)
-                          ],
-                        ),
-                        //const SizedBox(width: 7,),
-                        Column(
-                          children: [
-                            const SizedBox(height: 30,),
-                            Container(
-                                height: 70,
-                                width: 70,
+                                height: 50,
+                                width: 50,
                                 decoration: BoxDecoration(
                                     color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.white.withOpacity(0.5),
                                         spreadRadius: 7,
-                                        blurRadius: 7, // changes position of shadow
+                                        blurRadius:
+                                            7, // changes position of shadow
                                       ),
                                     ],
-                                    borderRadius: const BorderRadius.all(Radius.circular(50.0))
-                                ),
-                                child:
-                                IconButton(onPressed: (){
-                                    GlobalPol=widget.pol;
-                                    nextScreenReplace(context,ProfilePageEdit(
-                                      email: widget.email,
-                                      userName: widget.userName,
-                                      about: widget.about,
-                                      age: widget.age,
-                                      hobbi: widget.hobbi,
-                                      deti: widget.deti,
-                                      city: widget.city,
-                                      rost:widget.rost ,
-                                    ));
-                                  }
-                                  , icon: const Icon(Icons.mode_edit_sharp,size: 35,color: Colors.blueGrey,),
-
-
-                                ),
-
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(50.0))),
+                                child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.settings,
+                                      size: 35,
+                                      color: Colors.blueGrey,
+                                    ))),
+                            const Text(
+                              "Настройки",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14),
                             ),
-                            const Text("Изменить профиль",style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 18
-                            ),)
-
+                            const SizedBox(
+                              height: 50,
+                            )
+                          ],
+                        ),
+                        //const SizedBox(width: 7,),
+                        Column(
+                          children: [
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              height: 70,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.5),
+                                      spreadRadius: 7,
+                                      blurRadius:
+                                          7, // changes position of shadow
+                                    ),
+                                  ],
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(50.0))),
+                              child: IconButton(
+                                onPressed: () {
+                                  GlobalPol = widget.pol;
+                                  nextScreenReplace(
+                                      context,
+                                      ProfilePageEdit(
+                                        email: widget.email,
+                                        userName: widget.userName,
+                                        about: widget.about,
+                                        age: widget.age,
+                                        hobbi: widget.hobbi,
+                                        deti: widget.deti,
+                                        city: widget.city,
+                                        rost: widget.rost,
+                                      ));
+                                },
+                                icon: const Icon(
+                                  Icons.mode_edit_sharp,
+                                  size: 35,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "Изменить профиль",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 18),
+                            )
                           ],
                         ),
                         //const SizedBox(width: 7,),
@@ -256,139 +272,170 @@ class _ProfilePageState extends State<ProfilePage> {
                                       BoxShadow(
                                         color: Colors.white.withOpacity(0.5),
                                         spreadRadius: 7,
-                                        blurRadius: 7, // changes position of shadow
+                                        blurRadius:
+                                            7, // changes position of shadow
                                       ),
                                     ],
-                                    borderRadius: const BorderRadius.all(Radius.circular(50.0))
-                                ),
-                                child:
-                                IconButton(
-                                    onPressed: (){
-                                      nextScreenReplace(context, ProfilesList(
-                                        userName: widget.userName,
-                                        email: widget.email,
-                                      ));
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(50.0))),
+                                child: IconButton(
+                                    onPressed: () {
+                                      nextScreenReplace(
+                                          context,
+                                          ProfilesList(
+                                            userName: widget.userName,
+                                            email: widget.email,
+                                          ));
                                     },
-                                    icon:
-                                    const Icon(
-                                      Icons.person,size: 35,color: Colors.blueGrey,
-                                    )
-                                )
+                                    icon: const Icon(
+                                      Icons.person,
+                                      size: 35,
+                                      color: Colors.blueGrey,
+                                    ))),
+                            const Text(
+                              "Люди",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14),
                             ),
-                            const Text("Люди",style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 14
-                            ),),
-                            const SizedBox(height: 50,)
+                            const SizedBox(
+                              height: 50,
+                            )
                           ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40,),
-                  CountImages==0
-                      ?Column(
-                        children: [
-                          const Text("Нет фотографий",style: TextStyle(color: Colors.white),),
-                          ElevatedButton(onPressed: ()async{
-
-                            XFile? image = await ImagePicker().pickImage(
-                                source: ImageSource.gallery);
-                            setState(() {
-                              _image = image;
-                            });
-
-                            FirebaseStorage storage = FirebaseStorage.instance;
-                            try {
-                              await
-                              storage.ref(
-                                  'images-${FirebaseAuth.instance.currentUser!
-                                      .displayName}').putFile(File(_image!.path));
-                            } on FirebaseException catch (e) {
-                              print(e);
-                            }
-                            var downloadUrl = await storage.ref(
-                                'images-${FirebaseAuth.instance.currentUser!
-                                    .displayName}').getDownloadURL();
-
-                            AddImages(FirebaseAuth.instance.currentUser!.uid, downloadUrl);
-                          }, child: const Text("Добавить фотографии",))
-                        ],
-                      )
-                      :Column(
-                        children: [
-                          Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder:(BuildContext, int index){
-                            return Container(
-                              decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15),bottomLeft:Radius.circular(15) )
-                              ),
-
-                              height: 300,
-                              child: InkWell(
-
-                                  onTap: (){
-                                    showDialog(
-
-                                      builder: (context)=>AlertDialog(
-                                        backgroundColor: Colors.transparent,
-                                        insetPadding: const EdgeInsets.all(2),
-                                        title: Container(
-                                          decoration: const BoxDecoration(),
-                                          width: MediaQuery.of(context).size.width,
-                                          child: Container(
-                                            child: Image.network(
-                                              Images[index],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      context: context,
-                                    );
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 5),
-                                    width: 100,
-                                    child: Image.network(
-                                        Images[index],fit: BoxFit.cover
-                                    ),
-                                  )),
-                            );
-
-                          },
-                          itemCount: CountImages,
-                    ),
+                  const SizedBox(
+                    height: 40,
                   ),
-                          ElevatedButton(onPressed: ()async{
+                  CountImages == 0
+                      ? Column(
+                          children: [
+                            const Text(
+                              "Нет фотографий",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                XFile? image = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+                                setState(() {
+                                  _image = image;
+                                });
 
-                            XFile? image = await ImagePicker().pickImage(
-                                source: ImageSource.gallery);
-                            setState(() {
-                              _image = image;
-                            });
+                                FirebaseStorage storage =
+                                    FirebaseStorage.instance;
+                                try {
+                                  await storage
+                                      .ref(
+                                          'images-${FirebaseAuth.instance.currentUser!.displayName}')
+                                      .putFile(File(_image!.path));
+                                } on FirebaseException catch (e) {
+                                  print(e);
+                                }
+                                var downloadUrl = await storage
+                                    .ref(
+                                        'images-${FirebaseAuth.instance.currentUser!.displayName}')
+                                    .getDownloadURL();
 
-                            FirebaseStorage storage = FirebaseStorage.instance;
-                            try {
-                              await
-                              storage.ref(
-                                  'images-${FirebaseAuth.instance.currentUser!
-                                      .displayName}-${_image!.name}').putFile(File(_image!.path));
-                            } on FirebaseException catch (e) {
-                              print(e);
-                            }
-                            var downloadUrl = await storage.ref(
-                                'images-${FirebaseAuth.instance.currentUser!
-                                    .displayName}-${_image!.name}').getDownloadURL();
+                                AddImages(
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    downloadUrl);
+                              },
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Colors.orangeAccent)),
+                              child: const Text(
+                                "Добавить фотографии",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            )
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Container(
+                              height: 100,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (BuildContext, int index) {
+                                  return Container(
+                                    decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            bottomLeft: Radius.circular(15))),
+                                    height: 300,
+                                    child: InkWell(
+                                        onTap: () {
+                                          showDialog(
+                                            builder: (context) => AlertDialog(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              insetPadding:
+                                                  const EdgeInsets.all(2),
+                                              title: Container(
+                                                decoration:
+                                                    const BoxDecoration(),
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                child: Container(
+                                                  child: Image.network(
+                                                    Images[index],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            context: context,
+                                          );
+                                        },
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 5),
+                                          width: 100,
+                                          child: Image.network(Images[index],
+                                              fit: BoxFit.cover),
+                                        )),
+                                  );
+                                },
+                                itemCount: CountImages,
+                              ),
+                            ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  XFile? image = await ImagePicker()
+                                      .pickImage(source: ImageSource.gallery);
+                                  setState(() {
+                                    _image = image;
+                                  });
 
-                            AddImages(FirebaseAuth.instance.currentUser!.uid, downloadUrl);
-                          }, child: const Text("Добавить фотографии",))
-                        ],
-                      ),
+                                  FirebaseStorage storage =
+                                      FirebaseStorage.instance;
+                                  try {
+                                    await storage
+                                        .ref(
+                                            'images-${FirebaseAuth.instance.currentUser!.displayName}-${_image!.name}')
+                                        .putFile(File(_image!.path));
+                                  } on FirebaseException catch (e) {
+                                    print(e);
+                                  }
+                                  var downloadUrl = await storage
+                                      .ref(
+                                          'images-${FirebaseAuth.instance.currentUser!.displayName}-${_image!.name}')
+                                      .getDownloadURL();
+
+                                  AddImages(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      downloadUrl);
+                                },
+                                child: const Text(
+                                  "Добавить фотографии",
+                                ))
+                          ],
+                        ),
                   // const SizedBox(height: 20,),
                   // Row(
                   //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -503,7 +550,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   //   ),
                   // ),
                   // const SizedBox(height: 20,),
-
                 ],
               ),
             ),
@@ -511,19 +557,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ],
     );
-
   }
 
-
-  AddImages(String uid,String url)async{
-    await FirebaseFirestore.instance.collection('users')
-        .doc(uid)
-        .update({
-      "images":FieldValue.arrayUnion([url])
+  AddImages(String uid, String url) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      "images": FieldValue.arrayUnion([url])
     });
-
   }
 }
-
-
-

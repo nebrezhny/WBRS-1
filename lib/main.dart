@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/helper/global.dart';
@@ -113,7 +115,7 @@ class _MyAppState extends State<MyApp> {
       home: _isSignedIn
           ? _isRegistrationEnd
               ? const HomePage()
-              : const AboutUserWriting()
+              : const HomePage()
           : const LoginPage(),
     );
   }

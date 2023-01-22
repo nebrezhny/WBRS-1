@@ -55,13 +55,13 @@ class _ProfilesListState extends State<ProfilesList> {
 
   late FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   get users => firebaseFirestore.collection("users").snapshots();
-  int age = int.parse(GlobalAge.toString());
+  //int age = int.parse(GlobalAge.toString());
 
   var collection = FirebaseFirestore.instance
           .collection('users')
           .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          // .orderBy('uid')
-          // .orderBy('age')
+      // .orderBy('uid')
+      // .orderBy('age')
       // .startAt([int.parse(GlobalAge.toString()) - 10])
       // .endAt([int.parse(GlobalAge.toString()) + 10])
       ;
@@ -146,13 +146,14 @@ class _ProfilesListState extends State<ProfilesList> {
                           Group == "зелёно-белая" ||
                           Group == "зелёно-оранжевая"
                       ? StreamBuilder<QuerySnapshot>(
-                          stream: collection.where("группа", whereIn: <String>[
-                            "красно-белая",
-                            "оранжево-красная",
-                            "оранжево-зелёная",
-                            "красно-оранжевая",
-                            "оранжево-белая"
-                          ])
+                          stream: collection
+                              .where("группа", whereIn: <String>[
+                                "красно-белая",
+                                "оранжево-красная",
+                                "оранжево-зелёная",
+                                "красно-оранжевая",
+                                "оранжево-белая"
+                              ])
                               //.orderBy('age', descending: true)
                               .orderBy('uid')
                               .snapshots(),
@@ -177,12 +178,13 @@ class _ProfilesListState extends State<ProfilesList> {
                               Group == "бело-зелёная" ||
                               Group == "бело-оранжевая"
                           ? StreamBuilder<QuerySnapshot>(
-                              stream: collection.where("группа", whereIn: [
-                                "красно-белая",
-                                "красно-зелёная",
-                                "красно-оранжевая",
-                                "оранжево-белая"
-                              ])
+                              stream: collection
+                                  .where("группа", whereIn: [
+                                    "красно-белая",
+                                    "красно-зелёная",
+                                    "красно-оранжевая",
+                                    "оранжево-белая"
+                                  ])
                                   //.orderBy('age', descending: true)
                                   .orderBy('uid')
                                   .snapshots(),
@@ -284,7 +286,7 @@ class _ProfilesListState extends State<ProfilesList> {
         return
             //snapshot.data!.docs[index]["age"]>=10 && snapshot.data!.docs[index]["age"]<=19
             Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 3),
           child: GestureDetector(
             onTap: () async {
               DocumentSnapshot doc = await FirebaseFirestore.instance

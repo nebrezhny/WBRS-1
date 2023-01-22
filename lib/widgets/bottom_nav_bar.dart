@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/pages/home_page.dart';
@@ -31,8 +32,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             .get();
         Images = doc.get('images');
         CountImages = Images.length;
-        print(Images);
-        print(CountImages);
 
         await FirebaseFirestore.instance
             .collection("users")
@@ -67,7 +66,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             ));
         break;
       case 1:
-        nextScreen(context, HomePage());
+        nextScreen(context, const HomePage());
         break;
       case 2:
         FirebaseFirestore.instance
@@ -92,25 +91,41 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                   FirebaseAuth.instance.currentUser!.displayName.toString(),
             ));
         break;
+      case 3:
+        nextScreen(context, const HomePage());
+        break;
     }
     ;
   }
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: Colors.transparent,
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Профиль"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.message_outlined), label: "Чаты"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.people), label: "Пользователи"),
+    return CurvedNavigationBar(
+      items: const [
+        Icon(
+          Icons.person,
+          size: 30,
+        ),
+        Icon(
+          Icons.message_outlined,
+          size: 30,
+        ),
+        Icon(
+          Icons.people,
+          size: 30,
+        ),
+        Icon(
+          Icons.access_alarm_sharp,
+          size: 30,
+        ),
       ],
-      currentIndex: _selectedIndex,
+      index: _selectedIndex,
+      backgroundColor: Colors.transparent,
+      animationDuration: const Duration(milliseconds: 300),
+      color: Colors.orangeAccent.shade400,
+      buttonBackgroundColor: Colors.orangeAccent.shade100,
       onTap: _onItemTapped,
-      unselectedItemColor: Colors.white,
-      selectedItemColor: Colors.white,
+      height: 60,
     );
   }
 }
