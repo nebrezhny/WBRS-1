@@ -27,83 +27,80 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+    getAndSetMessages();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          title: Text(widget.groupName),
-          backgroundColor: Theme.of(context).primaryColor,
-          actions: [
-          ],
-        ),
-        body: Container(
-          child: Stack(
-            children: [
-              chatMessages(),
-              const Padding(padding: EdgeInsets.only(bottom: 50.0)),
+      appBar: AppBar(
+        toolbarTextStyle: const TextStyle(color: Colors.black),
+        title: Text(widget.groupName),
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.people))],
+        backgroundColor: Colors.orangeAccent,
+      ),
+      body: Stack(
+        children: [
+          chatMessages(),
+          const Padding(padding: EdgeInsets.only(bottom: 50.0)),
 
-              Container(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                width: MediaQuery.of(context).size.width,
-                color: Colors.grey[700],
-
-                child: Row(children: [
-                  Expanded(
-                      child: TextFormField(
-                        controller: messageController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: "Отправить сообщение...",
-                          hintStyle: const TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      )),
-                  GestureDetector(
-                    onTap: () {
-                      sendMessage();
-                    },
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                    ),
-                  )
-                ]),
-              ),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              width: MediaQuery.of(context).size.width,
+              color: Colors.grey[700],
+              child: Row(children: [
+                Expanded(
+                    child: TextFormField(
+                  controller: messageController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: "Отправить сообщение...",
+                    hintStyle: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                )),
+                GestureDetector(
+                  onTap: () {
+                    sendMessage();
+                  },
+                  child: const Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
                 )
-              // chat messages here
-
-            ],
-          ),
-        ),
+              ]),
+            ),
+          )
+          // chat messages here
+        ],
+      ),
     );
+  }
+
+  getAndSetMessages() async {
+    chats = await DatabaseService().getGroupMessages(widget.groupId);
+    setState(() {});
   }
 
   chatMessages() {
     return StreamBuilder(
-        stream: chats,
-        builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
-              ? ListView.builder(
-                  padding: EdgeInsets.only(bottom: 70, top:16),
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    return MessageTile(
-                        message: snapshot.data.docs[index]['message'],
-                        sender: snapshot.data.docs[index]['sender'],
-                        sentByMe: widget.email ==
-                            snapshot.data.docs[index]['sender']);
-
-                  },
-                )
-              : Container();
-        },
+      stream: chats,
+      builder: (context, AsyncSnapshot snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+                padding: const EdgeInsets.only(bottom: 70, top: 16),
+                itemCount: snapshot.data.docs.length,
+                itemBuilder: (context, index) {
+                  return MessageTile(
+                      message: snapshot.data.docs[index]['message'],
+                      sender: snapshot.data.docs[index]['sender'],
+                      sentByMe:
+                          widget.email == snapshot.data.docs[index]['sender']);
+                },
+              )
+            : Container();
+      },
     );
   }
 
@@ -115,10 +112,9 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().millisecondsSinceEpoch,
       };
 
-      DatabaseService().sendMessage(widget.groupId, chatMessageMap);
+      DatabaseService().sendMessageGroup(widget.groupId, chatMessageMap);
       setState(() {
-        messageController.clear(
-        );
+        messageController.clear();
       });
     }
   }
@@ -127,4 +123,3 @@ class _ChatPageState extends State<ChatPage> {
     return Future.value(false);
   }
 }
-

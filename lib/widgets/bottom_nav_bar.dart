@@ -3,6 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/pages/home_page.dart';
+import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/profile_page.dart';
 import 'package:messenger/pages/profiles_list.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -16,12 +17,10 @@ class MyBottomNavigationBar extends StatefulWidget {
   State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
 }
 
-int _selectedIndex = selectedIndex;
-
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   void _onItemTapped(int index) async {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
 
     switch (index) {
@@ -92,7 +91,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             ));
         break;
       case 3:
-        nextScreen(context, const HomePage());
+        nextScreen(context, const MeetingPage());
         break;
     }
     ;
@@ -119,7 +118,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           size: 30,
         ),
       ],
-      index: _selectedIndex,
+      index: selectedIndex,
       backgroundColor: Colors.transparent,
       animationDuration: const Duration(milliseconds: 300),
       color: Colors.orangeAccent.shade400,

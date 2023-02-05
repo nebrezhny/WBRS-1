@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/auth/writing_data_user.dart';
 import 'package:messenger/pages/home_page.dart';
+import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/shop.dart';
 import 'package:messenger/widgets/widgets.dart';
 
@@ -28,7 +31,6 @@ class _MyDrawerState extends State<MyDrawer> {
   AuthService authService = AuthService();
 
   Stream? groups;
-  bool _isLoading = false;
   String groupName = "";
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,9 @@ class _MyDrawerState extends State<MyDrawer> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () async {
+                    setState(() {
+                      selectedIndex = 0;
+                    });
                     await FirebaseFirestore.instance
                         .collection("users")
                         .where("fullName",
@@ -93,7 +98,7 @@ class _MyDrawerState extends State<MyDrawer> {
                           FirebaseAuth.instance.currentUser!.photoURL == "" ||
                                   FirebaseAuth.instance.currentUser!.photoURL ==
                                       null
-                              ? Icon(
+                              ? const Icon(
                                   Icons.account_circle,
                                   size: 150,
                                   color: Colors.white,
@@ -133,14 +138,24 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 2,
                 ),
                 ListTile(
-                  title: Text("Заполнение"),
+                  leading: const Icon(
+                    Icons.question_answer,
+                    color: Colors.grey,
+                  ),
+                  title: const Text(
+                    "Пройти тест",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   onTap: () {
-                    nextScreenReplace(context, AboutUserWriting());
+                    nextScreenReplace(context, const AboutUserWriting());
                   },
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, HomePage());
+                    setState(() {
+                      selectedIndex = 1;
+                    });
+                    nextScreenReplace(context, const HomePage());
                     //   setState(() {
                     //     _selectedIndex=index;
                     //   });
@@ -159,14 +174,16 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () async {
+                    setState(() {
+                      selectedIndex = 0;
+                      print(selectedIndex);
+                    });
                     DocumentSnapshot doc = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(uid)
                         .get();
                     Images = doc.get('images');
                     CountImages = Images.length;
-                    print(Images);
-                    print(CountImages);
 
                     await FirebaseFirestore.instance
                         .collection("users")
@@ -201,8 +218,6 @@ class _MyDrawerState extends State<MyDrawer> {
                           deti: GlobalDeti,
                           pol: GlobalPol.toString(),
                         ));
-                    print(userName);
-                    print(FirebaseAuth.instance.currentUser!.displayName);
                   },
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -217,6 +232,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () async {
+                    setState(() {
+                      selectedIndex = 2;
+                    });
                     await FirebaseFirestore.instance
                         .collection("users")
                         .where("fullName", isEqualTo: userName)
@@ -236,22 +254,48 @@ class _MyDrawerState extends State<MyDrawer> {
                           email: email,
                         ));
                   },
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.people,
                     color: Colors.grey,
                   ),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  title: Text(
+                  title: const Text(
                     "Список пользователей",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, ShopPage());
+                    nextScreenReplace(context, const ShopPage());
                   },
                   title: const Text("Магазин",
+                      style: TextStyle(color: Colors.white)),
+                  leading: const Icon(
+                    Icons.shopping_basket,
+                    color: Colors.grey,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                ),
+                ListTile(
+                  onTap: () {
+                    nextScreenReplace(context, const MeetingPage());
+                  },
+                  title: const Text("Встречи",
+                      style: TextStyle(color: Colors.white)),
+                  leading: const Icon(
+                    Icons.shopping_basket,
+                    color: Colors.grey,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                ),
+                ListTile(
+                  onTap: () {
+                    nextScreenReplace(context, const ShopPage());
+                  },
+                  title: const Text("О приложении",
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.shopping_basket,

@@ -280,6 +280,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Radius.circular(50.0))),
                                 child: IconButton(
                                     onPressed: () {
+                                      setState(() {
+                                        selectedIndex = 3;
+                                      });
                                       nextScreenReplace(
                                           context,
                                           ProfilesList(
