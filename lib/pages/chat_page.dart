@@ -109,7 +109,7 @@ class _ChatPageState extends State<ChatPage> {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text,
         "sender": widget.email,
-        "time": DateTime.now().millisecondsSinceEpoch,
+        "time": DateTime.now(),
       };
 
       DatabaseService().sendMessageGroup(widget.groupId, chatMessageMap);

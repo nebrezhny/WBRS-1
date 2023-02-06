@@ -12,6 +12,7 @@ import 'package:messenger/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../helper/global.dart';
+import '../../helper/helper_function.dart';
 import '../test/red_group.dart';
 
 class AboutUserWriting extends StatefulWidget {
@@ -34,12 +35,21 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   String imageUrl = " ";
   String chatIdThis = "";
   XFile? _image;
-
+  bool _isSignedIn = false;
   String? deti;
   String? pol;
   bool Deti = false;
 
   bool Is18 = false;
+  getUserLoggedInStatus() async {
+    await HelperFunctions.getUserLoggedInStatus().then((value) {
+      if (value != null) {
+        setState(() {
+          _isSignedIn = value;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +73,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
           height: 50,
         ),
         Scaffold(
+          appBar: AppBar(),
           backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           body: SingleChildScrollView(

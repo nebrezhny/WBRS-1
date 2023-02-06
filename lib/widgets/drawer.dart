@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
+import 'package:messenger/pages/about_app.dart';
 import 'package:messenger/pages/auth/writing_data_user.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
@@ -267,7 +268,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, const ShopPage());
+                    nextScreenReplace(context, MyApp());
                   },
                   title: const Text("Магазин",
                       style: TextStyle(color: Colors.white)),
@@ -285,20 +286,21 @@ class _MyDrawerState extends State<MyDrawer> {
                   title: const Text("Встречи",
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
-                    Icons.shopping_basket,
+                    Icons.person_pin_circle,
                     color: Colors.grey,
+                    size: 30,
                   ),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, const ShopPage());
+                    nextScreenReplace(context, const About_App());
                   },
                   title: const Text("О приложении",
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
-                    Icons.shopping_basket,
+                    Icons.info,
                     color: Colors.grey,
                   ),
                   contentPadding:

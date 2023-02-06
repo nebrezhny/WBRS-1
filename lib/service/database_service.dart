@@ -244,6 +244,7 @@ class DatabaseService {
         .collection("meets")
         .doc(chatRoomId)
         .collection("messages")
+        .orderBy('time', descending: false)
         .snapshots();
   }
 

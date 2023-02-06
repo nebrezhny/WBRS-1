@@ -38,6 +38,7 @@ class _MeetingPageState extends State<MeetingPage> {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: const Text("Встречи"),
+              backgroundColor: Colors.transparent,
             ),
             bottomNavigationBar: const MyBottomNavigationBar(),
             drawer: const MyDrawer(),
@@ -50,6 +51,7 @@ class _MeetingPageState extends State<MeetingPage> {
                 child: Column(
                   children: [
                     Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 10),
                       decoration: const BoxDecoration(
@@ -59,26 +61,34 @@ class _MeetingPageState extends State<MeetingPage> {
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 300,
-                            height: 50,
+                            width: 295,
                             child: TextField(
                               controller: city,
                               style: const TextStyle(),
                               decoration: const InputDecoration(
                                 alignLabelWithHint: false,
                                 border: InputBorder.none,
-                                hintText: "Москва",
+                                hintText: "Введите ваш город",
                                 hintStyle: TextStyle(
-                                    color: Colors.black,
+                                    color: Colors.grey,
                                     fontWeight: FontWeight.w400,
                                     fontSize: 18),
                               ),
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                meets = FirebaseFirestore.instance
+                                    .collection('meets')
+                                    .where('city', isEqualTo: city.text)
+                                    .snapshots();
+                              });
+                              print(city.text);
+                            },
                             icon: const Icon(Icons.search),
-                            splashRadius: 10,
+                            iconSize: 25,
+                            splashRadius: 1,
                             splashColor: Colors.black,
                           )
                         ],
@@ -87,9 +97,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     SizedBox(
                         height: 1000,
                         child: StreamBuilder<Object>(
-                            stream: meets = FirebaseFirestore.instance
-                                .collection('meets')
-                                .snapshots(),
+                            stream: meets,
                             builder: (context, AsyncSnapshot snapshot) {
                               return snapshot.hasData
                                   ? ListView.builder(
@@ -119,23 +127,31 @@ class _MeetingPageState extends State<MeetingPage> {
 Widget kartovhkaVstrechi(
     context, AsyncSnapshot snapshot, int index, CollectionReference meets) {
   return snapshot.hasData
-      ? GestureDetector(
-          onTap: (() {
-            nextScreen(context, const AboutMeet());
-          }),
-          child: Container(
-            margin: const EdgeInsets.all(12),
-            color: Colors.white,
-            height: 70,
-            width: double.infinity,
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(snapshot.data.docs[index]['name']),
-                  Text(snapshot.data.docs[index]['city']),
-                  Text(snapshot.data.docs[index]['type']),
-                ]),
+      ? Container(
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.all(Radius.circular(18))),
+          child: GestureDetector(
+            onTap: (() {
+              nextScreen(context, const AboutMeet());
+            }),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  color: Colors.white),
+              margin: const EdgeInsets.all(12),
+              height: 70,
+              width: double.infinity,
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(snapshot.data.docs[index]['name']),
+                    Text(snapshot.data.docs[index]['city']),
+                    Text(snapshot.data.docs[index]['type']),
+                  ]),
+            ),
           ),
         )
       : Container();

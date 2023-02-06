@@ -29,6 +29,9 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  tinkoff_acquiring: ^3.0.9
+  tinkoff_acquiring_flutter: ^3.0.9
+
   cloud_firestore: ^4.0.4
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.1.1
