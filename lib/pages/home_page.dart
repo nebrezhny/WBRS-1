@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
@@ -290,27 +291,26 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             drawer: MyDrawer(),
-            body: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                  child: StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('chats')
-                          .snapshots(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (!snapshot.hasData) {
-                          return Text(
-                            "Нет чатов",
-                            textAlign: TextAlign.center,
-                          );
-                        } else {
-                          return chatRoomsList(
-                              snapshot,
-                              FirebaseAuth.instance.currentUser!.displayName
-                                  .toString());
-                        }
-                      })),
+            body: Container(
+              height: 10000,
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('chats')
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Text(
+                        "Нет чатов",
+                        textAlign: TextAlign.center,
+                      );
+                    } else {
+                      return chatRoomsList(
+                          snapshot,
+                          FirebaseAuth.instance.currentUser!.displayName
+                              .toString());
+                    }
+                  }),
             )),
       ],
     );

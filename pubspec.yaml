@@ -31,7 +31,7 @@ environment:
 dependencies:
   tinkoff_acquiring: ^3.0.9
   tinkoff_acquiring_flutter: ^3.0.9
-
+  path_provider:
   cloud_firestore: ^4.0.4
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.1.1

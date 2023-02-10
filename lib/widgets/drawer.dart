@@ -9,6 +9,7 @@ import 'package:messenger/pages/auth/writing_data_user.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/shop.dart';
+import 'package:messenger/pages/test/kvadrat.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../pages/auth/login_page.dart';
@@ -148,7 +149,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onTap: () {
-                    nextScreenReplace(context, const AboutUserWriting());
+                    //nextScreenReplace(context, const AboutUserWriting());
+                    nextScreen(context, AboutUserWriting());
                   },
                 ),
                 ListTile(

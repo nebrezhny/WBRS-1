@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -8,11 +9,14 @@ class ChatPage extends StatefulWidget {
   final String groupId;
   final String groupName;
   final String email;
+  final List users;
   const ChatPage(
       {Key? key,
       required this.groupId,
       required this.groupName,
-      required this.email})
+      required this.email,
+      required this.users
+      })
       : super(key: key);
 
   @override
@@ -21,22 +25,36 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   Stream<QuerySnapshot>? chats;
+  Stream? users_in_meet;
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
   TextEditingController messageController = TextEditingController();
   String admin = "";
+  late List users_id;
+
 
   @override
   void initState() {
     super.initState();
     getAndSetMessages();
+    getUsers();
+    users_id = widget.users;
   }
 
   @override
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarTextStyle: const TextStyle(color: Colors.black),
         title: Text(widget.groupName),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.people))],
+        actions: [IconButton(onPressed: () {
+          showDialog(context: context, builder: (context){
+            return SizedBox(
+              child: listUsers()
+            );
+          });
+        }, icon: const Icon(Icons.people))],
         backgroundColor: Colors.orangeAccent,
       ),
       body: Stack(
@@ -83,6 +101,11 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  getUsers() async {
+    users_in_meet = await FirebaseFirestore.instance.collection('meets').doc(widget.groupId).snapshots();
+    setState(() {});
+  }
+
   chatMessages() {
     return StreamBuilder(
       stream: chats,
@@ -101,6 +124,26 @@ class _ChatPageState extends State<ChatPage> {
               )
             : Container();
       },
+    );
+  }
+
+  listUsers(){
+    return StreamBuilder(
+      stream: users_in_meet,
+      builder: (context, AsyncSnapshot snapshot){
+        return ListView.builder(
+          itemCount: widget.users.length,
+            itemBuilder: (context, index){
+                  return MaterialApp(
+                    home: UserAccountsDrawerHeader(
+                        accountName: Text(users.doc(users_id[index]).get('name')),
+                        accountEmail: Text(snapshot.data.docs[index]['users'])
+                    ),
+                  );
+                }
+              );
+            }
+
     );
   }
 
