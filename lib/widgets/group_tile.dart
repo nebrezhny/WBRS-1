@@ -29,6 +29,7 @@ class _ChatTileState extends State<ChatTile> {
               groupId: widget.chatId,
               groupName: widget.userName2,
               email: widget.userName,
+              users: [],
             ));
       },
       child: Container(

@@ -15,8 +15,7 @@ class ChatPage extends StatefulWidget {
       required this.groupId,
       required this.groupName,
       required this.email,
-      required this.users
-      })
+      required this.users})
       : super(key: key);
 
   @override
@@ -31,7 +30,6 @@ class _ChatPageState extends State<ChatPage> {
   String admin = "";
   late List users_id;
 
-
   @override
   void initState() {
     super.initState();
@@ -41,20 +39,22 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarTextStyle: const TextStyle(color: Colors.black),
         title: Text(widget.groupName),
-        actions: [IconButton(onPressed: () {
-          showDialog(context: context, builder: (context){
-            return SizedBox(
-              child: listUsers()
-            );
-          });
-        }, icon: const Icon(Icons.people))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return SizedBox(child: listUsers());
+                    });
+              },
+              icon: const Icon(Icons.people))
+        ],
         backgroundColor: Colors.orangeAccent,
       ),
       body: Stack(
@@ -102,7 +102,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getUsers() async {
-    users_in_meet = await FirebaseFirestore.instance.collection('meets').doc(widget.groupId).snapshots();
+    users_in_meet = await FirebaseFirestore.instance
+        .collection('meets')
+        .doc(widget.groupId)
+        .snapshots();
     setState(() {});
   }
 
@@ -127,24 +130,20 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  listUsers(){
+  listUsers() {
     return StreamBuilder(
-      stream: users_in_meet,
-      builder: (context, AsyncSnapshot snapshot){
-        return ListView.builder(
-          itemCount: widget.users.length,
-            itemBuilder: (context, index){
-                  return MaterialApp(
-                    home: UserAccountsDrawerHeader(
-                        accountName: Text(users.doc(users_id[index]).get('name')),
-                        accountEmail: Text(snapshot.data.docs[index]['users'])
-                    ),
-                  );
-                }
-              );
-            }
-
-    );
+        stream: users_in_meet,
+        builder: (context, AsyncSnapshot snapshot) {
+          return ListView.builder(
+              itemCount: widget.users.length,
+              itemBuilder: (context, index) {
+                return MaterialApp(
+                  home: UserAccountsDrawerHeader(
+                      accountName: Text(''),
+                      accountEmail: Text(snapshot.data.docs[index]['users'])),
+                );
+              });
+        });
   }
 
   sendMessage() {
