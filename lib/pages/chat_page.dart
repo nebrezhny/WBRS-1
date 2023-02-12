@@ -1,9 +1,21 @@
+import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:messenger/helper/global.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+class UserInfo {
+  String name;
+  String age;
+  String city;
+  String image_url;
+
+  UserInfo(this.name, this.age, this.city, this.image_url);
+}
 
 class ChatPage extends StatefulWidget {
   final String groupId;
@@ -25,17 +37,17 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   Stream<QuerySnapshot>? chats;
   Stream? users_in_meet;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+
   TextEditingController messageController = TextEditingController();
   String admin = "";
-  late List users_id;
+
+  List<UserInfo> user_info = [];
 
   @override
   void initState() {
     super.initState();
     getAndSetMessages();
     getUsers();
-    users_id = widget.users;
   }
 
   @override
@@ -46,11 +58,37 @@ class _ChatPageState extends State<ChatPage> {
         title: Text(widget.groupName),
         actions: [
           IconButton(
-              onPressed: () {
-                showDialog(
+              onPressed: () async {
+                for (int i = 0; i < widget.users.length; i++) {
+                  DocumentSnapshot doc = await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.users[i])
+                      .get();
+                  try {
+                    UserInfo some_user_info = UserInfo(
+                        doc.get('fullName'),
+                        doc.get('age').toString(),
+                        doc.get('city'),
+                        doc.get('profilePic'));
+                    user_info.add(some_user_info);
+                  } on Exception catch (e) {
+                    showSnackbar(context, Colors.red, e);
+                  }
+                }
+                showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return SizedBox(child: listUsers());
+                      return Scaffold(
+                        appBar: AppBar(
+                          backgroundColor: Colors.orangeAccent,
+                          title: const Text('Список пользователей'),
+                        ),
+                        body: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 15),
+                          child: listUsers(),
+                        ),
+                      );
                     });
               },
               icon: const Icon(Icons.people))
@@ -109,6 +147,11 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  getUserInfo(String id) async {
+    DocumentSnapshot doc =
+        await FirebaseFirestore.instance.collection('users').doc(id).get();
+  }
+
   chatMessages() {
     return StreamBuilder(
       stream: chats,
@@ -137,10 +180,18 @@ class _ChatPageState extends State<ChatPage> {
           return ListView.builder(
               itemCount: widget.users.length,
               itemBuilder: (context, index) {
-                return MaterialApp(
-                  home: UserAccountsDrawerHeader(
-                      accountName: Text(''),
-                      accountEmail: Text(snapshot.data.docs[index]['users'])),
+                return Card(
+                  child: ListTile(
+                    title: Center(child: Text(user_info[index].age)),
+                    leading: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(user_info[index].name),
+                      ],
+                    ),
+                    trailing: Text(user_info[index].city),
+                    dense: false,
+                  ),
                 );
               });
         });

@@ -5,10 +5,12 @@ import 'package:messenger/pages/chat_page.dart';
 import 'package:messenger/pages/chatscreen.dart';
 
 class AboutMeet extends StatefulWidget {
-  String id='';
-  String name='';
+  String id = '';
+  String name = '';
   List users;
-  AboutMeet({Key?key, required this.id, required this.users, required this.name}):super(key:key);
+  AboutMeet(
+      {Key? key, required this.id, required this.users, required this.name})
+      : super(key: key);
 
   @override
   State<AboutMeet> createState() => _AboutMeetState();
@@ -16,8 +18,7 @@ class AboutMeet extends StatefulWidget {
 
 class _AboutMeetState extends State<AboutMeet> {
   @override
-  Widget build(BuildContext context)  {
-
+  Widget build(BuildContext context) {
     return ChatPage(
       groupId: widget.id,
       groupName: widget.name,
