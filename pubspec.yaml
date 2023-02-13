@@ -52,6 +52,7 @@ dependencies:
   curved_navigation_bar: 
   firebase_in_app_messaging:
   platform_device_id:
+  flutter_local_notifications:
 
 
 dev_dependencies:

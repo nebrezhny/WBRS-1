@@ -1,17 +1,14 @@
-import 'dart:ffi';
-import 'dart:io';
+// ignore_for_file: non_constant_identifier_names
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:messenger/helper/global.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:platform_device_id/platform_device_id.dart';
-import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+
+import '../service/notifications.dart';
 
 class UserInfo {
   String name;
@@ -77,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
       sound: true,
     );
 
-    firebaseMessaging.getNotificationSettings(IosNotificationsSettings());
+    firebaseMessaging.getNotificationSettings();
 
     print(settings.authorizationStatus);
   }
@@ -240,6 +237,7 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 return Card(
                   child: ListTile(
+                    onTap: () => nextScreen(context, const MainScreen()),
                     title: Text(user_info[index].name),
                     subtitle: Row(
                       children: [
