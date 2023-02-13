@@ -29,16 +29,16 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  tinkoff_acquiring: ^3.0.9
-  tinkoff_acquiring_flutter: ^3.0.9
+  tinkoff_acquiring: 
+  tinkoff_acquiring_flutter: 
   path_provider:
-  cloud_firestore: ^4.0.4
-  cupertino_icons: ^1.0.2
-  firebase_auth: ^4.1.1
-  firebase_core: ^2.1.1
+  cloud_firestore:
+  cupertino_icons: 
+  firebase_auth: 
+  firebase_core: ^2.5.0
   flutter:
     sdk: flutter
-  shared_preferences: ^2.0.15
+  shared_preferences: 
   image_picker:
   file_picker:
   random_string:
@@ -46,9 +46,12 @@ dependencies:
   url_launcher:
   firebase_messaging:
   flutter_bloc:
-  equatable: ^2.0.5
+  equatable:
+  firebase_core_platform_interface:
   google_fonts:
-  curved_navigation_bar: ^1.0.3
+  curved_navigation_bar: 
+  firebase_in_app_messaging:
+  platform_device_id:
 
 
 dev_dependencies:

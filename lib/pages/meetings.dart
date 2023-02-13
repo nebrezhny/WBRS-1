@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:messenger/pages/about_meet.dart';
 import 'package:messenger/widgets/bottom_nav_bar.dart';
 import 'package:messenger/widgets/drawer.dart';
@@ -14,20 +15,18 @@ class MeetingPage extends StatefulWidget {
 }
 
 class _MeetingPageState extends State<MeetingPage> {
-
-
   @override
-  void initState(){
-    meets = FirebaseFirestore.instance
-        .collection('meets')
-        .snapshots();
+  void initState() {
+    meets = FirebaseFirestore.instance.collection('meets').snapshots();
   }
 
-
   Stream<QuerySnapshot>? meets;
-  CollectionReference collectionReference=FirebaseFirestore.instance.collection('meets');
+  CollectionReference collectionReference =
+      FirebaseFirestore.instance.collection('meets');
   TextEditingController name_meet = TextEditingController();
   TextEditingController city = TextEditingController();
+  TextEditingController description = TextEditingController();
+  TextEditingController date_and_time = TextEditingController();
   late int kolvo_users;
 
   Widget build(BuildContext context) {
@@ -51,74 +50,155 @@ class _MeetingPageState extends State<MeetingPage> {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-
               actions: [
-                IconButton(onPressed: (){
-                  showDialog(
+                IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              child: Scaffold(
+                                appBar: AppBar(
+                                  title: const Text("Создание новой встречи"),
+                                  backgroundColor: Colors.orangeAccent,
+                                ),
+                                body: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        TextField(
+                                          controller: name_meet,
+                                          decoration: const InputDecoration(
+                                              hintText:
+                                                  'Введите название встречи',
+                                              border: InputBorder.none,
+                                              enabledBorder:
+                                                  OutlineInputBorder(),
+                                              focusedBorder:
+                                                  OutlineInputBorder(),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                        ),
+                                        const SizedBox(
+                                          height: 30,
+                                        ),
+                                        TextField(
+                                          controller: city,
+                                          decoration: const InputDecoration(
+                                              hintText: 'Введите город встречи',
+                                              border: InputBorder.none,
+                                              enabledBorder:
+                                                  OutlineInputBorder(),
+                                              focusedBorder:
+                                                  OutlineInputBorder(),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                        ),
+                                        const SizedBox(
+                                          height: 30,
+                                        ),
+                                        TextField(
+                                          maxLength: 30,
+                                          controller: description,
+                                          decoration: const InputDecoration(
+                                              hintText:
+                                                  'Введите краткое описание встречи',
+                                              border: InputBorder.none,
+                                              enabledBorder:
+                                                  OutlineInputBorder(),
+                                              focusedBorder:
+                                                  OutlineInputBorder(),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        TextFormField(
+                                          enableInteractiveSelection: true,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp('[0-9.:/ ]')),
+                                          ],
+                                          controller: date_and_time,
+                                          keyboardType: TextInputType.datetime,
+                                          decoration: const InputDecoration(
+                                              hintText:
+                                                  'Введите дату и время встречи',
+                                              border: InputBorder.none,
+                                              enabledBorder:
+                                                  OutlineInputBorder(),
+                                              focusedBorder:
+                                                  OutlineInputBorder(),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        TextButton(
+                                            onPressed: () {
+                                              if (name_meet.text == '') {
+                                                showSnackbar(
+                                                    context,
+                                                    Colors.red,
+                                                    'Введите название!');
+                                              }
+                                              if (city.text == '') {
+                                                showSnackbar(
+                                                    context,
+                                                    Colors.red,
+                                                    'Введите город!');
+                                              } else {
+                                                collectionReference.add({
+                                                  'name': name_meet.text,
+                                                  'city': city.text,
+                                                  'description':
+                                                      description.text,
+                                                  'datetime':
+                                                      date_and_time.text,
+                                                  'admin': FirebaseAuth.instance
+                                                      .currentUser!.uid,
+                                                  'users': [
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid
+                                                  ],
+                                                  'type': "группа",
+                                                  'recentMessage': '',
+                                                  'recentMessageSender': '',
+                                                });
+                                                Navigator.pop(context);
+                                              }
 
-                      context: context,
-
-                      builder: (context){
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      child: Scaffold(
-                        appBar: AppBar(
-                          title: const Text("Создание новой встречи"),
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                        body: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                          child: Column(
-                            children:[
-                              TextField(
-                                controller: name_meet,
-                                decoration: const InputDecoration(
-                                  hintText: 'Введите название встречи',
-                                  border: InputBorder.none,
-                                  enabledBorder: OutlineInputBorder(),
-                                  focusedBorder: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 5)
+                                              setState(() {
+                                                name_meet.clear();
+                                                city.clear();
+                                                description.clear();
+                                                date_and_time.clear();
+                                              });
+                                            },
+                                            child: const Text(
+                                              "Сохранить",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.orangeAccent),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 10,),
-                              TextField(
-                                controller: city,
-
-                                decoration: const InputDecoration(
-                                    hintText: 'Введите город встречи',
-                                    border: InputBorder.none,
-                                    enabledBorder: OutlineInputBorder(),
-                                    focusedBorder: OutlineInputBorder(),
-
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 5)
-                                ),
-                              ),
-
-                              TextButton(onPressed: (){
-                                if(name_meet.text==''){
-                                  showSnackbar(context, Colors.red, 'Введите название!');
-                                }
-                                if(city.text==''){
-                                  showSnackbar(context, Colors.red, 'Введите город!');
-                                }
-                                else{
-                                  collectionReference.add({
-                                    'name':name_meet.text,
-                                    'city':city.text,
-                                    'admin':FirebaseAuth.instance.currentUser!.uid,
-                                    'users':[FirebaseAuth.instance.currentUser!.uid],
-                                    'type':"группа"
-                                  });
-                                  Navigator.pop(context);
-                                }
-                              }, child: const Text("Сохранить",style: TextStyle(fontSize: 20, color: Colors.orangeAccent),))
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  });
-                }, icon: const Icon(Icons.add))
+                            );
+                          });
+                    },
+                    icon: const Icon(Icons.add))
               ],
               title: const Text("Встречи"),
               backgroundColor: Colors.transparent,
@@ -152,7 +232,6 @@ class _MeetingPageState extends State<MeetingPage> {
                                 alignLabelWithHint: false,
                                 border: InputBorder.none,
                                 hintText: "Введите ваш город",
-
                                 hintStyle: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w400,
@@ -163,17 +242,16 @@ class _MeetingPageState extends State<MeetingPage> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                if(city==''){
+                                if (city == '') {
                                   meets = FirebaseFirestore.instance
                                       .collection('meets')
                                       .snapshots();
-                                }else{
+                                } else {
                                   meets = FirebaseFirestore.instance
                                       .collection('meets')
                                       .where('city', isEqualTo: city.text)
                                       .snapshots();
                                 }
-
                               });
                               print(city.text);
                             },
@@ -194,8 +272,7 @@ class _MeetingPageState extends State<MeetingPage> {
                                   ? ListView.builder(
                                       itemCount: snapshot.data.docs.length,
                                       itemBuilder:
-                                          (BuildContext context, index){
-
+                                          (BuildContext context, index) {
                                         return kartovhkaVstrechi(
                                             context,
                                             snapshot,
@@ -215,8 +292,13 @@ class _MeetingPageState extends State<MeetingPage> {
     );
   }
 
-  Future<int> GetUsers(String id)async{
-    var kolvo_users2=await FirebaseFirestore.instance.collection('users').doc(id).collection('users').snapshots().length;
+  Future<int> GetUsers(String id) async {
+    var kolvo_users2 = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .collection('users')
+        .snapshots()
+        .length;
     return kolvo_users2;
   }
 
@@ -224,38 +306,65 @@ class _MeetingPageState extends State<MeetingPage> {
       context, AsyncSnapshot snapshot, int index, CollectionReference meets) {
     return snapshot.hasData
         ? Container(
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
-          borderRadius: const BorderRadius.all(Radius.circular(18))),
-      child: GestureDetector(
-        onTap: (() async{
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: const BorderRadius.all(Radius.circular(18))),
+            child: GestureDetector(
+              onTap: (() async {
+                DocumentSnapshot doc = await FirebaseFirestore.instance
+                    .collection('meets')
+                    .doc(snapshot.data.docs[index].id)
+                    .get();
+                List users = doc.get('users');
 
-          DocumentSnapshot doc = await FirebaseFirestore.instance.collection('meets').doc(snapshot.data.docs[index].id).get();
-          List users = doc.get('users');
-          nextScreen(context, AboutMeet(id: snapshot.data.docs[index].id, users: users,name: snapshot.data.docs[index]['name'],));
-        }),
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-              color: Colors.white),
-          margin: const EdgeInsets.all(12),
-          height: 70,
-          width: double.infinity,
-          child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(snapshot.data.docs[index]['name']),
-                Text(snapshot.data.docs[index]['city']),
-                Text(snapshot.data.docs[index]['type']),
-              ]),
-        ),
-      ),
-    )
+                bool is_user_join = false;
+
+                for (int i = 0; i < users.length; i++) {
+                  if (users[i] == FirebaseAuth.instance.currentUser!.uid) {
+                    is_user_join = true;
+                  }
+                }
+                nextScreen(
+                    context,
+                    AboutMeet(
+                      id: snapshot.data.docs[index].id,
+                      users: users,
+                      name: snapshot.data.docs[index]['name'],
+                      is_user_join: is_user_join,
+                    ));
+              }),
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Colors.white),
+                margin: const EdgeInsets.all(12),
+                height: 70,
+                width: double.infinity,
+                child: ListTile(
+                  title: Row(children: [
+                    Text(snapshot.data.docs[index]['name']),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(snapshot.data.docs[index]['city']),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(snapshot.data.docs[index]['datetime']),
+                  ]),
+                  subtitle: Row(children: [
+                    Text(
+                        snapshot.data.docs[index]['recentMessageSender'] + ':'),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(snapshot.data.docs[index]['recentMessage']),
+                  ]),
+                ),
+              ),
+            ),
+          )
         : Container();
-
   }
 }
-
-

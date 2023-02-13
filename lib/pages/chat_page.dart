@@ -1,12 +1,17 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 
 class UserInfo {
   String name;
@@ -22,12 +27,14 @@ class ChatPage extends StatefulWidget {
   final String groupName;
   final String email;
   final List users;
+  final bool is_user_join;
   const ChatPage(
       {Key? key,
       required this.groupId,
       required this.groupName,
       required this.email,
-      required this.users})
+      required this.users,
+      required this.is_user_join})
       : super(key: key);
 
   @override
@@ -42,12 +49,37 @@ class _ChatPageState extends State<ChatPage> {
   String admin = "";
 
   List<UserInfo> user_info = [];
+  bool is_user_join = false;
+
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
     getAndSetMessages();
     getUsers();
+    is_user_join = widget.is_user_join;
+
+    getToken();
+  }
+
+  getToken() async {
+    final token = await firebaseMessaging.getInitialMessage();
+    print(token);
+
+    NotificationSettings settings = await firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    firebaseMessaging.getNotificationSettings(IosNotificationsSettings());
+
+    print(settings.authorizationStatus);
   }
 
   @override
@@ -106,26 +138,51 @@ class _ChatPageState extends State<ChatPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               width: MediaQuery.of(context).size.width,
               color: Colors.grey[700],
-              child: Row(children: [
-                Expanded(
-                    child: TextFormField(
-                  controller: messageController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: "Отправить сообщение...",
-                    hintStyle: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                )),
-                GestureDetector(
-                  onTap: () {
-                    sendMessage();
-                  },
-                  child: const Icon(
-                    Icons.send,
-                    color: Colors.white,
-                  ),
-                )
-              ]),
+              child: is_user_join
+                  ? Row(children: [
+                      Expanded(
+                          child: TextFormField(
+                        controller: messageController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          hintText: "Отправить сообщение...",
+                          hintStyle:
+                              TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      )),
+                      GestureDetector(
+                        onTap: () {
+                          sendMessage();
+                        },
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                      )
+                    ])
+                  : Row(
+                      children: [
+                        Expanded(
+                            child: TextFormField(
+                          controller: messageController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            hintText: "Вы не являетесь участником встречи",
+                            hintStyle:
+                                TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        )),
+                        TextButton(
+                            onPressed: () {
+                              joinUser(FirebaseAuth.instance.currentUser!.uid,
+                                  widget.groupId);
+                              setState(() {
+                                is_user_join = true;
+                              });
+                            },
+                            child: const Text('Присоедениться'))
+                      ],
+                    ),
             ),
           )
           // chat messages here
@@ -164,8 +221,9 @@ class _ChatPageState extends State<ChatPage> {
                   return MessageTile(
                       message: snapshot.data.docs[index]['message'],
                       sender: snapshot.data.docs[index]['sender'],
-                      sentByMe:
-                          widget.email == snapshot.data.docs[index]['sender']);
+                      name: snapshot.data.docs[index]['name'],
+                      sentByMe: FirebaseAuth.instance.currentUser!.email ==
+                          snapshot.data.docs[index]['sender']);
                 },
               )
             : Container();
@@ -182,14 +240,38 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 return Card(
                   child: ListTile(
-                    title: Center(child: Text(user_info[index].age)),
-                    leading: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    title: Text(user_info[index].name),
+                    subtitle: Row(
                       children: [
-                        Text(user_info[index].name),
+                        int.parse(user_info[index].age) % 10 == 0
+                            ? Text(user_info[index].age + ' лет')
+                            : int.parse(user_info[index].age) % 10 == 1
+                                ? Text(user_info[index].age + ' год')
+                                : int.parse(user_info[index].age) % 10 != 5
+                                    ? Text(user_info[index].age + ' года')
+                                    : Text(user_info[index].age + ' лет'),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text("Город " + user_info[index].city)
                       ],
                     ),
-                    trailing: Text(user_info[index].city),
+                    leading: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(200),
+                            child: user_info[index].image_url == ''
+                                ? Image.asset('assets/profile.png')
+                                : Image.network(
+                                    user_info[index].image_url,
+                                    fit: BoxFit.cover,
+                                  ),
+                          )),
+                    ),
                     dense: false,
                   ),
                 );
@@ -197,11 +279,17 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
-  sendMessage() {
+  sendMessage() async {
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    String name = doc.get('fullName');
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text,
-        "sender": widget.email,
+        "sender": FirebaseAuth.instance.currentUser!.email,
+        'name': name,
         "time": DateTime.now(),
       };
 
@@ -210,9 +298,22 @@ class _ChatPageState extends State<ChatPage> {
         messageController.clear();
       });
     }
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('ChatList Got a message whilst in the foreground!');
+      print('ChatList Message data: ${message.data}');
+    });
   }
 
   Future<bool> onBackPress() {
     return Future.value(false);
+  }
+
+  joinUser(String uid, String groupID) {
+    widget.users.add(uid);
+    FirebaseFirestore.instance
+        .collection('meets')
+        .doc(groupID)
+        .update({'users': widget.users});
   }
 }

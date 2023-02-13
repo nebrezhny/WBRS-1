@@ -8,8 +8,13 @@ class AboutMeet extends StatefulWidget {
   String id = '';
   String name = '';
   List users;
+  bool is_user_join = false;
   AboutMeet(
-      {Key? key, required this.id, required this.users, required this.name})
+      {Key? key,
+      required this.id,
+      required this.users,
+      required this.name,
+      required this.is_user_join})
       : super(key: key);
 
   @override
@@ -24,6 +29,7 @@ class _AboutMeetState extends State<AboutMeet> {
       groupName: widget.name,
       email: "some",
       users: widget.users,
+      is_user_join: widget.is_user_join,
     );
   }
 }

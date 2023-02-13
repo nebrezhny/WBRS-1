@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class MessageTile extends StatefulWidget {
   final String message;
   final String sender;
+  final String name;
   final bool sentByMe;
 
   const MessageTile(
       {Key? key,
       required this.message,
       required this.sender,
-      required this.sentByMe})
+      required this.sentByMe,
+      required this.name})
       : super(key: key);
 
   @override
@@ -51,7 +53,7 @@ class _MessageTileState extends State<MessageTile> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.sender.toUpperCase(),
+              widget.name.toUpperCase(),
               textAlign: TextAlign.start,
               style: const TextStyle(
                   fontSize: 13,

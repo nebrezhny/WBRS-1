@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/helper/global.dart';
@@ -58,6 +60,12 @@ void main() async {
     }
   });
 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    badge: true,
+  );
+
   runApp(const MyApp());
 }
 
@@ -72,12 +80,18 @@ class _MyAppState extends State<MyApp> {
   bool _isSignedIn = false;
   bool _isRegistrationEnd = false;
 
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
   @override
   void initState() {
     super.initState();
     getUserLoggedInStatus();
     if (_isSignedIn) {
       getUserRegistrationStatus();
+    }
+
+    if (Platform.isIOS) {
+      firebaseMessaging.requestPermission();
     }
   }
 

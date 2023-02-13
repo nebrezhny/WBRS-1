@@ -23,14 +23,14 @@ class _ChatTileState extends State<ChatTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        nextScreen(
-            context,
-            ChatPage(
-              groupId: widget.chatId,
-              groupName: widget.userName2,
-              email: widget.userName,
-              users: [],
-            ));
+        // nextScreen(
+        //     context,
+        //     ChatPage(
+        //       groupId: widget.chatId,
+        //       groupName: widget.userName2,
+        //       email: widget.userName,
+        //       users: [],
+        //     ));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
