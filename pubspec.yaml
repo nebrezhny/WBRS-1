@@ -53,7 +53,10 @@ dependencies:
   firebase_in_app_messaging:
   platform_device_id:
   flutter_local_notifications:
+<<<<<<< HEAD
   http:
+=======
+>>>>>>> 7748ae941d8d7d0875e6ba0231b0534231ea514d
 
 
 dev_dependencies:
