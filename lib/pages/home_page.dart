@@ -1,4 +1,5 @@
-import 'package:flutter/rendering.dart';
+import 'dart:convert';
+
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
@@ -35,10 +36,10 @@ class _HomePageState extends State<HomePage> {
       TextEditingController();
 
   getMyInfoFromSharedPreference() async {
-    myName = await HelperFunctions().getDisplayName().toString();
-    myProfilePic = await HelperFunctions().getUserProfileUrl().toString();
-    myUserName = await HelperFunctions().getUserName().toString();
-    myEmail = await HelperFunctions().getUserEmail().toString();
+    myName = HelperFunctions().getDisplayName().toString();
+    myProfilePic = HelperFunctions().getUserProfileUrl().toString();
+    myUserName = HelperFunctions().getUserName().toString();
+    myEmail = HelperFunctions().getUserEmail().toString();
   }
 
   getChatRooms() async {
@@ -72,8 +73,8 @@ class _HomePageState extends State<HomePage> {
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      padding: EdgeInsets.symmetric(horizontal: 2.0),
-      itemCount: ((snapshot.data! as QuerySnapshot).docs.length),
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      itemCount: ((snapshot.data!).docs.length),
       itemBuilder: (BuildContext context, int index) {
         return snapshot.data!.docs[index].get("user1") == MyNickname ||
                 snapshot.data!.docs[index].get("user2") == MyNickname
@@ -85,20 +86,20 @@ class _HomePageState extends State<HomePage> {
                   subtitle: snapshot.data!.docs[index]["lastMessage"] != ""
                       ? Text(
                           "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         )
-                      : Text(
+                      : const Text(
                           "нет сообщений",
                           style: TextStyle(color: Colors.white),
                         ),
                   title: snapshot.data!.docs[index].get("user1") == MyNickname
                       ? Text(
                           snapshot.data!.docs[index].get("user2"),
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         )
                       : Text(
                           snapshot.data!.docs[index].get("user1"),
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                   onTap: () async {
                     snapshot.data!.docs[index].get("user1") == MyNickname
@@ -132,7 +133,6 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context, ChatScreen(nick, MyNickname, photoUrl, id));
                     });
-                    print(chatRoomId);
                   },
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(100.0),
@@ -146,8 +146,8 @@ class _HomePageState extends State<HomePage> {
                               )
                             : Container(
                                 color: Colors.white,
-                                padding: EdgeInsets.all(8),
-                                child: Icon(Icons.person, size: 40))
+                                padding: const EdgeInsets.all(8),
+                                child: const Icon(Icons.person, size: 40))
                         : snapshot.data!.docs[index].get("user1_image") != ""
                             ? Image.network(
                                 snapshot.data!.docs[index].get("user1_image"),
@@ -157,75 +157,17 @@ class _HomePageState extends State<HomePage> {
                               )
                             : Container(
                                 color: Colors.white,
-                                padding: EdgeInsets.all(8),
-                                child: Icon(Icons.person, size: 40)),
+                                padding: const EdgeInsets.all(8),
+                                child: const Icon(Icons.person, size: 40)),
                   ),
                   tileColor: Colors.white24,
-                  contentPadding: EdgeInsets.all(10.0),
+                  contentPadding: const EdgeInsets.all(10.0),
                 ),
               )
             : Container();
       },
     );
   }
-
-  // Widget searchUsersList() {
-  //   return StreamBuilder(
-  //     stream: usersStream,
-  //     builder: (context, snapshot) {
-  //       return snapshot.hasData
-  //           ? ListView.builder(
-  //         itemCount: snapshot.data.docs.length,
-  //         shrinkWrap: true,
-  //         itemBuilder: (context, index) {
-  //           DocumentSnapshot ds = snapshot.data.docs[index];
-  //           return searchListUserTile(
-  //               profileUrl: ds["imgUrl"],
-  //               name: ds["name"],
-  //               email: ds["email"],
-  //               username: ds["username"]);
-  //         },
-  //       )
-  //           : Center(
-  //         child: CircularProgressIndicator(),
-  //       );
-  //     },
-  //   );
-  // }
-  // Widget searchListUserTile({String? profileUrl, name, username, email}) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       var chatRoomId = getChatRoomIdByUsernames(myUserName, username);
-  //       Map<String, dynamic> chatRoomInfoMap = {
-  //         "users": [myUserName, username]
-  //       };
-  //       DatabaseService().createChatRoom(chatRoomId, chatRoomInfoMap);
-  //       Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //       builder: (context) => ChatScreen(username, name)));
-  //     },
-  //     child: Container(
-  //       margin: EdgeInsets.symmetric(vertical: 8),
-  //       child: Row(
-  //         children: [
-  //           ClipRRect(
-  //             borderRadius: BorderRadius.circular(40),
-  //             child: Image.network(
-  //               profileUrl!,
-  //               height: 40,
-  //               width: 40,
-  //             ),
-  //           ),
-  //           SizedBox(width: 12),
-  //           Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [Text(name), Text(email)])
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   // string manipulation
   String getId(String res) {
@@ -298,10 +240,16 @@ class _HomePageState extends State<HomePage> {
           fit: BoxFit.cover,
         ),
         Scaffold(
-            bottomNavigationBar: MyBottomNavigationBar(),
+            bottomNavigationBar: const MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-              actions: [],
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      sendPushMessage('body', 'title', 'token');
+                    },
+                    icon: const Icon(Icons.multitrack_audio_outlined))
+              ],
               elevation: 0,
               centerTitle: true,
               backgroundColor: Colors.transparent,
@@ -313,8 +261,8 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 27),
               ),
             ),
-            drawer: MyDrawer(),
-            body: Container(
+            drawer: const MyDrawer(),
+            body: SizedBox(
               height: 10000,
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
@@ -323,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
-                      return Text(
+                      return const Text(
                         "Нет чатов",
                         textAlign: TextAlign.center,
                       );
