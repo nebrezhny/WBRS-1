@@ -77,7 +77,7 @@ class _ChatPageState extends State<ChatPage> {
       sound: true,
     );
 
-    firebaseMessaging.getNotificationSettings(IosNotificationsSettings());
+    firebaseMessaging.getNotificationSettings();
 
     print(settings.authorizationStatus);
   }
