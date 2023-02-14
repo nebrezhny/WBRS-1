@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:messenger/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
 import '../widgets/bottom_nav_bar.dart';
 
@@ -256,6 +257,36 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void sendPushMessage(String body, String title, String token) async {
+    try {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key=737154946294',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{
+              'body': body,
+              'title': title,
+            },
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            "to": token,
+          },
+        ),
+      );
+      print('done');
+    } catch (e) {
+      print("error push notification");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -270,15 +301,7 @@ class _HomePageState extends State<HomePage> {
             bottomNavigationBar: MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-              actions: [
-                // IconButton(
-                //     onPressed: () {
-                //       nextScreen(context, const SearchPage());
-                //     },
-                //     icon: const Icon(
-                //       Icons.search,
-                //     ))
-              ],
+              actions: [],
               elevation: 0,
               centerTitle: true,
               backgroundColor: Colors.transparent,
