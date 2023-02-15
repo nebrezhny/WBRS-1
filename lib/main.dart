@@ -50,20 +50,10 @@ class _MyAppState extends State<MyApp> {
       FlutterLocalNotificationsPlugin();
   String? mtoken = " ";
 
-  void getToken() async {
-    await FirebaseMessaging.instance.getToken().then((token) {
-      setState(() {
-        mtoken = token;
-      });
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    requestPermission();
-    loadFCM();
-    listenFCM();
+
     getUserLoggedInStatus();
     if (_isSignedIn) {
       getUserRegistrationStatus();
@@ -100,6 +90,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    //getToken();
     return MaterialApp(
       theme: ThemeData(
           primaryColor: Constants().primaryColor,
@@ -111,29 +102,6 @@ class _MyAppState extends State<MyApp> {
               : const HomePage()
           : const LoginPage(),
     );
-  }
-
-  void requestPermission() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
-    } else {
-      print('User declined or has not accepted permission');
-    }
   }
 
   void loadFCM() async {

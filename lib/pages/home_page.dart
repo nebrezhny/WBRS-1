@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
@@ -10,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:messenger/widgets/widgets.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
 import '../widgets/bottom_nav_bar.dart';
@@ -34,6 +37,9 @@ class _HomePageState extends State<HomePage> {
   late String myName, myProfilePic, myUserName, myEmail;
   TextEditingController searchUsernameEditingController =
       TextEditingController();
+
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   getMyInfoFromSharedPreference() async {
     myName = HelperFunctions().getDisplayName().toString();
@@ -199,34 +205,70 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void sendPushMessage(String body, String title, String token) async {
-    try {
-      await http.post(
-        Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'key=737154946294',
-        },
-        body: jsonEncode(
-          <String, dynamic>{
-            'notification': <String, dynamic>{
-              'body': body,
-              'title': title,
-            },
-            'priority': 'high',
-            'data': <String, dynamic>{
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': '1',
-              'status': 'done'
-            },
-            "to": token,
-          },
-        ),
-      );
-      print('done');
-    } catch (e) {
-      print("error push notification");
+  @override
+  void initState() {
+    super.initState();
+    requestPermission();
+    getToken();
+  }
+
+  initInfo() {
+    var androidInitialize =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var iosInitialize = IOSInitializationSettings();
+    var initializationsSettings =
+        InitializationSettings(android: androidInitialize, iOS: iosInitialize);
+
+    flutterLocalNotificationsPlugin.initialize(initializationsSettings,
+        onSelectNotification: (String? payload) async {
+      try {
+        if (payload != null && payload.isNotEmpty) {
+        } else {}
+      } on Exception catch (e) {
+        // TODO
+      }
+    });
+  }
+
+  void saveUserToken(String token) {
+    FirebaseFirestore.instance
+        .collection('TOKENS')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({'token': token});
+  }
+
+  void requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+    } else {
+      print('User declined or has not accepted permission');
     }
+  }
+
+  String? mtoken;
+  void getToken() async {
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mtoken = token;
+      });
+    });
+
+    saveUserToken(mtoken!);
   }
 
   @override
@@ -245,9 +287,7 @@ class _HomePageState extends State<HomePage> {
             appBar: AppBar(
               actions: [
                 IconButton(
-                    onPressed: () {
-                      sendPushMessage('body', 'title', 'token');
-                    },
+                    onPressed: () {},
                     icon: const Icon(Icons.multitrack_audio_outlined))
               ],
               elevation: 0,
