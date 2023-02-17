@@ -15,6 +15,7 @@ import 'package:messenger/widgets/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
+import '../service/notifications.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -210,11 +211,12 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     requestPermission();
     getToken();
+    initInfo();
   }
 
   initInfo() {
     var androidInitialize =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
+        const AndroidInitializationSettings('@mipmap/launcher_icon');
     var iosInitialize = IOSInitializationSettings();
     var initializationsSettings =
         InitializationSettings(android: androidInitialize, iOS: iosInitialize);
@@ -227,6 +229,34 @@ class _HomePageState extends State<HomePage> {
       } on Exception catch (e) {
         // TODO
       }
+      return;
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print('...............onMessage................');
+      print(
+          'onMessage: ${message.notification?.title}/${message.notification?.body}');
+
+      BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+        message.notification!.body.toString(),
+        htmlFormatBigText: true,
+        contentTitle: message.notification!.title.toString(),
+        htmlFormatContentTitle: true,
+      );
+
+      AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails('wbrs', 'wbrs', 'wbrs',
+              importance: Importance.max,
+              styleInformation: bigTextStyleInformation,
+              priority: Priority.max,
+              playSound: false);
+
+      NotificationDetails platformChannelSpecifics =
+          NotificationDetails(android: androidNotificationDetails);
+
+      await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
+          message.notification?.body, platformChannelSpecifics,
+          payload: message.data['title']);
     });
   }
 
@@ -285,11 +315,6 @@ class _HomePageState extends State<HomePage> {
             bottomNavigationBar: const MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-              actions: [
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.multitrack_audio_outlined))
-              ],
               elevation: 0,
               centerTitle: true,
               backgroundColor: Colors.transparent,

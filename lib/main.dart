@@ -9,11 +9,16 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/home_page.dart';
+import 'package:messenger/service/messaging.dart';
 import 'package:messenger/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Handling a background message ${message.messageId}');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +33,14 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
+
+  await FirebaseMessaging.instance.getInitialMessage();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
 
   runApp(const MyApp());
 }

@@ -54,6 +54,7 @@ dependencies:
   platform_device_id:
   flutter_local_notifications:
   http:
+  flutter_app_badger:
 
 
 dev_dependencies:

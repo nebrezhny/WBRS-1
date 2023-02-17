@@ -5,7 +5,7 @@ import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/helper/helper_function.dart';
-import 'package:messenger/service/database_service.dart';
+import 'package:messenger/service/notifications.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
@@ -46,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       Map<String, dynamic> messageInfoMap = {
         "message": message,
-        "sendBy": await FirebaseAuth.instance.currentUser!.displayName,
+        "sendBy": FirebaseAuth.instance.currentUser!.displayName,
         "ts": lastMessageTs,
         "imgUrl": FirebaseAuth.instance.currentUser!.photoURL
       };
@@ -75,6 +75,19 @@ class _ChatScreenState extends State<ChatScreen> {
           messageId = "";
         }
       });
+
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('TOKENS')
+          .doc(widget.id)
+          .get();
+      DocumentSnapshot snap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.id)
+          .get();
+      String token = doc.get('token');
+      String name = snap.get('fullName');
+      NotificationsService().sendPushMessage(token, message, name, 4,
+          FirebaseAuth.instance.currentUser!.photoURL, 'dcscscs');
     }
   }
 
@@ -141,9 +154,18 @@ class _ChatScreenState extends State<ChatScreen> {
     getAndSetMessages();
   }
 
+  chatWith_Update(String id) async {
+    String myId = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(myId)
+        .update({'chatWithId': id});
+  }
+
   @override
   void initState() {
     doThisOnLaunch();
+    chatWith_Update(widget.id);
     super.initState();
   }
 

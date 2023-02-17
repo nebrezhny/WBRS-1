@@ -237,7 +237,6 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 return Card(
                   child: ListTile(
-                    onTap: () => nextScreen(context, const MainScreen()),
                     title: Text(user_info[index].name),
                     subtitle: Row(
                       children: [
