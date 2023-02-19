@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/home_page.dart';
@@ -103,11 +104,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme tema =
+        GoogleFonts.robotoMonoTextTheme(Theme.of(context).textTheme);
     //getToken();
     return MaterialApp(
       theme: ThemeData(
           primaryColor: Constants().primaryColor,
-          scaffoldBackgroundColor: Colors.white),
+          scaffoldBackgroundColor: Colors.white,
+          textTheme: tema),
       debugShowCheckedModeBanner: false,
       home: _isSignedIn
           ? _isRegistrationEnd

@@ -32,3 +32,11 @@ String FiltrPol = "";
 RangeValues currentValues = const RangeValues(18, 22);
 
 late List user_info;
+
+getWidthOfScreen(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
+}
+
+getHeightOfScreen(BuildContext context) {
+  double height = MediaQuery.of(context).size.height;
+}

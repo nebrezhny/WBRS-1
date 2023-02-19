@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MessageTile extends StatefulWidget {
   final String message;
   final String sender;
   final String name;
   final bool sentByMe;
+  final isRead;
 
   const MessageTile(
       {Key? key,
       required this.message,
       required this.sender,
       required this.sentByMe,
+      required this.isRead,
       required this.name})
       : super(key: key);
 
@@ -21,6 +24,7 @@ class MessageTile extends StatefulWidget {
 class _MessageTileState extends State<MessageTile> {
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       padding: EdgeInsets.only(
           top: 4,
@@ -66,7 +70,10 @@ class _MessageTileState extends State<MessageTile> {
             ),
             Text(widget.message,
                 textAlign: TextAlign.start,
-                style: const TextStyle(fontSize: 16, color: Colors.white))
+                style: const TextStyle(fontSize: 16, color: Colors.white)),
+            // widget.isRead
+            //     ? const FaIcon(FontAwesomeIcons.check)
+            //     : const FaIcon(FontAwesomeIcons.check),
           ],
         ),
       ),

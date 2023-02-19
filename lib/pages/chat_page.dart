@@ -216,11 +216,13 @@ class _ChatPageState extends State<ChatPage> {
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
                   return MessageTile(
-                      message: snapshot.data.docs[index]['message'],
-                      sender: snapshot.data.docs[index]['sender'],
-                      name: snapshot.data.docs[index]['name'],
-                      sentByMe: FirebaseAuth.instance.currentUser!.email ==
-                          snapshot.data.docs[index]['sender']);
+                    message: snapshot.data.docs[index]['message'],
+                    sender: snapshot.data.docs[index]['sender'],
+                    name: snapshot.data.docs[index]['name'],
+                    sentByMe: FirebaseAuth.instance.currentUser!.email ==
+                        snapshot.data.docs[index]['sender'],
+                    isRead: true,
+                  );
                 },
               )
             : Container();

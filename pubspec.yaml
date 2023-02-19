@@ -55,6 +55,7 @@ dependencies:
   flutter_local_notifications:
   http:
   flutter_app_badger:
+  font_awesome_flutter:
 
 
 dev_dependencies:

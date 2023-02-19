@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
@@ -91,9 +92,29 @@ class _HomePageState extends State<HomePage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40.0)),
                   subtitle: snapshot.data!.docs[index]["lastMessage"] != ""
-                      ? Text(
-                          "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
-                          style: const TextStyle(color: Colors.white),
+                      ? Container(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 10,
+                                child: Text(
+                                  '4',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
+                                      fontFamily: 'Roboto'),
+                                ),
+                              )
+                            ],
+                          ),
                         )
                       : const Text(
                           "нет сообщений",
@@ -332,6 +353,7 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
+                      .orderBy('lastMessageSendTs', descending: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {

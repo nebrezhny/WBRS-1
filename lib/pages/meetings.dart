@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/about_meet.dart';
 import 'package:messenger/widgets/bottom_nav_bar.dart';
 import 'package:messenger/widgets/drawer.dart';
@@ -27,9 +28,12 @@ class _MeetingPageState extends State<MeetingPage> {
   TextEditingController city = TextEditingController();
   TextEditingController description = TextEditingController();
   TextEditingController date_and_time = TextEditingController();
+
   late int kolvo_users;
 
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return MaterialApp(
       home: Stack(
         children: [
@@ -215,8 +219,8 @@ class _MeetingPageState extends State<MeetingPage> {
                   children: [
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.symmetric(
+                          vertical: height * 0.01, horizontal: width * 0.011),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(8)),

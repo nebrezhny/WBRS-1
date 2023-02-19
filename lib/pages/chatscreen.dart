@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/service/database_service.dart';
@@ -91,7 +92,8 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Widget chatMessageTile(String message, bool sendByMe) {
+  Widget chatMessageTile(String message, bool sendByMe, bool isRead) {
+    Size size = MediaQuery.of(context).size;
     return Row(
       mainAxisAlignment:
           sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -113,9 +115,35 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: sendByMe ? Colors.orange : Colors.blue.shade400,
               ),
               padding: const EdgeInsets.all(16),
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white),
+              child: Container(
+                constraints:
+                    BoxConstraints(minWidth: 50, maxWidth: size.width / 2),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 170,
+                      child: Text(
+                        message,
+                        maxLines: 100,
+                        softWrap: true,
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    isRead
+                        ? const FaIcon(
+                            FontAwesomeIcons.check,
+                            size: 10,
+                          )
+                        : const FaIcon(
+                            FontAwesomeIcons.check,
+                            size: 10,
+                          ),
+                  ],
+                ),
               )),
         ),
       ],
@@ -136,7 +164,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   return chatMessageTile(
                       ds["message"],
                       FirebaseAuth.instance.currentUser!.displayName ==
-                          ds["sendBy"]);
+                          ds["sendBy"],
+                      true);
                 })
             : const Center(child: CircularProgressIndicator());
       },
