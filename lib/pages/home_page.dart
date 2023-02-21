@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      itemCount: ((snapshot.data!).docs.length),
+      itemCount: (snapshot.data != null ? (snapshot.data!).docs.length : 0),
       itemBuilder: (BuildContext context, int index) {
         return snapshot.data!.docs[index].get("user1") == MyNickname ||
                 snapshot.data!.docs[index].get("user2") == MyNickname
@@ -97,22 +97,39 @@ class _HomePageState extends State<HomePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              const CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 10,
+                              Flexible(
                                 child: Text(
-                                  '4',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14,
-                                      fontFamily: 'Roboto'),
+                                  "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
+                                  style: const TextStyle(color: Colors.white),
                                 ),
-                              )
+                              ),
+                              snapshot.data!.docs[index]["lastMessageSendBy"] !=
+                                      MyNickname
+                                  ? snapshot.data!.docs[index]
+                                              ['unreadMessage'] !=
+                                          null
+                                      ? snapshot.data!.docs[index]
+                                                  ['unreadMessage'] !=
+                                              0
+                                          ? CircleAvatar(
+                                              backgroundColor: Colors.white,
+                                              radius: 10,
+                                              child: Text(
+                                                snapshot
+                                                    .data!
+                                                    .docs[index]
+                                                        ['unreadMessage']
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14,
+                                                    fontFamily: 'Roboto'),
+                                              ),
+                                            )
+                                          : SizedBox()
+                                      : SizedBox()
+                                  : SizedBox(),
                             ],
                           ),
                         )
@@ -192,7 +209,10 @@ class _HomePageState extends State<HomePage> {
                   contentPadding: const EdgeInsets.all(10.0),
                 ),
               )
-            : Container();
+            : Container(
+                color: Colors.red,
+                child: const Text('Нет чатов'),
+              );
       },
     );
   }
@@ -353,16 +373,17 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
-                      .orderBy('lastMessageSendTs', descending: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
+                      print(snapshot);
                       return const Text(
                         "Нет чатов",
                         textAlign: TextAlign.center,
                       );
                     } else {
+                      print('object');
                       return chatRoomsList(
                           snapshot,
                           FirebaseAuth.instance.currentUser!.displayName

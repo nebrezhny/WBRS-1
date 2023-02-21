@@ -219,7 +219,7 @@ class _ChatPageState extends State<ChatPage> {
                     message: snapshot.data.docs[index]['message'],
                     sender: snapshot.data.docs[index]['sender'],
                     name: snapshot.data.docs[index]['name'],
-                    sentByMe: FirebaseAuth.instance.currentUser!.email ==
+                    sentByMe: FirebaseAuth.instance.currentUser!.displayName ==
                         snapshot.data.docs[index]['sender'],
                     isRead: true,
                   );
@@ -287,7 +287,7 @@ class _ChatPageState extends State<ChatPage> {
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text,
-        "sender": FirebaseAuth.instance.currentUser!.email,
+        "sender": FirebaseAuth.instance.currentUser!.displayName,
         'name': name,
         "time": DateTime.now(),
       };

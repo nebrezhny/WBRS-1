@@ -7,6 +7,7 @@ import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/service/notifications.dart';
+import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
@@ -41,6 +42,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   addMessage(bool sendClicked) async {
     if (messageTextEdittingController.text != "") {
+      QuerySnapshot querySnap = await FirebaseFirestore.instance
+          .collection('users')
+          .where('fullName', isEqualTo: widget.chatWithUsername)
+          .get();
+      String chatWith = querySnap.docs[0]['chatWithId'];
+      bool isUserInChat = chatWith == FirebaseAuth.instance.currentUser!.uid;
+
+      isUserInChat
+          ? null
+          : DatabaseService().updateUnreadMessageCount(chatRoomId.toString());
       String message = messageTextEdittingController.text;
 
       var lastMessageTs = DateTime.now();
@@ -49,7 +60,8 @@ class _ChatScreenState extends State<ChatScreen> {
         "message": message,
         "sendBy": FirebaseAuth.instance.currentUser!.displayName,
         "ts": lastMessageTs,
-        "imgUrl": FirebaseAuth.instance.currentUser!.photoURL
+        "imgUrl": FirebaseAuth.instance.currentUser!.photoURL,
+        "isRead": isUserInChat ? true : false
       };
 
       //messageId
@@ -87,8 +99,11 @@ class _ChatScreenState extends State<ChatScreen> {
           .get();
       String token = doc.get('token');
       String name = snap.get('fullName');
-      NotificationsService().sendPushMessage(token, message, name, 4,
-          FirebaseAuth.instance.currentUser!.photoURL, 'dcscscs');
+
+      !isUserInChat
+          ? NotificationsService().sendPushMessage(token, message, name, 4,
+              FirebaseAuth.instance.currentUser!.photoURL, 'dcscscs')
+          : null;
     }
   }
 
@@ -114,34 +129,25 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 color: sendByMe ? Colors.orange : Colors.blue.shade400,
               ),
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.only(
+                  top: 4,
+                  bottom: 4,
+                  left: sendByMe ? 0 : 24,
+                  right: sendByMe ? 24 : 0),
               child: Container(
                 constraints:
                     BoxConstraints(minWidth: 50, maxWidth: size.width / 2),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 170,
-                      child: Text(
-                        message,
-                        maxLines: 100,
-                        softWrap: true,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
+                    Text(
+                      message,
+                      maxLines: 100,
+                      softWrap: true,
+                      style: const TextStyle(
+                        color: Colors.white,
                       ),
                     ),
-                    isRead
-                        ? const FaIcon(
-                            FontAwesomeIcons.check,
-                            size: 10,
-                          )
-                        : const FaIcon(
-                            FontAwesomeIcons.check,
-                            size: 10,
-                          ),
                   ],
                 ),
               )),
@@ -161,11 +167,25 @@ class _ChatScreenState extends State<ChatScreen> {
                 reverse: true,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
-                  return chatMessageTile(
-                      ds["message"],
-                      FirebaseAuth.instance.currentUser!.displayName ==
-                          ds["sendBy"],
-                      true);
+                  ds.id;
+                  if (ds["sendBy"] !=
+                      FirebaseAuth.instance.currentUser!.displayName) {
+                    FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(chatRoomId)
+                        .collection('chats')
+                        .doc(ds.id)
+                        .update({'isRead': true});
+                  }
+
+                  return MessageTile(
+                      sender: ds["sendBy"],
+                      name: ds["sendBy"],
+                      message: ds["message"],
+                      sentByMe:
+                          FirebaseAuth.instance.currentUser!.displayName ==
+                              ds["sendBy"],
+                      isRead: ds["isRead"]);
                 })
             : const Center(child: CircularProgressIndicator());
       },
@@ -189,6 +209,31 @@ class _ChatScreenState extends State<ChatScreen> {
         .collection('users')
         .doc(myId)
         .update({'chatWithId': id});
+    DocumentSnapshot chat = await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatRoomId)
+        .get();
+
+    var chatSnapshot =
+        await FirebaseFirestore.instance.collection('chats').doc(chatRoomId);
+
+    String lastMessageSendBy = chat.get('lastMessageSendBy');
+
+    if (lastMessageSendBy != FirebaseAuth.instance.currentUser!.displayName) {
+      chatSnapshot.update({
+        'unreadMessage': 0,
+      });
+    }
+  }
+
+  Future<bool> outOfChat() async {
+    String myId = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(myId)
+        .update({'chatWithId': ''});
+
+    return true;
   }
 
   @override
@@ -208,84 +253,89 @@ class _ChatScreenState extends State<ChatScreen> {
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
         ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Row(
+        WillPopScope(
+          onWillPop: () {
+            return outOfChat();
+          },
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              title: Row(
+                children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: SizedBox(
+                        height: 45,
+                        width: 45,
+                        child: FloatingActionButton(
+                            onPressed: () async {
+                              DocumentSnapshot doc = await FirebaseFirestore
+                                  .instance
+                                  .collection('users')
+                                  .doc(widget.id)
+                                  .get();
+                              Images = doc.get('images');
+                              CountImages = Images.length;
+                              nextScreen(
+                                  context,
+                                  SomebodyProfile(
+                                    uid: widget.id,
+                                    photoUrl: widget.photoUrl,
+                                    name: widget.chatWithUsername,
+                                  ));
+                            },
+                            child: Image.network(
+                              widget.photoUrl,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: 45,
+                            )),
+                      )),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(widget.chatWithUsername),
+                ],
+              ),
+              backgroundColor: Colors.transparent,
+            ),
+            body: Stack(
               children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: SizedBox(
-                      height: 45,
-                      width: 45,
-                      child: FloatingActionButton(
-                          onPressed: () async {
-                            DocumentSnapshot doc = await FirebaseFirestore
-                                .instance
-                                .collection('users')
-                                .doc(widget.id)
-                                .get();
-                            Images = doc.get('images');
-                            CountImages = Images.length;
-                            nextScreen(
-                                context,
-                                SomebodyProfile(
-                                  uid: widget.id,
-                                  photoUrl: widget.photoUrl,
-                                  name: widget.chatWithUsername,
-                                ));
+                chatMessages(),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: TextField(
+                          controller: messageTextEdittingController,
+                          onChanged: (value) {},
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "type a message",
+                              hintStyle: TextStyle(
+                                  color: Colors.white.withOpacity(0.6))),
+                        )),
+                        GestureDetector(
+                          onTap: () {
+                            addMessage(true);
                           },
-                          child: Image.network(
-                            widget.photoUrl,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: 45,
-                          )),
-                    )),
-                const SizedBox(
-                  width: 20,
-                ),
-                Text(widget.chatWithUsername),
+                          child: const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
-            backgroundColor: Colors.transparent,
-          ),
-          body: Stack(
-            children: [
-              chatMessages(),
-              Container(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  color: Colors.black.withOpacity(0.8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        controller: messageTextEdittingController,
-                        onChanged: (value) {},
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "type a message",
-                            hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.6))),
-                      )),
-                      GestureDetector(
-                        onTap: () {
-                          addMessage(true);
-                        },
-                        child: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
           ),
         ),
       ],

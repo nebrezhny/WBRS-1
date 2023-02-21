@@ -248,8 +248,6 @@ class DatabaseService {
         .snapshots();
   }
 
-
-
   Future<String> GetChatRoomId(String user1, String user2) async {
     String chatId = "";
     await FirebaseFirestore.instance
@@ -290,6 +288,19 @@ class DatabaseService {
         .collection("chats")
         .doc(chatRoomId)
         .update(lastMessageInfoMap);
+  }
+
+  updateUnreadMessageCount(String chatRoomId) async {
+    DocumentSnapshot count = await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatRoomId)
+        .get();
+    int kolvo = count.get('unreadMessage') + 1;
+
+    FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatRoomId)
+        .update({"unreadMessage": kolvo});
   }
 
   Future addChat(String uid, String chatId) {

@@ -18,6 +18,8 @@ class MyBottomNavigationBar extends StatefulWidget {
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
+  String email = FirebaseAuth.instance.currentUser!.email.toString();
+  String userName = FirebaseAuth.instance.currentUser!.displayName.toString();
   void _onItemTapped(int index) async {
     setState(() {
       selectedIndex = index;
@@ -68,9 +70,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         nextScreen(context, const HomePage());
         break;
       case 2:
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection("users")
-            .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where("fullName",
+                isEqualTo:
+                    FirebaseAuth.instance.currentUser!.displayName.toString())
             .get()
             .then((QuerySnapshot snapshot) {
           GlobalAge = snapshot.docs[0].get("age".toString()).toString();
@@ -82,13 +86,9 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           Group = snapshot.docs[0]["группа"];
           GlobalPol = snapshot.docs[0]["пол"];
         });
-        nextScreen(
-            context,
-            ProfilesList(
-              email: FirebaseAuth.instance.currentUser!.email.toString(),
-              userName:
-                  FirebaseAuth.instance.currentUser!.displayName.toString(),
-            ));
+        nextScreenReplace(context, ProfilesList());
+        print(email + userName);
+
         break;
       case 3:
         nextScreen(context, const MeetingPage());

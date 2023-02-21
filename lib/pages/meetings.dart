@@ -343,7 +343,6 @@ class _MeetingPageState extends State<MeetingPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                     color: Colors.white),
                 margin: const EdgeInsets.all(12),
-                height: 70,
                 width: double.infinity,
                 child: ListTile(
                   title: Row(children: [
@@ -363,7 +362,9 @@ class _MeetingPageState extends State<MeetingPage> {
                     const SizedBox(
                       width: 10,
                     ),
-                    Text(snapshot.data.docs[index]['recentMessage']),
+                    Flexible(
+                        child:
+                            Text(snapshot.data.docs[index]['recentMessage'])),
                   ]),
                 ),
               ),

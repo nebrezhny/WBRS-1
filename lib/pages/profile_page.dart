@@ -284,11 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         selectedIndex = 3;
                                       });
                                       nextScreenReplace(
-                                          context,
-                                          ProfilesList(
-                                            userName: widget.userName,
-                                            email: widget.email,
-                                          ));
+                                          context, ProfilesList());
                                     },
                                     icon: const Icon(
                                       Icons.person,

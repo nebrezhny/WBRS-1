@@ -250,12 +250,8 @@ class _MyDrawerState extends State<MyDrawer> {
                       GlobalPol = snapshot.docs[0]["пол"].toString();
                       Group = snapshot.docs[0]["группа"];
                     });
-                    nextScreenReplace(
-                        context,
-                        ProfilesList(
-                          userName: userName,
-                          email: email,
-                        ));
+                    nextScreenReplace(context, ProfilesList());
+                    print(email + userName);
                   },
                   leading: const Icon(
                     Icons.people,

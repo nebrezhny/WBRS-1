@@ -15,10 +15,7 @@ import 'filter_pages/filter_page.dart';
 
 // ignore: must_be_immutable
 class ProfilesList extends StatefulWidget {
-  String userName;
-  String email;
-  ProfilesList({Key? key, required this.email, required this.userName})
-      : super(key: key);
+  ProfilesList({Key? key}) : super(key: key);
 
   @override
   State<ProfilesList> createState() => _ProfilesListState();
