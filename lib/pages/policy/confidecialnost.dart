@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tinkoff_acquiring_flutter/tinkoff_acquiring_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class Politica extends StatefulWidget {
   const Politica({super.key});
@@ -15,6 +18,8 @@ class Politica extends StatefulWidget {
 
 class _PoliticaState extends State<Politica> {
   String _text = '';
+
+  final WebViewController controller = WebViewController();
 
   @override
   void initState() {
@@ -39,14 +44,9 @@ class _PoliticaState extends State<Politica> {
           ),
         ),
         Scaffold(
-          appBar: AppBar(title: const Text("Политика конфиденциальности")),
-          backgroundColor: Colors.transparent,
-          body: Container(
-              child: Text(
-            File("my_file.txt").readAsStringSync(),
-            style: const TextStyle(color: Colors.white),
-          )),
-        ),
+            appBar: AppBar(title: const Text("Политика конфиденциальности")),
+            backgroundColor: Colors.transparent,
+            body: Container(child: Text('d'))),
       ],
     );
   }

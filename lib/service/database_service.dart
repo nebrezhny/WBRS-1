@@ -218,7 +218,7 @@ class DatabaseService {
         .get();
   }
 
-  getChatRoomIdByUsernames(String a, String b) {
+  getChatRoomIdByUserID(String a, String b) {
     if (a.isNotEmpty && b.isNotEmpty) {
       if (a.substring(0, 1).codeUnitAt(0) <= b.substring(0, 1).codeUnitAt(0)) {
         return "$a\_$b";
@@ -252,13 +252,13 @@ class DatabaseService {
     String chatId = "";
     await FirebaseFirestore.instance
         .collection("chats")
-        .where("chatId", isEqualTo: getChatRoomIdByUsernames(user1, user2))
+        .where("chatId", isEqualTo: getChatRoomIdByUserID(user1, user2))
         .get()
         .then((QuerySnapshot snapshot) {
       if (snapshot.docs.isEmpty) {
-        chatId = getChatRoomIdByUsernames(user2, user1);
+        chatId = getChatRoomIdByUserID(user2, user1);
       } else {
-        chatId = getChatRoomIdByUsernames(user1, user2);
+        chatId = getChatRoomIdByUserID(user1, user2);
       }
     });
     chatRoomId = await chatId;

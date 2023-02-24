@@ -205,6 +205,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       Group = snapshot.docs[0]["группа"];
                       GlobalPol = snapshot.docs[0]["пол"];
                     });
+
                     nextScreen(
                         context,
                         ProfilePage(
