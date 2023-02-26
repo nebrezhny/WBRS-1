@@ -177,11 +177,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 50,
                                 width: 50,
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Colors.orangeAccent,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.white.withOpacity(0.5),
-                                        spreadRadius: 7,
+                                        spreadRadius: 3,
                                         blurRadius:
                                             7, // changes position of shadow
                                       ),
@@ -193,7 +193,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     icon: const Icon(
                                       Icons.settings,
                                       size: 35,
-                                      color: Colors.blueGrey,
+                                      color: Colors.white,
                                     ))),
                             const Text(
                               "Настройки",
@@ -217,11 +217,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 70,
                               width: 70,
                               decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Colors.orangeAccent,
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.white.withOpacity(0.5),
-                                      spreadRadius: 7,
+                                      spreadRadius: 3,
                                       blurRadius:
                                           7, // changes position of shadow
                                     ),
@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: IconButton(
                                 onPressed: () {
                                   GlobalPol = widget.pol;
-                                  nextScreenReplace(
+                                  nextScreen(
                                       context,
                                       ProfilePageEdit(
                                         email: widget.email,
@@ -247,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 icon: const Icon(
                                   Icons.mode_edit_sharp,
                                   size: 35,
-                                  color: Colors.blueGrey,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -267,11 +267,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 50,
                                 width: 50,
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Colors.orangeAccent,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.white.withOpacity(0.5),
-                                        spreadRadius: 7,
+                                        spreadRadius: 3,
                                         blurRadius:
                                             7, // changes position of shadow
                                       ),
@@ -289,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     icon: const Icon(
                                       Icons.person,
                                       size: 35,
-                                      color: Colors.blueGrey,
+                                      color: Colors.white,
                                     ))),
                             const Text(
                               "Люди",
@@ -430,6 +430,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       FirebaseAuth.instance.currentUser!.uid,
                                       downloadUrl);
                                 },
+                                style: const ButtonStyle(
+                                    backgroundColor: MaterialStatePropertyAll(
+                                        Colors.orangeAccent)),
                                 child: const Text(
                                   "Добавить фотографии",
                                 ))

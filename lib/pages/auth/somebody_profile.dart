@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/service/database_service.dart';
-import 'package:messenger/widgets/drawer.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../../widgets/bottom_nav_bar.dart';
@@ -62,7 +60,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
             fit: BoxFit.cover,
           ),
           Scaffold(
-            bottomNavigationBar: MyBottomNavigationBar(),
+            bottomNavigationBar: const MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
                 elevation: 0,
@@ -70,10 +68,10 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                 backgroundColor: Colors.transparent,
                 title: Text(
                   widget.name,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 )),
             body: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 17),
@@ -99,9 +97,10 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                 height: 150.0,
                                 width: 150.0,
                               )),
-                      Padding(padding: EdgeInsets.symmetric(vertical: 10.0)),
+                      const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0)),
                       CountImages == 0
-                          ? Text(
+                          ? const Text(
                               "Нет фотографий",
                               style: TextStyle(color: Colors.white),
                             )
@@ -112,7 +111,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (BuildContext, int index) {
                                   return Container(
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(15),
                                             bottomLeft: Radius.circular(15))),
@@ -123,9 +122,11 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                             builder: (context) => AlertDialog(
                                               backgroundColor:
                                                   Colors.transparent,
-                                              insetPadding: EdgeInsets.all(2),
+                                              insetPadding:
+                                                  const EdgeInsets.all(2),
                                               title: Container(
-                                                decoration: BoxDecoration(),
+                                                decoration:
+                                                    const BoxDecoration(),
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
@@ -140,7 +141,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           );
                                         },
                                         child: Container(
-                                          margin: EdgeInsets.only(right: 5),
+                                          margin:
+                                              const EdgeInsets.only(right: 5),
                                           width: 100,
                                           child: Image.network(Images[index],
                                               fit: BoxFit.cover),
@@ -155,7 +157,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                         children: [
                           Text(
                             widget.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontWeight: FontWeight.w500,
@@ -167,9 +169,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   onPressed: () async {
                                     Map<String, dynamic> chatRoomInfoMap = {
                                       "user1": FirebaseAuth
-                                          .instance.currentUser!.displayName
+                                          .instance.currentUser!.uid
                                           .toString(),
-                                      "user2": widget.name,
+                                      "user2": widget.uid,
+                                      "user1Nickname": FirebaseAuth
+                                          .instance.currentUser!.displayName,
+                                      "user2Nickname": widget.name,
                                       "user1_image": FirebaseAuth
                                           .instance.currentUser!.photoURL,
                                       "user2_image": widget.photoUrl,
@@ -242,12 +247,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                     .toString(),
                                                 widget.name));
                                       } else {
-                                        nextScreen(context, HomePage());
+                                        nextScreen(context, const HomePage());
                                       }
-                                      nextScreen(context, HomePage());
+                                      nextScreen(context, const HomePage());
                                     });
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.messenger_outline,
                                     color: Colors.orange,
                                     size: 35,
@@ -257,7 +262,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   showSnackbar(context, Colors.green,
                                       "Спасибо за отклик! Мы уже рассматриваем заявку.");
                                 },
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.feedback_rounded,
                                   size: 35,
                                   color: Colors.red,
@@ -281,7 +286,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Возраст: ",
                                         style: TextStyle(
                                             color: Colors.white,
@@ -290,19 +295,19 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       ),
                                       Text(
                                         data['age'].toString(),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Рост: ",
                                         style: TextStyle(
                                             color: Colors.white,
@@ -311,12 +316,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       ),
                                       Text(
                                         data['rost'],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Container(
@@ -326,7 +331,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
+                                        const Text(
                                           "Хобби: ",
                                           style: TextStyle(
                                               color: Colors.white,
@@ -339,7 +344,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           data['hobbi'] != ""
                                               ? data['hobbi']
                                               : "не заполнено",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 21),
                                           softWrap: true,
@@ -347,14 +352,14 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       ],
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Дети: ",
                                         style: TextStyle(
                                             color: Colors.white,
@@ -363,12 +368,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       ),
                                       Text(
                                         data['deti'] ? "есть" : "нет",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Container(
@@ -376,13 +381,13 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text("О себе",
+                                        const Text("О себе",
                                             style: TextStyle(
                                                 fontSize: 23,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white),
                                             textAlign: TextAlign.left),
-                                        Padding(
+                                        const Padding(
                                             padding:
                                                 EdgeInsets.only(bottom: 20.0)),
                                         Column(
@@ -410,9 +415,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                 ],
                               );
                             } else {
-                              return Text('Загрузка... ');
+                              return const Text('Загрузка... ');
                             }
-                            return Text('Загрузка...');
+                            return const Text('Загрузка...');
                           })
                     ],
                   ),

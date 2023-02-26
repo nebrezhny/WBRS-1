@@ -267,7 +267,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, MyApp());
+                    nextScreenReplace(context, ShopPage());
                   },
                   title: const Text("Магазин",
                       style: TextStyle(color: Colors.white)),

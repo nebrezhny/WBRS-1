@@ -12,8 +12,9 @@ import 'package:messenger/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String chatWithUsername, name, photoUrl, id;
-  ChatScreen(this.chatWithUsername, this.name, this.photoUrl, this.id);
+  final String chatWithUsername, name, photoUrl, id, chatId;
+  ChatScreen(
+      this.chatWithUsername, this.name, this.photoUrl, this.id, this.chatId);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -51,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       isUserInChat
           ? null
-          : DatabaseService().updateUnreadMessageCount(chatRoomId.toString());
+          : DatabaseService().updateUnreadMessageCount(widget.chatId);
       String message = messageTextEdittingController.text;
 
       var lastMessageTs = DateTime.now();
@@ -59,6 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
       Map<String, dynamic> messageInfoMap = {
         "message": message,
         "sendBy": FirebaseAuth.instance.currentUser!.displayName,
+        "sendByID": FirebaseAuth.instance.currentUser!.uid,
         "ts": lastMessageTs,
         "imgUrl": FirebaseAuth.instance.currentUser!.photoURL,
         "isRead": isUserInChat ? true : false
@@ -70,16 +72,17 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       DatabaseService()
-          .addMessage(chatRoomId.toString(), messageId, messageInfoMap)
+          .addMessage(widget.chatId, messageId, messageInfoMap)
           .then((value) {
         Map<String, dynamic> lastMessageInfoMap = {
           "lastMessage": message,
           "lastMessageSendTs": lastMessageTs,
-          "lastMessageSendBy": FirebaseAuth.instance.currentUser!.displayName
+          "lastMessageSendBy": FirebaseAuth.instance.currentUser!.displayName,
+          "lastMessageSendByID": FirebaseAuth.instance.currentUser!.uid,
         };
 
         DatabaseService()
-            .updateLastMessageSend(chatRoomId.toString(), lastMessageInfoMap);
+            .updateLastMessageSend(widget.chatId, lastMessageInfoMap);
 
         if (sendClicked) {
           // remove the text in the message input field
@@ -168,11 +171,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   ds.id;
-                  if (ds["sendBy"] !=
-                      FirebaseAuth.instance.currentUser!.displayName) {
+                  if (ds["sendByID"] !=
+                      FirebaseAuth.instance.currentUser!.uid) {
                     FirebaseFirestore.instance
                         .collection('chats')
-                        .doc(chatRoomId)
+                        .doc(widget.chatId)
                         .collection('chats')
                         .doc(ds.id)
                         .update({'isRead': true});
@@ -182,9 +185,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       sender: ds["sendBy"],
                       name: ds["sendBy"],
                       message: ds["message"],
-                      sentByMe:
-                          FirebaseAuth.instance.currentUser!.displayName ==
-                              ds["sendBy"],
+                      sentByMe: FirebaseAuth.instance.currentUser!.uid ==
+                          ds["sendByID"],
                       isRead: ds["isRead"]);
                 })
             : const Center(child: CircularProgressIndicator());
@@ -193,8 +195,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   getAndSetMessages() async {
-    messageStream =
-        await DatabaseService().getChatRoomMessages(chatRoomId.toString());
+    messageStream = await DatabaseService().getChatRoomMessages(widget.chatId);
     setState(() {});
   }
 
@@ -211,11 +212,11 @@ class _ChatScreenState extends State<ChatScreen> {
         .update({'chatWithId': id});
     DocumentSnapshot chat = await FirebaseFirestore.instance
         .collection('chats')
-        .doc(chatRoomId)
+        .doc(widget.chatId)
         .get();
 
     var chatSnapshot =
-        await FirebaseFirestore.instance.collection('chats').doc(chatRoomId);
+        await FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
 
     String lastMessageSendBy = chat.get('lastMessageSendBy');
 

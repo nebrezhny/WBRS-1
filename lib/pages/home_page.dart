@@ -76,7 +76,8 @@ class _HomePageState extends State<HomePage> {
     getChatRooms();
   }
 
-  chatRoomsList(AsyncSnapshot<QuerySnapshot> snapshot, String MyNickname) {
+  chatRoomsList(
+      AsyncSnapshot<QuerySnapshot> snapshot, String MyUID, String MyNickname) {
     String nick, userNum;
     return ListView.builder(
       scrollDirection: Axis.vertical,
@@ -84,8 +85,8 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       itemCount: (snapshot.data != null ? (snapshot.data!).docs.length : 0),
       itemBuilder: (BuildContext context, int index) {
-        return snapshot.data!.docs[index].get("user1") == MyNickname ||
-                snapshot.data!.docs[index].get("user2") == MyNickname
+        return snapshot.data!.docs[index].get("user1") == MyUID ||
+                snapshot.data!.docs[index].get("user2") == MyUID
             ? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 9.0),
                 child: ListTile(
@@ -99,12 +100,13 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  "${snapshot.data!.docs[index]["lastMessageSendBy"] == MyNickname ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
+                                  "${snapshot.data!.docs[index]["lastMessageSendByID"] == MyUID ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
-                              snapshot.data!.docs[index]["lastMessageSendBy"] !=
-                                      MyNickname
+                              snapshot.data!.docs[index]
+                                          ["lastMessageSendByID"] !=
+                                      MyUID
                                   ? snapshot.data!.docs[index]
                                               ['unreadMessage'] !=
                                           null
@@ -137,19 +139,20 @@ class _HomePageState extends State<HomePage> {
                           "нет сообщений",
                           style: TextStyle(color: Colors.white),
                         ),
-                  title: snapshot.data!.docs[index].get("user1") == MyNickname
+                  title: snapshot.data!.docs[index].get("user1") == MyUID
                       ? Text(
-                          snapshot.data!.docs[index].get("user2"),
+                          snapshot.data!.docs[index].get("user2Nickname"),
                           style: const TextStyle(color: Colors.white),
                         )
                       : Text(
-                          snapshot.data!.docs[index].get("user1"),
+                          snapshot.data!.docs[index].get("user1Nickname"),
                           style: const TextStyle(color: Colors.white),
                         ),
                   onTap: () async {
-                    snapshot.data!.docs[index].get("user1") == MyNickname
-                        ? nick = snapshot.data!.docs[index].get("user2")
-                        : nick = snapshot.data!.docs[index].get("user1");
+                    snapshot.data!.docs[index].get("user1") == MyUID
+                        ? nick = snapshot.data!.docs[index].get("user2Nickname")
+                        : nick =
+                            snapshot.data!.docs[index].get("user1Nickname");
 
                     await FirebaseFirestore.instance
                         .collection("chats")
@@ -157,13 +160,7 @@ class _HomePageState extends State<HomePage> {
                             isEqualTo:
                                 getChatRoomIdByUsernames(nick, MyNickname))
                         .get()
-                        .then((QuerySnapshot snapshot) {
-                      if (snapshot.docs.isEmpty) {
-                        chatRoomId = getChatRoomIdByUsernames(MyNickname, nick);
-                      } else {
-                        chatRoomId = getChatRoomIdByUsernames(nick, MyNickname);
-                      }
-                    });
+                        .then((QuerySnapshot snapshot) {});
 
                     await FirebaseFirestore.instance
                         .collection("users")
@@ -175,13 +172,16 @@ class _HomePageState extends State<HomePage> {
                     });
 
                     setState(() {
+                      print(snapshot.data!.docs[index].id);
                       nextScreen(
-                          context, ChatScreen(nick, MyNickname, photoUrl, id));
+                          context,
+                          ChatScreen(nick, MyNickname, photoUrl, id,
+                              snapshot.data!.docs[index].id));
                     });
                   },
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(100.0),
-                    child: snapshot.data!.docs[index].get("user1") == MyNickname
+                    child: snapshot.data!.docs[index].get("user1") == MyUID
                         ? snapshot.data!.docs[index].get("user2_image") != ""
                             ? Image.network(
                                 snapshot.data!.docs[index].get("user2_image"),
@@ -384,8 +384,10 @@ class _HomePageState extends State<HomePage> {
                       );
                     } else {
                       print('object');
+
                       return chatRoomsList(
                           snapshot,
+                          FirebaseAuth.instance.currentUser!.uid,
                           FirebaseAuth.instance.currentUser!.displayName
                               .toString());
                     }

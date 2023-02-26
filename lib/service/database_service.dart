@@ -261,7 +261,6 @@ class DatabaseService {
         chatId = getChatRoomIdByUserID(user1, user2);
       }
     });
-    chatRoomId = await chatId;
     return chatId;
   }
 

@@ -246,7 +246,7 @@ class _MeetingPageState extends State<MeetingPage> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                if (city == '') {
+                                if (city.text == '') {
                                   meets = FirebaseFirestore.instance
                                       .collection('meets')
                                       .snapshots();

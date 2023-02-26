@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 String? somebodyUid,
     somebodyFullname,
     somebodyImageUrl,
-    chatRoomId,
     GlobalAbout,
     GlobalAge = '',
     GlobalPol,

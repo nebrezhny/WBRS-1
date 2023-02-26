@@ -104,10 +104,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                     fontWeight: FontWeight.bold),
               ),
             ),
-            drawer: const MyDrawer(),
             body: SingleChildScrollView(
               child: Container(
-                height: MediaQuery.of(context).size.height + 100,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("assets/fon.jpg"),
@@ -585,7 +583,33 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                         height: 20,
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          var chats = await FirebaseFirestore.instance
+                              .collection('chats')
+                              .where('user1',
+                                  isEqualTo:
+                                      FirebaseAuth.instance.currentUser!.uid)
+                              .get();
+
+                          var listWhereIamUser1 = [];
+                          var listWhereIamUser2 = [];
+                          for (int i = 0; i < chats.size; i++) {
+                            if (chats.docs[i]['user1Nickname'] ==
+                                FirebaseAuth
+                                    .instance.currentUser!.displayName) {
+                              listWhereIamUser1.add(chats.docs[i].id);
+                              FirebaseFirestore.instance
+                                  .collection('chats')
+                                  .doc(chats.docs[i].id)
+                                  .update({'user1Nickname': widget.userName});
+                            } else {
+                              listWhereIamUser2.add(chats.docs[i].id);
+                              FirebaseFirestore.instance
+                                  .collection('chats')
+                                  .doc(chats.docs[i].id)
+                                  .update({'user2Nickname': widget.userName});
+                            }
+                          }
                           setState(() {
                             DatabaseService().updateUserData(
                                 widget.userName,
@@ -599,6 +623,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                             global.GlobalAge = widget.age;
                             global.GlobalAbout = widget.about;
                           });
+
                           nextScreenReplace(
                               context,
                               ProfilePage(
