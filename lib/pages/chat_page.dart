@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,8 +7,6 @@ import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../service/notifications.dart';
 
 class UserInfo {
   String name;
@@ -61,22 +59,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getToken() async {
-    final token = await firebaseMessaging.getInitialMessage();
-    print(token);
-
-    NotificationSettings settings = await firebaseMessaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
     firebaseMessaging.getNotificationSettings();
-
-    print(settings.authorizationStatus);
   }
 
   @override
@@ -194,17 +177,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getUsers() async {
-    users_in_meet = await FirebaseFirestore.instance
+    users_in_meet = FirebaseFirestore.instance
         .collection('meets')
         .doc(widget.groupId)
         .snapshots();
     setState(() {});
   }
 
-  getUserInfo(String id) async {
-    DocumentSnapshot doc =
-        await FirebaseFirestore.instance.collection('users').doc(id).get();
-  }
+  getUserInfo(String id) async {}
 
   chatMessages() {
     return StreamBuilder(
@@ -243,16 +223,16 @@ class _ChatPageState extends State<ChatPage> {
                     subtitle: Row(
                       children: [
                         int.parse(user_info[index].age) % 10 == 0
-                            ? Text(user_info[index].age + ' лет')
+                            ? Text('${user_info[index].age} лет')
                             : int.parse(user_info[index].age) % 10 == 1
-                                ? Text(user_info[index].age + ' год')
+                                ? Text('${user_info[index].age} год')
                                 : int.parse(user_info[index].age) % 10 != 5
-                                    ? Text(user_info[index].age + ' года')
-                                    : Text(user_info[index].age + ' лет'),
+                                    ? Text('${user_info[index].age} года')
+                                    : Text('${user_info[index].age} лет'),
                         const SizedBox(
                           width: 20,
                         ),
-                        Text("Город " + user_info[index].city)
+                        Text("Город ${user_info[index].city}")
                       ],
                     ),
                     leading: SizedBox(
@@ -298,10 +278,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('ChatList Got a message whilst in the foreground!');
-      print('ChatList Message data: ${message.data}');
-    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
   }
 
   Future<bool> onBackPress() {

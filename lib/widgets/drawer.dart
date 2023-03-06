@@ -9,7 +9,7 @@ import 'package:messenger/pages/auth/writing_data_user.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/shop.dart';
-import 'package:messenger/pages/test/kvadrat.dart';
+import 'package:messenger/pages/visiters.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../pages/auth/login_page.dart';
@@ -34,6 +34,28 @@ class _MyDrawerState extends State<MyDrawer> {
 
   Stream? groups;
   String groupName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .where("fullName",
+            isEqualTo:
+                FirebaseAuth.instance.currentUser!.displayName.toString())
+        .get()
+        .then((QuerySnapshot snapshot) {
+      GlobalAge = snapshot.docs[0].get("age".toString()).toString();
+      GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
+      GlobalCity = snapshot.docs[0]["city"].toString();
+      GlobalHobbi = snapshot.docs[0]["hobbi"];
+      GlobalRost = snapshot.docs[0]["rost"];
+      GlobalDeti = snapshot.docs[0]["deti"];
+      Group = snapshot.docs[0]["группа"];
+      GlobalPol = snapshot.docs[0]["пол"];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -57,25 +79,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     setState(() {
                       selectedIndex = 0;
                     });
-                    await FirebaseFirestore.instance
-                        .collection("users")
-                        .where("fullName",
-                            isEqualTo: FirebaseAuth
-                                .instance.currentUser!.displayName
-                                .toString())
-                        .get()
-                        .then((QuerySnapshot snapshot) {
-                      GlobalAge =
-                          snapshot.docs[0].get("age".toString()).toString();
-                      GlobalAbout =
-                          snapshot.docs[0].get("about".toString()).toString();
-                      GlobalCity = snapshot.docs[0]["city"].toString();
-                      GlobalHobbi = snapshot.docs[0]["hobbi"];
-                      GlobalRost = snapshot.docs[0]["rost"];
-                      GlobalDeti = snapshot.docs[0]["deti"];
-                      Group = snapshot.docs[0]["группа"];
-                      GlobalPol = snapshot.docs[0]["пол"];
-                    });
+
                     nextScreen(
                         context,
                         ProfilePage(
@@ -150,7 +154,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   onTap: () {
                     //nextScreenReplace(context, const AboutUserWriting());
-                    nextScreen(context, AboutUserWriting());
+                    nextScreen(context, const AboutUserWriting());
                   },
                 ),
                 ListTile(
@@ -179,7 +183,6 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () async {
                     setState(() {
                       selectedIndex = 0;
-                      print(selectedIndex);
                     });
                     DocumentSnapshot doc = await FirebaseFirestore.instance
                         .collection('users')
@@ -187,24 +190,6 @@ class _MyDrawerState extends State<MyDrawer> {
                         .get();
                     Images = doc.get('images');
                     CountImages = Images.length;
-
-                    await FirebaseFirestore.instance
-                        .collection("users")
-                        .where("uid",
-                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                        .get()
-                        .then((QuerySnapshot snapshot) {
-                      GlobalAge =
-                          snapshot.docs[0].get("age".toString()).toString();
-                      GlobalAbout =
-                          snapshot.docs[0].get("about".toString()).toString();
-                      GlobalCity = snapshot.docs[0]["city"].toString();
-                      GlobalHobbi = snapshot.docs[0]["hobbi"];
-                      GlobalRost = snapshot.docs[0]["rost"];
-                      GlobalDeti = snapshot.docs[0]["deti"];
-                      Group = snapshot.docs[0]["группа"];
-                      GlobalPol = snapshot.docs[0]["пол"];
-                    });
 
                     nextScreen(
                         context,
@@ -235,6 +220,28 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                 ),
                 ListTile(
+                  onTap: () {
+                    var visiters = FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection('visiters')
+                        .snapshots();
+                    nextScreen(
+                        context,
+                        MyVisitersPage(
+                          visiters: visiters,
+                        ));
+                  },
+                  title: const Text("Гости",
+                      style: TextStyle(color: Colors.white)),
+                  leading: const Icon(
+                    Icons.transfer_within_a_station,
+                    color: Colors.grey,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                ),
+                ListTile(
                   onTap: () async {
                     setState(() {
                       selectedIndex = 2;
@@ -252,7 +259,6 @@ class _MyDrawerState extends State<MyDrawer> {
                       Group = snapshot.docs[0]["группа"];
                     });
                     nextScreenReplace(context, ProfilesList());
-                    print(email + userName);
                   },
                   leading: const Icon(
                     Icons.people,
@@ -267,7 +273,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () {
-                    nextScreenReplace(context, ShopPage());
+                    nextScreenReplace(context, const ShopPage());
                   },
                   title: const Text("Магазин",
                       style: TextStyle(color: Colors.white)),
@@ -280,6 +286,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () {
+                    setState(() {
+                      selectedIndex = 3;
+                    });
                     nextScreenReplace(context, const MeetingPage());
                   },
                   title: const Text("Встречи",

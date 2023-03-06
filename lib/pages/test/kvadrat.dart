@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -10,18 +12,15 @@ class Kvadrat extends StatefulWidget {
 }
 
 class _KvadratState extends State<Kvadrat> {
-
   Alignment align = Alignment.center;
-  bool all_buttons=true;
-  bool left_button=true;
-  bool right_button=true;
+  bool all_buttons = true;
+  bool left_button = true;
+  bool right_button = true;
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(
+      body: SizedBox(
         width: 500,
         height: 1000,
         child: Center(
@@ -29,44 +28,54 @@ class _KvadratState extends State<Kvadrat> {
             children: [
               AnimatedContainer(
                 color: Colors.white,
-                alignment:align,
+                alignment: align,
                 height: 100,
                 width: MediaQuery.of(context).size.width,
                 curve: Curves.fastOutSlowIn,
-                duration: Duration(seconds: 1),
+                duration: const Duration(seconds: 1),
                 child: Container(
                   color: Colors.green,
                   width: 100,
                 ),
-
               ),
-
               Row(
                 children: [
-                  ElevatedButton(onPressed: all_buttons?left_button?(){
-                    MoveLeft();
-                    all_buttons=false;
-                    Timer(Duration(seconds: 1),(){
-                      setState((){
-                        all_buttons=true;
-                      });
-                    });
-                    left_button=false;
-                    right_button=true;
-                  }:null:null, child: Icon(Icons.arrow_back), style: ButtonStyle(
-
-                  ),),
-                  ElevatedButton(onPressed: all_buttons?right_button?(){
-                    MoveRight();
-                    all_buttons=false;
-                    Timer(Duration(seconds: 1),(){
-                      setState((){
-                        all_buttons=true;
-                      });
-                    });
-                    right_button=false;
-                    left_button=true;
-                  }:null:null, child: Icon(Icons.arrow_forward_outlined)),
+                  ElevatedButton(
+                    onPressed: all_buttons
+                        ? left_button
+                            ? () {
+                                MoveLeft();
+                                all_buttons = false;
+                                Timer(const Duration(seconds: 1), () {
+                                  setState(() {
+                                    all_buttons = true;
+                                  });
+                                });
+                                left_button = false;
+                                right_button = true;
+                              }
+                            : null
+                        : null,
+                    style: const ButtonStyle(),
+                    child: const Icon(Icons.arrow_back),
+                  ),
+                  ElevatedButton(
+                      onPressed: all_buttons
+                          ? right_button
+                              ? () {
+                                  MoveRight();
+                                  all_buttons = false;
+                                  Timer(const Duration(seconds: 1), () {
+                                    setState(() {
+                                      all_buttons = true;
+                                    });
+                                  });
+                                  right_button = false;
+                                  left_button = true;
+                                }
+                              : null
+                          : null,
+                      child: const Icon(Icons.arrow_forward_outlined)),
                 ],
               ),
             ],
@@ -76,12 +85,13 @@ class _KvadratState extends State<Kvadrat> {
     );
   }
 
-  void MoveLeft(){
+  void MoveLeft() {
     setState(() {
       align = Alignment.topLeft;
     });
   }
-  void MoveRight(){
+
+  void MoveRight() {
     setState(() {
       align = Alignment.topRight;
     });

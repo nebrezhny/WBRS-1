@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/src/widgets/container.dart';
+// ignore_for_file: implementation_imports, must_be_immutable, non_constant_identifier_names
+
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:messenger/pages/chat_page.dart';
-import 'package:messenger/pages/chatscreen.dart';
 
 class AboutMeet extends StatefulWidget {
   String id = '';

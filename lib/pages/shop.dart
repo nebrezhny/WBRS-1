@@ -1,11 +1,7 @@
-import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:messenger/widgets/bottom_nav_bar.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:tinkoff_acquiring/tinkoff_acquiring.dart';
-import 'package:tinkoff_acquiring_flutter/tinkoff_acquiring_flutter.dart';
 
 class Podarok {
   String img;
@@ -28,12 +24,6 @@ class _ShopPageState extends State<ShopPage> {
           terminalKey: terminalKey, isDebugMode: true));
 
   static const String terminalKey = 'TestSDK';
-  static const String password = '12345678';
-  static const String publicKey =
-      'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5Yg3RyEkszggDVMDHCAGzJm0mYpYT53BpasrsKdby8iaWJVACj8ueR0Wj3Tu2BY64HdIoZFvG0v7UqSFztE/zUvnznbXVYguaUcnRdwao9gLUQO2I/097SHF9r++BYI0t6EtbbcWbfi755A1EWfu9tdZYXTrwkqgU9ok2UIZCPZ4evVDEzDCKH6ArphVc4+iKFrzdwbFBmPmwi5Xd6CB9Na2kRoPYBHePGzGgYmtKgKMNs+6rdv5v9VB3k7CS/lSIH4p74/OPRjyryo6Q7NbL+evz0+s60Qz5gbBRGfqCA57lUiB3hfXQZq5/q1YkABOHf9cR6Ov5nTRSOnjORgPjwIDAQAB';
-
-  static const String customerKey = 'madbrains-user-key';
-  static const int amount = 1400;
 
   ValueNotifier<bool> threeDs = ValueNotifier<bool>(false);
   ValueNotifier<bool> threeDsV2 = ValueNotifier<bool>(false);
@@ -117,9 +107,9 @@ class _ShopPageState extends State<ShopPage> {
       subtitle: Text(price.toString()),
       trailing: ElevatedButton(
         onPressed: () {},
-        child: const Text("Купить"),
         style: const ButtonStyle(
             backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+        child: const Text("Купить"),
       ),
       tileColor: Colors.white,
     );

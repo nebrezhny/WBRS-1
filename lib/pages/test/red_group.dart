@@ -1,5 +1,6 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/test/green_group.dart';
 
@@ -62,71 +63,68 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
   int counter = 0;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Colors.green,
-              )
-            ]),
-            child: Image.asset(
-              "assets/fon.jpg",
-              height: MediaQuery.of(context).size.height,
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(boxShadow: [
+            BoxShadow(
+              color: Colors.green,
+            )
+          ]),
+          child: Image.asset(
+            "assets/fon.jpg",
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+            scale: 0.6,
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: const Text(
+              "Tecт",
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Container(
               width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              scale: 0.6,
-            ),
-          ),
-          Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              title: const Text(
-                "Tecт",
-              ),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 1350,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                child: Column(
-                  children: [
-                    const Text(
-                      "Отметьте знаком «+» те качества , которые для вас обычны и «-» если противоположны, повседневны. Итак, если вы:",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: 1150,
-                      child: ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: colors.length,
-                          itemBuilder: (_, int index) {
-                            return QuestionBuilder(index);
-                          }),
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          RedGroup = counter;
-                        });
-                        nextScreen(context, const GreenPage());
-                      },
-                      child: const Text("Дальше"),
-                    )
-                  ],
-                ),
+              height: 1350,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Column(
+                children: [
+                  const Text(
+                    "Отметьте знаком «+» те качества , которые для вас обычны и «-» если противоположны, повседневны. Итак, если вы:",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  SizedBox(
+                    height: 1150,
+                    child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: colors.length,
+                        itemBuilder: (_, int index) {
+                          return QuestionBuilder(index);
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        RedGroup = counter;
+                      });
+                      nextScreen(context, const GreenPage());
+                    },
+                    child: const Text("Дальше"),
+                  )
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -151,14 +149,14 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                         counter++;
                       });
                     },
-                    child: const Text(
-                      "+",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.red
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "+",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -174,14 +172,14 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                         colors[index] = Colors.red;
                       });
                     },
-                    child: const Text(
-                      "-",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.green
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "-",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ],
               ),

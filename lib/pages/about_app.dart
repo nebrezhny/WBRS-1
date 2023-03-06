@@ -1,6 +1,6 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:messenger/pages/policy/confidecialnost.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -72,7 +72,7 @@ class About_App extends StatelessWidget {
                     thickness: 1,
                   ),
                   Container(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: const [

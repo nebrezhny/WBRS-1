@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:messenger/pages/profile_edit_page.dart';
 import 'package:messenger/pages/profiles_list.dart';
+import 'package:messenger/pages/visiters.dart';
 import 'package:messenger/service/auth_service.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:flutter/material.dart';
@@ -189,14 +192,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(50.0))),
                                 child: IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      var visiters = FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .collection('visiters')
+                                          .snapshots();
+                                      nextScreen(
+                                          context,
+                                          MyVisitersPage(
+                                            visiters: visiters,
+                                          ));
+                                    },
                                     icon: const Icon(
-                                      Icons.settings,
-                                      size: 35,
+                                      Icons.info,
+                                      size: 30,
                                       color: Colors.white,
                                     ))),
                             const Text(
-                              "Настройки",
+                              "Мои гости",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w300,
@@ -281,7 +296,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        selectedIndex = 3;
+                                        selectedIndex = 2;
                                       });
                                       nextScreenReplace(
                                           context, ProfilesList());
@@ -331,9 +346,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       .ref(
                                           'images-${FirebaseAuth.instance.currentUser!.displayName}')
                                       .putFile(File(_image!.path));
-                                } on FirebaseException catch (e) {
-                                  print(e);
-                                }
+                                } on FirebaseException {}
                                 var downloadUrl = await storage
                                     .ref(
                                         'images-${FirebaseAuth.instance.currentUser!.displayName}')
@@ -355,12 +368,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         )
                       : Column(
                           children: [
-                            Container(
+                            SizedBox(
                               height: 100,
                               width: MediaQuery.of(context).size.width,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemBuilder: (BuildContext, int index) {
+                                itemBuilder: (BuildContext context, int index) {
                                   return Container(
                                     decoration: const BoxDecoration(
                                         borderRadius: BorderRadius.only(
@@ -381,10 +394,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
-                                                child: Container(
-                                                  child: Image.network(
-                                                    Images[index],
-                                                  ),
+                                                child: Image.network(
+                                                  Images[index],
                                                 ),
                                               ),
                                             ),

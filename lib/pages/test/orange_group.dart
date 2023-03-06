@@ -1,13 +1,11 @@
+// ignore_for_file: unrelated_type_equality_checks, non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
-import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/profile_page.dart';
 import 'package:messenger/widgets/widgets.dart';
-
-import '../../helper/global.dart';
 
 class OrangePage extends StatefulWidget {
   const OrangePage({Key? key}) : super(key: key);
@@ -144,11 +142,6 @@ class _OrangePageState extends State<OrangePage> {
                             if (OrangeGroup > max2 && OrangePage != max) {
                               max2 = OrangeGroup;
                             }
-                            print(FirebaseAuth.instance.currentUser!.uid);
-                            print(RedGroup +
-                                WhiteGroup +
-                                OrangeGroup +
-                                GreenGroup);
                             if (max == RedGroup) {
                               if (max2 == GreenGroup) {
                                 FirebaseFirestore.instance
@@ -295,14 +288,14 @@ class _OrangePageState extends State<OrangePage> {
                         counter++;
                       });
                     },
-                    child: const Text(
-                      "+",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.red
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "+",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -318,14 +311,14 @@ class _OrangePageState extends State<OrangePage> {
                         colors[index] = Colors.red;
                       });
                     },
-                    child: const Text(
-                      "-",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.green
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "-",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ],
               ),

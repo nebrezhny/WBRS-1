@@ -1,6 +1,5 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, avoid_function_literals_in_foreach_calls
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,12 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/home_page.dart';
-import 'package:messenger/service/messaging.dart';
 import 'package:messenger/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:messenger/widgets/check_internet.dart';
+import 'package:messenger/widgets/widgets.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message ${message.messageId}');
@@ -66,8 +66,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    checkInternet();
     super.initState();
-
     getUserLoggedInStatus();
     if (_isSignedIn) {
       getUserRegistrationStatus();
@@ -75,6 +75,21 @@ class _MyAppState extends State<MyApp> {
 
     if (Platform.isIOS) {
       firebaseMessaging.requestPermission();
+    }
+  }
+
+  checkInternet() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        print(result);
+        return true;
+      }
+    } on SocketException catch (_) {
+      nextScreen(context, const CheckInternetPage());
+      print('not connected');
+      return false;
     }
   }
 
@@ -167,8 +182,6 @@ class _MyAppState extends State<MyApp> {
               channel.id,
               channel.name,
               channel.description,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
               icon: 'launch_background',
             ),
           ),

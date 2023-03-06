@@ -1,8 +1,9 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/about_meet.dart';
 import 'package:messenger/widgets/bottom_nav_bar.dart';
 import 'package:messenger/widgets/drawer.dart';
@@ -18,6 +19,7 @@ class MeetingPage extends StatefulWidget {
 class _MeetingPageState extends State<MeetingPage> {
   @override
   void initState() {
+    super.initState();
     meets = FirebaseFirestore.instance.collection('meets').snapshots();
   }
 
@@ -31,6 +33,7 @@ class _MeetingPageState extends State<MeetingPage> {
 
   late int kolvo_users;
 
+  @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -257,7 +260,6 @@ class _MeetingPageState extends State<MeetingPage> {
                                       .snapshots();
                                 }
                               });
-                              print(city.text);
                             },
                             icon: const Icon(Icons.search),
                             iconSize: 25,

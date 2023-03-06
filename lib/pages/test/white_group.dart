@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/test/orange_group.dart';
@@ -64,7 +66,7 @@ class _WhitePageState extends State<WhitePage> {
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(boxShadow: [
+          decoration: const BoxDecoration(boxShadow: [
             BoxShadow(
               color: Colors.green,
             )
@@ -80,29 +82,30 @@ class _WhitePageState extends State<WhitePage> {
         Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-              title: Text(
+              title: const Text(
                 "Tecт",
               ),
             ),
             body: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
                   width: 800,
                   height: 1160,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 1020,
                         child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: colors.length,
                             itemBuilder: (_, int index) {
                               return QuestionBuilder(index);
                             }),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 30,
                       ),
                       ElevatedButton(
@@ -110,9 +113,9 @@ class _WhitePageState extends State<WhitePage> {
                             setState(() {
                               WhiteGroup = counter;
                             });
-                            nextScreen(context, OrangePage());
+                            nextScreen(context, const OrangePage());
                           },
-                          child: Text("Дальше"))
+                          child: const Text("Дальше"))
                     ],
                   ),
                 ))),
@@ -141,14 +144,14 @@ class _WhitePageState extends State<WhitePage> {
                         counter++;
                       });
                     },
-                    child: const Text(
-                      "+",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.red
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "+",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -164,14 +167,14 @@ class _WhitePageState extends State<WhitePage> {
                         colors[index] = Colors.red;
                       });
                     },
-                    child: const Text(
-                      "-",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.green
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "-",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ],
               ),

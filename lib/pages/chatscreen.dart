@@ -1,7 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/service/database_service.dart';
@@ -13,8 +14,14 @@ import 'package:random_string/random_string.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatWithUsername, name, photoUrl, id, chatId;
-  ChatScreen(
-      this.chatWithUsername, this.name, this.photoUrl, this.id, this.chatId);
+  const ChatScreen(
+      {Key? key,
+      required this.chatWithUsername,
+      required this.name,
+      required this.photoUrl,
+      required this.id,
+      required this.chatId})
+      : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -27,10 +34,10 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageTextEdittingController = TextEditingController();
 
   getMyInfoFromSharedPreference() async {
-    myName = await HelperFunctions().getDisplayName().toString();
-    myProfilePic = await HelperFunctions().getUserProfileUrl().toString();
-    myUserName = await HelperFunctions().getUserName().toString();
-    myEmail = await HelperFunctions().getUserEmail().toString();
+    myName = HelperFunctions().getDisplayName().toString();
+    myProfilePic = HelperFunctions().getUserProfileUrl().toString();
+    myUserName = HelperFunctions().getUserName().toString();
+    myEmail = HelperFunctions().getUserEmail().toString();
   }
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -216,7 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
         .get();
 
     var chatSnapshot =
-        await FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
+        FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
 
     String lastMessageSendBy = chat.get('lastMessageSendBy');
 
@@ -278,11 +285,15 @@ class _ChatScreenState extends State<ChatScreen> {
                               Images = doc.get('images');
                               CountImages = Images.length;
                               nextScreen(
-                                  context,
+                                  !mounted ? context : '',
                                   SomebodyProfile(
                                     uid: widget.id,
                                     photoUrl: widget.photoUrl,
                                     name: widget.chatWithUsername,
+                                    userInfo: FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(widget.id)
+                                        .snapshots(),
                                   ));
                             },
                             child: Image.network(

@@ -1,7 +1,10 @@
+// ignore_for_file: must_be_immutable, unnecessary_string_escapes, non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
+import 'package:messenger/pages/chatscreen.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -12,8 +15,13 @@ class SomebodyProfile extends StatefulWidget {
   String uid;
   String photoUrl;
   String name;
+  Stream? userInfo;
   SomebodyProfile(
-      {Key? key, required this.uid, required this.photoUrl, required this.name})
+      {Key? key,
+      required this.uid,
+      required this.photoUrl,
+      required this.name,
+      required this.userInfo})
       : super(key: key);
 
   @override
@@ -32,6 +40,78 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
     } else {
       return "abrakadabra";
     }
+  }
+
+  upgradeUserVisiters(String uid) async {
+    String myUid = FirebaseAuth.instance.currentUser!.uid;
+
+    var doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('visiters')
+        .snapshots()
+        .isEmpty;
+
+    var MyUserInfo = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (!doc) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('visiters')
+          .add({
+        "uid": myUid,
+        "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+        "lastVisitTs": DateTime.now(),
+        "fullName": FirebaseAuth.instance.currentUser!.displayName,
+        "age": MyUserInfo.get('age'),
+        "city": MyUserInfo.get('city')
+      });
+    } else {
+      var doc2 = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('visiters')
+          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .snapshots()
+          .isEmpty;
+      if (!doc2) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('visiters')
+            .add({
+          "uid": myUid,
+          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+          "lastVisitTs": DateTime.now(),
+          "fullName": FirebaseAuth.instance.currentUser!.displayName,
+          "age": MyUserInfo.get('age'),
+          "city": MyUserInfo.get('city')
+        });
+      } else {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('visiters')
+            .doc(myUid)
+            .update({
+          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+          "lastVisitTs": DateTime.now(),
+          "fullName": FirebaseAuth.instance.currentUser!.displayName,
+          "age": MyUserInfo.get('age'),
+          "city": MyUserInfo.get('city')
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    upgradeUserVisiters(widget.uid);
   }
 
   @override
@@ -104,12 +184,13 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                               "Нет фотографий",
                               style: TextStyle(color: Colors.white),
                             )
-                          : Container(
+                          : SizedBox(
                               height: 100,
                               width: MediaQuery.of(context).size.width,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemBuilder: (BuildContext, int index) {
+                                itemBuilder:
+                                    (BuildContext BuildContext, int index) {
                                   return Container(
                                     decoration: const BoxDecoration(
                                         borderRadius: BorderRadius.only(
@@ -130,10 +211,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
-                                                child: Container(
-                                                  child: Image.network(
-                                                    Images[index],
-                                                  ),
+                                                child: Image.network(
+                                                  Images[index],
                                                 ),
                                               ),
                                             ),
@@ -167,6 +246,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                             children: [
                               IconButton(
                                   onPressed: () async {
+                                    String chatID = '';
                                     Map<String, dynamic> chatRoomInfoMap = {
                                       "user1": FirebaseAuth
                                           .instance.currentUser!.uid
@@ -191,20 +271,30 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     // :nextScreen(context, HomePage());
                                     await FirebaseFirestore.instance
                                         .collection("chats")
-                                        .where("chatId",
-                                            isEqualTo: getChatRoomIdByUsernames(
-                                                widget.name,
-                                                FirebaseAuth.instance
-                                                    .currentUser!.displayName
-                                                    .toString()))
+                                        .where("user1",
+                                            isEqualTo: FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                        .where("user2", isEqualTo: widget.uid)
                                         .get()
                                         .then((QuerySnapshot snapshot) {
-                                      print(1);
                                       if (snapshot.docs.isEmpty) {
-                                        print(false);
                                       } else {
                                         HaveOrNot = true;
-                                        print(true);
+                                        chatID = snapshot.docs[0].id;
+                                      }
+                                    });
+                                    await FirebaseFirestore.instance
+                                        .collection("chats")
+                                        .where("user2",
+                                            isEqualTo: FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                        .where("user1", isEqualTo: widget.uid)
+                                        .get()
+                                        .then((QuerySnapshot snapshot) {
+                                      if (snapshot.docs.isEmpty) {
+                                      } else {
+                                        HaveOrNot = true;
+                                        chatID = snapshot.docs[0].id;
                                       }
                                     });
                                     await FirebaseFirestore.instance
@@ -217,11 +307,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                 widget.name))
                                         .get()
                                         .then((QuerySnapshot snapshot) {
-                                      print(1);
                                       if (snapshot.docs.isEmpty) {
                                       } else {
                                         HaveOrNot = true;
-                                        print(true);
                                       }
                                       if (HaveOrNot == false) {
                                         DatabaseService().createChatRoom(
@@ -246,10 +334,24 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                     .currentUser!.displayName
                                                     .toString(),
                                                 widget.name));
-                                      } else {
                                         nextScreen(context, const HomePage());
+                                      } else {
+                                        nextScreenReplace(
+                                            context,
+                                            ChatScreen(
+                                              chatId: chatID,
+                                              chatWithUsername: widget.name,
+                                              id: FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              name: FirebaseAuth.instance
+                                                  .currentUser!.displayName
+                                                  .toString(),
+                                              photoUrl: widget.photoUrl,
+                                            ));
                                       }
-                                      nextScreen(context, const HomePage());
+                                    });
+                                    setState(() {
+                                      selectedIndex = 1;
                                     });
                                   },
                                   icon: const Icon(
@@ -272,14 +374,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                           )
                         ],
                       ),
-                      FutureBuilder(
-                          future: users.doc(widget.uid).get(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
+                      StreamBuilder(
+                          stream: widget.userInfo,
+                          builder: (BuildContext context, snapshot) {
+                            print(snapshot);
                             if (snapshot.connectionState ==
                                 ConnectionState.done) {
-                              Map<String, dynamic> data =
-                                  snapshot.data!.data() as Map<String, dynamic>;
                               return Column(
                                 children: [
                                   Row(
@@ -294,7 +394,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
-                                        data['age'].toString(),
+                                        snapshot.data!.get('age').toString(),
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
@@ -315,7 +415,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
-                                        data['rost'],
+                                        snapshot.data!.get('rost'),
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
@@ -324,33 +424,33 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Хобби: ",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 23,
-                                              fontWeight: FontWeight.bold),
-                                          softWrap: true,
-                                          textAlign: TextAlign.left,
-                                        ),
-                                        Text(
-                                          data['hobbi'] != ""
-                                              ? data['hobbi']
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Хобби: ",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 23,
+                                            fontWeight: FontWeight.bold),
+                                        softWrap: true,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          snapshot.data!.get('hobbi') != ""
+                                              ? snapshot.data!.get('hobbi')
                                               : "не заполнено",
                                           style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 21),
                                           softWrap: true,
-                                        )
-                                      ],
-                                    ),
+                                          maxLines: 10,
+                                          overflow: TextOverflow.fade,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -367,7 +467,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
-                                        data['deti'] ? "есть" : "нет",
+                                        snapshot.data!.get('deti')
+                                            ? "есть"
+                                            : "нет",
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                       )
@@ -376,48 +478,43 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Container(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text("О себе",
-                                            style: TextStyle(
-                                                fontSize: 23,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                            textAlign: TextAlign.left),
-                                        const Padding(
-                                            padding:
-                                                EdgeInsets.only(bottom: 20.0)),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              width: double.infinity,
-                                              child: Container(
-                                                child: new Text(
-                                                  data['about'],
-                                                  style: const TextStyle(
-                                                      fontSize: 21,
-                                                      color: Colors.white),
-                                                  textAlign: TextAlign.center,
-                                                  softWrap: true,
-                                                ),
-                                              ),
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text("О себе",
+                                          style: TextStyle(
+                                              fontSize: 23,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
+                                          textAlign: TextAlign.left),
+                                      const Padding(
+                                          padding:
+                                              EdgeInsets.only(bottom: 20.0)),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Text(
+                                              snapshot.data!.get('about'),
+                                              style: const TextStyle(
+                                                  fontSize: 21,
+                                                  color: Colors.white),
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
                                             ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   ),
                                 ],
                               );
                             } else {
                               return const Text('Загрузка... ');
                             }
-                            return const Text('Загрузка...');
                           })
                     ],
                   ),
@@ -428,8 +525,6 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         ],
       );
     }
-
-    ;
 
     return BuildSomebodyProfile();
 

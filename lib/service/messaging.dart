@@ -11,20 +11,17 @@ initializeMessaging() async {
   _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings("@mipmap/launcher_icon");
-  final InitializationSettings initializationSettings =
+  const InitializationSettings initializationSettings =
       InitializationSettings(android: initializationSettingsAndroid);
   await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: selectionNotification);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print("onMessage: $message");
     await handleMessage(message);
   });
 }
 
-Future<dynamic> selectionNotification(String? payload) async {
-  print('payload: $payload');
-}
+Future<dynamic> selectionNotification(String? payload) async {}
 
 handleMessage(RemoteMessage message) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =

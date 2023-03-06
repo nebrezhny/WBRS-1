@@ -1,7 +1,8 @@
 // ignore: non_constant_identifier_names
-import 'package:firebase_auth/firebase_auth.dart';
+
+// ignore_for_file: non_constant_identifier_names, duplicate_ignore
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 String? somebodyUid,
     somebodyFullname,
@@ -31,11 +32,3 @@ String FiltrPol = "";
 RangeValues currentValues = const RangeValues(18, 22);
 
 late List user_info;
-
-getWidthOfScreen(BuildContext context) {
-  double width = MediaQuery.of(context).size.width;
-}
-
-getHeightOfScreen(BuildContext context) {
-  double height = MediaQuery.of(context).size.height;
-}

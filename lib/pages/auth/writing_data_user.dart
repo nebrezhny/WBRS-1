@@ -1,6 +1,6 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:io';
-import 'package:messenger/pages/home_page.dart';
-import 'package:messenger/pages/test/orange_group.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:messenger/widgets/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../helper/global.dart';
 import '../../helper/helper_function.dart';
@@ -35,7 +34,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   String imageUrl = " ";
   String chatIdThis = "";
   XFile? _image;
-  bool _isSignedIn = false;
   String? deti;
   String? pol;
   bool Deti = false;
@@ -44,9 +42,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   getUserLoggedInStatus() async {
     await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {
-        setState(() {
-          _isSignedIn = value;
-        });
+        setState(() {});
       }
     });
   }
@@ -73,7 +69,9 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
           height: 50,
         ),
         Scaffold(
-          appBar: AppBar(),
+          appBar: AppBar(
+            backgroundColor: Colors.orangeAccent,
+          ),
           backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           body: SingleChildScrollView(
@@ -103,7 +101,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                         size: 105,
                                       )),
                                 )
-                              : Container(
+                              : SizedBox(
                                   width: 200,
                                   height: 200,
                                   child: Image.file(
@@ -121,19 +119,12 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             height: 50,
                             child: IconButton(
                               onPressed: () async {
-                                final AuthName = FirebaseAuth
-                                    .instance.currentUser!.displayName;
-
                                 // print(await FirebaseFirestore.instance.collection('chats').where('user2',isEqualTo: AuthName)
                                 //     .snapshots().length);
 
                                 XFile? image = await ImagePicker()
                                     .pickImage(source: ImageSource.gallery);
-                                if (image == null) {
-                                  print(1);
-                                } else {
-                                  print(image.path);
-                                }
+
                                 setState(() {
                                   _image = image;
                                 });
@@ -146,7 +137,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                           'avatar-${FirebaseAuth.instance.currentUser!.displayName}')
                                       .putFile(File(_image!.path));
                                 } on FirebaseException catch (e) {
-                                  print(e);
+                                  e.message;
                                 }
                                 var downloadUrl = await storage
                                     .ref(
@@ -157,8 +148,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 await FirebaseFirestore.instance
                                     .collection("users")
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({'profilePic': downloadUrl}).then(
-                                        (value) => print("done"));
+                                    .update({'profilePic': downloadUrl});
 
                                 FirebaseAuth.instance.currentUser!
                                     .updatePhotoURL(downloadUrl);
@@ -187,7 +177,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Возраст"),
-                        Container(
+                        SizedBox(
                           width: 190,
                           height: 40,
                           child: TextField(
@@ -223,7 +213,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Рост"),
-                        Container(
+                        SizedBox(
                           width: 190,
                           height: 40,
                           child: TextField(
@@ -257,7 +247,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Город"),
-                        Container(
+                        SizedBox(
                           width: 190,
                           height: 40,
                           child: TextField(
@@ -360,7 +350,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Хобби"),
-                        Container(
+                        SizedBox(
                           width: 190,
                           height: 40,
                           child: TextField(
@@ -394,7 +384,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("О себе"),
-                        Container(
+                        SizedBox(
                           width: 190,
                           height: 140,
                           child: TextField(
@@ -443,9 +433,11 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Вы подтверждаете, что вам есть 18 лет",
-                            style: TextStyle(color: Colors.white),
+                          const Flexible(
+                            child: Text(
+                              "Вы подтверждаете, что вам есть 18 лет",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                           Checkbox(
                             value: Is18,
@@ -534,7 +526,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             if (pol == null) {
                               showSnackbar(context, Colors.red, "Укажите пол.");
                             } else {
-                              print(pol);
                               nextScreenReplace(context, const FirstGroupRed());
                             }
                           }

@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:messenger/pages/chat_page.dart';
-import 'package:messenger/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class ChatTile extends StatefulWidget {

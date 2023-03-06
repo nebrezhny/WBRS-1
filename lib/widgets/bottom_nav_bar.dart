@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,14 +89,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           GlobalPol = snapshot.docs[0]["пол"];
         });
         nextScreenReplace(context, ProfilesList());
-        print(email + userName);
 
         break;
       case 3:
         nextScreen(context, const MeetingPage());
         break;
     }
-    ;
   }
 
   @override

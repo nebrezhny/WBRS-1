@@ -1,9 +1,7 @@
-import 'dart:convert';
+// ignore_for_file: unnecessary_string_escapes, non_constant_identifier_names
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
 import 'package:messenger/service/auth_service.dart';
@@ -13,10 +11,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:messenger/widgets/widgets.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
-
-import '../service/notifications.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -78,7 +72,7 @@ class _HomePageState extends State<HomePage> {
 
   chatRoomsList(
       AsyncSnapshot<QuerySnapshot> snapshot, String MyUID, String MyNickname) {
-    String nick, userNum;
+    String nick;
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
@@ -94,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(40.0)),
                   subtitle: snapshot.data!.docs[index]["lastMessage"] != ""
                       ? Container(
-                          padding: EdgeInsets.only(right: 20),
+                          padding: const EdgeInsets.only(right: 20),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -129,9 +123,9 @@ class _HomePageState extends State<HomePage> {
                                                     fontFamily: 'Roboto'),
                                               ),
                                             )
-                                          : SizedBox()
-                                      : SizedBox()
-                                  : SizedBox(),
+                                          : const SizedBox()
+                                      : const SizedBox()
+                                  : const SizedBox(),
                             ],
                           ),
                         )
@@ -149,34 +143,25 @@ class _HomePageState extends State<HomePage> {
                           style: const TextStyle(color: Colors.white),
                         ),
                   onTap: () async {
-                    snapshot.data!.docs[index].get("user1") == MyUID
-                        ? nick = snapshot.data!.docs[index].get("user2Nickname")
-                        : nick =
-                            snapshot.data!.docs[index].get("user1Nickname");
-
-                    await FirebaseFirestore.instance
-                        .collection("chats")
-                        .where("chatId",
-                            isEqualTo:
-                                getChatRoomIdByUsernames(nick, MyNickname))
-                        .get()
-                        .then((QuerySnapshot snapshot) {});
-
-                    await FirebaseFirestore.instance
-                        .collection("users")
-                        .where("fullName", isEqualTo: nick)
-                        .get()
-                        .then((QuerySnapshot snapshot) {
-                      id = snapshot.docs[0].id;
-                      photoUrl = snapshot.docs[0].get("profilePic");
-                    });
+                    if (snapshot.data!.docs[index].get("user1") == MyUID) {
+                      nick = snapshot.data!.docs[index].get("user2Nickname");
+                      id = snapshot.data!.docs[index]['user2'];
+                      photoUrl = snapshot.data!.docs[index]['user2_image'];
+                    } else {
+                      nick = snapshot.data!.docs[index].get("user1Nickname");
+                      id = snapshot.data!.docs[index]['user1'];
+                      photoUrl = snapshot.data!.docs[index]['user1_image'];
+                    }
 
                     setState(() {
-                      print(snapshot.data!.docs[index].id);
                       nextScreen(
                           context,
-                          ChatScreen(nick, MyNickname, photoUrl, id,
-                              snapshot.data!.docs[index].id));
+                          ChatScreen(
+                              chatWithUsername: nick,
+                              name: MyNickname,
+                              photoUrl: photoUrl,
+                              id: id,
+                              chatId: snapshot.data!.docs[index].id));
                     });
                   },
                   leading: ClipRRect(
@@ -258,7 +243,7 @@ class _HomePageState extends State<HomePage> {
   initInfo() {
     var androidInitialize =
         const AndroidInitializationSettings('@mipmap/launcher_icon');
-    var iosInitialize = IOSInitializationSettings();
+    var iosInitialize = const IOSInitializationSettings();
     var initializationsSettings =
         InitializationSettings(android: androidInitialize, iOS: iosInitialize);
 
@@ -268,16 +253,12 @@ class _HomePageState extends State<HomePage> {
         if (payload != null && payload.isNotEmpty) {
         } else {}
       } on Exception catch (e) {
-        // TODO
+        e.hashCode;
       }
       return;
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print('...............onMessage................');
-      print(
-          'onMessage: ${message.notification?.title}/${message.notification?.body}');
-
       BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
         message.notification!.body.toString(),
         htmlFormatBigText: true,
@@ -322,13 +303,9 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
     } else if (settings.authorizationStatus ==
         AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
-    } else {
-      print('User declined or has not accepted permission');
-    }
+    } else {}
   }
 
   String? mtoken;
@@ -377,14 +354,11 @@ class _HomePageState extends State<HomePage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
-                      print(snapshot);
                       return const Text(
                         "Нет чатов",
                         textAlign: TextAlign.center,
                       );
                     } else {
-                      print('object');
-
                       return chatRoomsList(
                           snapshot,
                           FirebaseAuth.instance.currentUser!.uid,

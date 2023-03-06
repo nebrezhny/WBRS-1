@@ -1,11 +1,8 @@
+// ignore_for_file: equal_keys_in_map, unnecessary_string_escapes, non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
-import 'package:messenger/pages/auth/somebody_profile.dart';
-import 'package:messenger/pages/home_page.dart';
-
-import '../models/message.dart';
 
 class DatabaseService {
   final String? uid;
@@ -60,7 +57,7 @@ class DatabaseService {
       "uid": FirebaseAuth.instance.currentUser!.uid,
       "city": city,
       "images": [],
-      "pol": pol
+      "pol": pol,
     });
   }
 
@@ -265,7 +262,7 @@ class DatabaseService {
   }
 
   Future<Stream<QuerySnapshot>> getChatRooms() async {
-    String myUsername = await HelperFunctions().getUserName().toString();
+    String myUsername = HelperFunctions().getUserName().toString();
     return FirebaseFirestore.instance
         .collection("chats")
         //.orderBy("lastMessage", descending: true)

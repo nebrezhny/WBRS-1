@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/test/white_group.dart';
@@ -93,7 +95,7 @@ class _GreenPageState extends State<GreenPage> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 1000,
                         child: ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
@@ -142,14 +144,14 @@ class _GreenPageState extends State<GreenPage> {
                         counter++;
                       });
                     },
-                    child: const Text(
-                      "+",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.red
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "+",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -165,14 +167,14 @@ class _GreenPageState extends State<GreenPage> {
                         colors[index] = Colors.red;
                       });
                     },
-                    child: const Text(
-                      "-",
-                      style: TextStyle(fontSize: 25),
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colors[index] == Colors.green
                             ? Colors.grey
                             : colors[index]),
+                    child: const Text(
+                      "-",
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ],
               ),

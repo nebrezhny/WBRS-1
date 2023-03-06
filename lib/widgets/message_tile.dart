@@ -6,7 +6,7 @@ class MessageTile extends StatefulWidget {
   final String sender;
   final String name;
   final bool sentByMe;
-  final isRead;
+  final bool isRead;
 
   const MessageTile(
       {Key? key,
@@ -52,57 +52,55 @@ class _MessageTileState extends State<MessageTile> {
                     bottomRight: Radius.circular(20),
                   ),
             color: widget.sentByMe ? Colors.orangeAccent : Colors.white),
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.name.toUpperCase(),
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    letterSpacing: -0.5),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(widget.message,
-                        textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.black)),
-                  ),
-                  widget.sentByMe
-                      ? const SizedBox(
-                          width: 10,
-                        )
-                      : const SizedBox(),
-                  widget.sentByMe
-                      ? widget.isRead
-                          ? const FaIcon(
-                              FontAwesomeIcons.check,
-                              size: 15,
-                              color: Colors.greenAccent,
-                            )
-                          : const FaIcon(
-                              FontAwesomeIcons.check,
-                              size: 15,
-                              color: Colors.grey,
-                            )
-                      : const SizedBox(),
-                ],
-              )
-              // widget.isRead
-              //     ? const FaIcon(FontAwesomeIcons.check)
-              //     : const FaIcon(FontAwesomeIcons.check),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.name.toUpperCase(),
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  letterSpacing: -0.5),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(widget.message,
+                      textAlign: TextAlign.start,
+                      style:
+                          const TextStyle(fontSize: 16, color: Colors.black)),
+                ),
+                widget.sentByMe
+                    ? const SizedBox(
+                        width: 10,
+                      )
+                    : const SizedBox(),
+                widget.sentByMe
+                    ? widget.isRead
+                        ? const FaIcon(
+                            FontAwesomeIcons.check,
+                            size: 15,
+                            color: Colors.greenAccent,
+                          )
+                        : const FaIcon(
+                            FontAwesomeIcons.check,
+                            size: 15,
+                            color: Colors.grey,
+                          )
+                    : const SizedBox(),
+              ],
+            )
+            // widget.isRead
+            //     ? const FaIcon(FontAwesomeIcons.check)
+            //     : const FaIcon(FontAwesomeIcons.check),
+          ],
         ),
       ),
     );

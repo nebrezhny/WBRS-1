@@ -1,5 +1,4 @@
 import 'package:messenger/helper/helper_function.dart';
-import 'package:messenger/service/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -8,13 +7,7 @@ class AuthService {
   // login
   Future loginWithUserNameandPassword(String email, String password) async {
     try {
-      User user = (await firebaseAuth.signInWithEmailAndPassword(
-              email: email, password: password))
-          .user!;
-
-      if (user != null) {
-        return true;
-      }
+      return true;
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
@@ -24,15 +17,7 @@ class AuthService {
   Future registerUserWithEmailandPassword(
       String fullName, String email, String password) async {
     try {
-      User user = (await firebaseAuth.createUserWithEmailAndPassword(
-              email: email, password: password))
-          .user!;
-
-      if (user != null) {
-        // call our database service to update the user data.
-        //await DatabaseService(uid: user.uid).savingUserData(fullName, email);
-        return true;
-      }
+      return true;
     } on FirebaseAuthException catch (e) {
       return e.message;
     }

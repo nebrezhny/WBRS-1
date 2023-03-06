@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors_in_immutables
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -308,6 +310,10 @@ class _ProfilesListState extends State<ProfilesList> {
                     uid: somebodyUid.toString(),
                     name: somebodyFullname.toString(),
                     photoUrl: somebodyImageUrl.toString(),
+                    userInfo: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(snapshot.data!.docs[index].get('uid'))
+                        .snapshots(),
                   ));
             },
 

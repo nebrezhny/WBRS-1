@@ -1,7 +1,5 @@
 import 'package:messenger/helper/helper_function.dart';
-import 'package:messenger/pages/chat_page.dart';
 import 'package:messenger/service/database_service.dart';
-import 'package:messenger/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +10,7 @@ class SearchPage extends StatefulWidget {
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
+
 //sdsdsd
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchController = TextEditingController();
@@ -50,9 +49,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme
-            .of(context)
-            .primaryColor,
+        backgroundColor: Theme.of(context).primaryColor,
         title: const Text(
           "Search",
           style: TextStyle(
@@ -62,9 +59,7 @@ class _SearchPageState extends State<SearchPage> {
       body: Column(
         children: [
           Container(
-            color: Theme
-                .of(context)
-                .primaryColor,
+            color: Theme.of(context).primaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               children: [
@@ -76,7 +71,7 @@ class _SearchPageState extends State<SearchPage> {
                         border: InputBorder.none,
                         hintText: "Найти пользователя....",
                         hintStyle:
-                        TextStyle(color: Colors.white, fontSize: 16)),
+                            TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
                 GestureDetector(
@@ -100,11 +95,9 @@ class _SearchPageState extends State<SearchPage> {
           ),
           isLoading
               ? Center(
-            child: CircularProgressIndicator(
-                color: Theme
-                    .of(context)
-                    .primaryColor),
-          )
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor),
+                )
               : Container(),
         ],
       ),
