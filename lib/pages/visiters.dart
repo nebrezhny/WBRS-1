@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
+import 'package:messenger/widgets/drawer.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 class MyVisitersPage extends StatefulWidget {
@@ -21,17 +22,20 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       return Card(
         child: ListTile(
-          onTap: () {
-            nextScreenReplace(
+          onTap: () async {
+            var doc = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(snapshot.data!.docs[index]['uid'])
+                .get();
+
+            // ignore: use_build_context_synchronously
+            nextScreen(
                 context,
                 SomebodyProfile(
                   uid: snapshot.data!.docs[index]['uid'],
                   photoUrl: snapshot.data!.docs[index]['photoUrl'],
                   name: snapshot.data!.docs[index]['fullName'],
-                  userInfo: FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(snapshot.data!.docs[index].get('uid'))
-                      .snapshots(),
+                  userInfo: doc,
                 ));
           },
           leading: SizedBox(
@@ -82,6 +86,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             backgroundColor: Colors.transparent,
           ),
           backgroundColor: Colors.transparent,
+          drawer: const MyDrawer(),
           body: SingleChildScrollView(
             child: StreamBuilder(
                 stream: widget.visiters,

@@ -9,7 +9,7 @@ class AuthService {
     try {
       return true;
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      print(e.message);
     }
   }
 
@@ -19,7 +19,7 @@ class AuthService {
     try {
       return true;
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      print(e.message);
     }
   }
 
@@ -31,7 +31,7 @@ class AuthService {
       await HelperFunctions.saveUserNameSF("");
       await firebaseAuth.signOut();
     } catch (e) {
-      return null;
+      print(e);
     }
   }
 }

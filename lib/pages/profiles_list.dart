@@ -310,10 +310,10 @@ class _ProfilesListState extends State<ProfilesList> {
                     uid: somebodyUid.toString(),
                     name: somebodyFullname.toString(),
                     photoUrl: somebodyImageUrl.toString(),
-                    userInfo: FirebaseFirestore.instance
+                    userInfo: await FirebaseFirestore.instance
                         .collection('users')
                         .doc(snapshot.data!.docs[index].get('uid'))
-                        .snapshots(),
+                        .get(),
                   ));
             },
 

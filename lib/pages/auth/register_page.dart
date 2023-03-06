@@ -30,7 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Container(
           decoration: const BoxDecoration(boxShadow: [
             BoxShadow(
-              color: Colors.green,
+              color: Colors.black,
             )
           ]),
           child: Image.asset(
@@ -38,6 +38,8 @@ class _RegisterPageState extends State<RegisterPage> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
+            color: Colors.white.withOpacity(0.7),
+            colorBlendMode: BlendMode.modulate,
             scale: 0.6,
           ),
         ),
@@ -187,12 +189,12 @@ class _RegisterPageState extends State<RegisterPage> {
                             Text.rich(TextSpan(
                               text: "Уже есть аккаунт? ",
                               style: const TextStyle(
-                                  color: Colors.black, fontSize: 14),
+                                  color: Colors.white, fontSize: 14),
                               children: <TextSpan>[
                                 TextSpan(
                                     text: "Войти",
                                     style: const TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         decoration: TextDecoration.underline),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {

@@ -290,10 +290,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     uid: widget.id,
                                     photoUrl: widget.photoUrl,
                                     name: widget.chatWithUsername,
-                                    userInfo: FirebaseFirestore.instance
+                                    userInfo: await FirebaseFirestore.instance
                                         .collection('users')
                                         .doc(widget.id)
-                                        .snapshots(),
+                                        .get(),
                                   ));
                             },
                             child: Image.network(
