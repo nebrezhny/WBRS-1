@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                                       fontWeight: FontWeight.w400,
                                       color: Colors.white)),
                               const SizedBox(
-                                height: 10,
+                                height: 50,
                               ),
                               TextFormField(
                                 style: const TextStyle(color: Colors.white),
@@ -213,14 +213,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  login() async {
+  login() {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-      await authService
-          .loginWithUserNameandPassword(email, password)
-          .then((value) async {
+      authService.loginWithUserNameandPassword(email, password).then((value) {
         if (value == true) {
           nextScreenReplace(context, const HomePage());
         } else {

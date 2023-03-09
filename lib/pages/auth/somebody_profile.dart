@@ -53,20 +53,31 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         .collection('users')
         .doc(uid)
         .collection('visiters')
+        .doc(myUid)
         .snapshots()
         .isEmpty;
+    var doc22 = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('visiters')
+        .doc(myUid)
+        .snapshots()
+        .length;
+
+    print(doc22);
 
     var MyUserInfo = await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    if (!doc) {
+    if (doc) {
       FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('visiters')
-          .add({
+          .doc(myUid)
+          .set({
         "uid": myUid,
         "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
         "lastVisitTs": DateTime.now(),
@@ -79,15 +90,16 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
           .collection('users')
           .doc(uid)
           .collection('visiters')
-          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .doc(myUid)
           .snapshots()
           .isEmpty;
-      if (!doc2) {
+      if (doc2) {
         FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
             .collection('visiters')
-            .add({
+            .doc(myUid)
+            .set({
           "uid": myUid,
           "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
           "lastVisitTs": DateTime.now(),
@@ -121,6 +133,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
   @override
   void initState() {
     super.initState();
+
     getUserInfo();
     upgradeUserVisiters(widget.uid);
     setState(() {

@@ -6,6 +6,8 @@ import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/widgets/drawer.dart';
 import 'package:messenger/widgets/widgets.dart';
 
+import '../widgets/bottom_nav_bar.dart';
+
 class MyVisitersPage extends StatefulWidget {
   Stream? visiters;
   MyVisitersPage({Key? key, required this.visiters}) : super(key: key);
@@ -54,17 +56,26 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
           ),
           subtitle: Row(
             children: [
-              int.parse(snapshot.data!.docs[index]['age']) % 10 == 0
-                  ? Text('${snapshot.data!.docs[index]['age']} лет')
-                  : int.parse(snapshot.data!.docs[index]['age']) % 10 == 1
-                      ? Text('${snapshot.data!.docs[index]['age']} год')
-                      : int.parse(snapshot.data!.docs[index]['age']) % 10 != 5
+              int.parse(snapshot.data!.docs[index]['age'].toString()) % 10 == 0
+                  ? Text('${snapshot.data!.docs[index]['age'].toString()} лет')
+                  : int.parse(snapshot.data!.docs[index]['age'].toString()) %
+                              10 ==
+                          1
+                      ? Text(
+                          '${snapshot.data!.docs[index]['age'].toString()} год')
+                      : int.parse(snapshot.data!.docs[index]['age']
+                                      .toString()) %
+                                  10 !=
+                              5
                           ? Text('${snapshot.data!.docs[index]['age']} года')
                           : Text('${snapshot.data!.docs[index]['age']} лет'),
               const SizedBox(
                 width: 20,
               ),
-              Text("Город: ${snapshot.data!.docs[index]['city']}")
+              Flexible(
+                child: Text(
+                    "Последнее посещение:${snapshot.data!.docs[index]['lastVisitTs'].toDate()}"),
+              )
             ],
           ),
           dense: false,
@@ -87,6 +98,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
           ),
           backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
+          bottomNavigationBar: const MyBottomNavigationBar(),
           body: SingleChildScrollView(
             child: StreamBuilder(
                 stream: widget.visiters,

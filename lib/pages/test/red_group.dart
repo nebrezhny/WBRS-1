@@ -88,8 +88,6 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
           ),
           body: SingleChildScrollView(
             child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 1350,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
               child: Column(
                 children: [

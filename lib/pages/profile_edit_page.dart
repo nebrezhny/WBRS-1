@@ -120,7 +120,10 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                         children: [
                           (_image == null)
                               ? (FirebaseAuth.instance.currentUser!.photoURL ==
-                                      "")
+                                          "" ||
+                                      FirebaseAuth
+                                              .instance.currentUser!.photoURL ==
+                                          null)
                                   ? ClipRRect(
                                       borderRadius:
                                           BorderRadius.circular(100.0),

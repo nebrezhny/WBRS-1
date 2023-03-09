@@ -91,14 +91,11 @@ class _OrangePageState extends State<OrangePage> {
             body: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
-                  width: 800,
-                  height: 1300,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 1160,
                         child: ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -238,7 +235,9 @@ class _OrangePageState extends State<OrangePage> {
                                 .collection('users')
                                 .doc(FirebaseAuth.instance.currentUser!.uid)
                                 .update({'isRegistrationEnd': true});
-
+                            setState(() {
+                              selectedIndex = 0;
+                            });
                             nextScreen(
                                 context,
                                 ProfilePage(

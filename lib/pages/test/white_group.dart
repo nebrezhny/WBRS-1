@@ -89,14 +89,11 @@ class _WhitePageState extends State<WhitePage> {
             body: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
-                  width: 800,
-                  height: 1160,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 1020,
                         child: ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,

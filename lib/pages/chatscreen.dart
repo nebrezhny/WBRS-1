@@ -285,7 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Images = doc.get('images');
                               CountImages = Images.length;
                               nextScreen(
-                                  !mounted ? context : '',
+                                  context,
                                   SomebodyProfile(
                                     uid: widget.id,
                                     photoUrl: widget.photoUrl,

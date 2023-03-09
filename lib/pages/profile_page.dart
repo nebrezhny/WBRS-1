@@ -112,7 +112,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Stack(
                     children: [
-                      (FirebaseAuth.instance.currentUser!.photoURL == "")
+                      (FirebaseAuth.instance.currentUser!.photoURL == "" ||
+                              FirebaseAuth.instance.currentUser!.photoURL ==
+                                  null)
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(100.0),
                               child: Image.asset(

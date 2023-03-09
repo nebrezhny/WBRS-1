@@ -1,5 +1,3 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'dart:io';
 import 'package:messenger/service/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,6 +35,10 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   String? deti;
   String? pol;
   bool Deti = false;
+
+  var currentUser;
+  var displayName;
+  var email;
 
   bool Is18 = false;
   getUserLoggedInStatus() async {
@@ -496,14 +498,26 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           });
                         }
 
+                        currentUser = FirebaseAuth.instance.currentUser;
+
+                        if (currentUser != null) {
+                          try {
+                            displayName = currentUser.displayName;
+                            email = currentUser.email;
+                          } on Exception catch (e) {
+                            print(e);
+                          }
+                        } else {
+                          displayName = "Error";
+                          email = 'test4@test.ru';
+                        }
+
                         if (city.text.isNotEmpty &&
                             age.text.isNotEmpty &&
                             rost.text.isNotEmpty) {
                           DatabaseService().savingUserDataAfterRegister(
-                              FirebaseAuth.instance.currentUser!.displayName
-                                  .toString(),
-                              FirebaseAuth.instance.currentUser!.email
-                                  .toString(),
+                              displayName,
+                              email,
                               int.parse(age.text),
                               rost.text,
                               city.text,

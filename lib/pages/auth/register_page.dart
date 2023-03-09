@@ -174,7 +174,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         borderRadius:
                                             BorderRadius.circular(30))),
                                 child: const Text(
-                                  "Зарегестрироваться",
+                                  "Зарегистрироваться",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 16),
                                 ),

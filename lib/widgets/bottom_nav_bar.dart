@@ -8,6 +8,7 @@ import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/profile_page.dart';
 import 'package:messenger/pages/profiles_list.dart';
+import 'package:messenger/widgets/splash.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../helper/global.dart';
@@ -20,8 +21,21 @@ class MyBottomNavigationBar extends StatefulWidget {
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
-  String email = FirebaseAuth.instance.currentUser!.email.toString();
-  String userName = FirebaseAuth.instance.currentUser!.displayName.toString();
+  @override
+  void initState() {
+    super.initState();
+    currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      String email = currentUser.email;
+      String userName = currentUser.displayName;
+    }
+  }
+
+  var currentUser;
+
+  var email;
+  var userName;
   void _onItemTapped(int index) async {
     setState(() {
       selectedIndex = index;
@@ -29,6 +43,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
     switch (index) {
       case 0:
+        bool isLoading = true;
+        nextScreen(context, SplashScreen());
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -36,59 +52,78 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         Images = doc.get('images');
         CountImages = Images.length;
 
-        await FirebaseFirestore.instance
-            .collection("users")
-            .where("fullName",
-                isEqualTo:
-                    FirebaseAuth.instance.currentUser!.displayName.toString())
-            .get()
-            .then((QuerySnapshot snapshot) {
-          GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-          GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-          GlobalCity = snapshot.docs[0]["city"].toString();
-          GlobalHobbi = snapshot.docs[0]["hobbi"];
-          GlobalRost = snapshot.docs[0]["rost"];
-          GlobalDeti = snapshot.docs[0]["deti"];
-          Group = snapshot.docs[0]["группа"];
-          GlobalPol = snapshot.docs[0]["пол"];
+        // await FirebaseFirestore.instance
+        //     .collection("users")
+        //     .where("fullName",
+        //         isEqualTo:
+        //             FirebaseAuth.instance.currentUser!.displayName.toString())
+        //     .get()
+        //     .then((QuerySnapshot snapshot) {
+        //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
+        //   GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
+        //   GlobalCity = snapshot.docs[0]["city"].toString();
+        //   GlobalHobbi = snapshot.docs[0]["hobbi"];
+        //   GlobalRost = snapshot.docs[0]["rost"];
+        //   GlobalDeti = snapshot.docs[0]["deti"];
+        //   Group = snapshot.docs[0]["группа"];
+        //   GlobalPol = snapshot.docs[0]["пол"];
+        // });
+        setState(() {
+          isLoading = false;
         });
+
+        if (isLoading == false) {
+          nextScreen(
+              context,
+              ProfilePage(
+                email: FirebaseAuth.instance.currentUser!.email.toString(),
+                userName:
+                    FirebaseAuth.instance.currentUser!.displayName.toString(),
+                about: GlobalAbout.toString(),
+                age: GlobalAge.toString(),
+                rost: GlobalRost.toString(),
+                hobbi: GlobalHobbi.toString(),
+                city: GlobalCity.toString(),
+                deti: GlobalDeti,
+                pol: GlobalPol.toString(),
+              ));
+        } else {
+          nextScreen(context, SplashScreen());
+        }
         // ignore: use_build_context_synchronously
-        nextScreen(
-            context,
-            ProfilePage(
-              email: FirebaseAuth.instance.currentUser!.email.toString(),
-              userName:
-                  FirebaseAuth.instance.currentUser!.displayName.toString(),
-              about: GlobalAbout.toString(),
-              age: GlobalAge.toString(),
-              rost: GlobalRost.toString(),
-              hobbi: GlobalHobbi.toString(),
-              city: GlobalCity.toString(),
-              deti: GlobalDeti,
-              pol: GlobalPol.toString(),
-            ));
+
         break;
       case 1:
         nextScreen(context, const HomePage());
         break;
       case 2:
-        await FirebaseFirestore.instance
-            .collection("users")
-            .where("fullName",
-                isEqualTo:
-                    FirebaseAuth.instance.currentUser!.displayName.toString())
-            .get()
-            .then((QuerySnapshot snapshot) {
-          GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-          GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-          GlobalCity = snapshot.docs[0]["city"].toString();
-          GlobalHobbi = snapshot.docs[0]["hobbi"];
-          GlobalRost = snapshot.docs[0]["rost"];
-          GlobalDeti = snapshot.docs[0]["deti"];
-          Group = snapshot.docs[0]["группа"];
-          GlobalPol = snapshot.docs[0]["пол"];
+        bool isLoading = true;
+        nextScreen(context, SplashScreen());
+        // await FirebaseFirestore.instance
+        //     .collection("users")
+        //     .where("fullName",
+        //         isEqualTo: FirebaseAuth.instance.currentUser!.displayName)
+        //     .get()
+        //     .then((QuerySnapshot snapshot) {
+        //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
+        //   GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
+        //   GlobalCity = snapshot.docs[0]["city"].toString();
+        //   GlobalHobbi = snapshot.docs[0]["hobbi"];
+        //   GlobalRost = snapshot.docs[0]["rost"];
+        //   GlobalDeti = snapshot.docs[0]["deti"];
+        //   Group = snapshot.docs[0]["группа"];
+        //   GlobalPol = snapshot.docs[0]["пол"];
+        // });
+        setState(() {
+          isLoading = false;
         });
-        nextScreenReplace(context, ProfilesList());
+
+        if (isLoading) {
+          nextScreen(context, SplashScreen());
+          // ignore: dead_code
+        } else {
+          nextScreen(context, ProfilesList());
+        }
 
         break;
       case 3:

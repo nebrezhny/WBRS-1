@@ -10,6 +10,7 @@ import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/shop.dart';
 import 'package:messenger/pages/visiters.dart';
+import 'package:messenger/widgets/splash.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../pages/auth/login_page.dart';
@@ -25,8 +26,9 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  String userName = FirebaseAuth.instance.currentUser!.displayName.toString();
-  String email = FirebaseAuth.instance.currentUser!.email.toString();
+  var userName;
+  var email;
+  var currentUser;
 
   FirebaseAuth auth = FirebaseAuth.instance;
   get uid => auth.currentUser!.uid;
@@ -34,26 +36,37 @@ class _MyDrawerState extends State<MyDrawer> {
 
   Stream? groups;
   String groupName = "";
+  var displayName;
 
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .where("fullName",
-            isEqualTo:
-                FirebaseAuth.instance.currentUser!.displayName.toString())
-        .get()
-        .then((QuerySnapshot snapshot) {
-      GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-      GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-      GlobalCity = snapshot.docs[0]["city"].toString();
-      GlobalHobbi = snapshot.docs[0]["hobbi"];
-      GlobalRost = snapshot.docs[0]["rost"];
-      GlobalDeti = snapshot.docs[0]["deti"];
-      Group = snapshot.docs[0]["группа"];
-      GlobalPol = snapshot.docs[0]["пол"];
-    });
+    var currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      displayName = currentUser.displayName;
+    }
+
+    // FirebaseFirestore.instance
+    //     .collection("users")
+    //     .where("fullName", isEqualTo: displayName)
+    //     .get()
+    //     .then((QuerySnapshot snapshot) {
+    //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
+    //   GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
+    //   GlobalCity = snapshot.docs[0]["city"].toString();
+    //   GlobalHobbi = snapshot.docs[0]["hobbi"];
+    //   GlobalRost = snapshot.docs[0]["rost"];
+    //   GlobalDeti = snapshot.docs[0]["deti"];
+    //   Group = snapshot.docs[0]["группа"];
+    //   GlobalPol = snapshot.docs[0]["пол"];
+    // });
+
+    currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      userName = FirebaseAuth.instance.currentUser!.displayName.toString();
+      email = FirebaseAuth.instance.currentUser!.email.toString();
+    }
   }
 
   @override
@@ -181,32 +194,42 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () async {
+                    bool isLoading = true;
                     setState(() {
                       selectedIndex = 0;
+                      isLoading = true;
                     });
+                    nextScreen(context, SplashScreen());
                     DocumentSnapshot doc = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(uid)
                         .get();
                     Images = doc.get('images');
                     CountImages = Images.length;
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                    nextScreen(
-                        context,
-                        ProfilePage(
-                          email: FirebaseAuth.instance.currentUser!.email
-                              .toString(),
-                          userName: FirebaseAuth
-                              .instance.currentUser!.displayName
-                              .toString(),
-                          about: GlobalAbout.toString(),
-                          age: GlobalAge.toString(),
-                          rost: GlobalRost.toString(),
-                          hobbi: GlobalHobbi.toString(),
-                          city: GlobalCity.toString(),
-                          deti: GlobalDeti,
-                          pol: GlobalPol.toString(),
-                        ));
+                    if (isLoading) {
+                      nextScreen(context, SplashScreen());
+                    } else {
+                      nextScreen(
+                          context,
+                          ProfilePage(
+                            email: FirebaseAuth.instance.currentUser!.email
+                                .toString(),
+                            userName: FirebaseAuth
+                                .instance.currentUser!.displayName
+                                .toString(),
+                            about: GlobalAbout.toString(),
+                            age: GlobalAge.toString(),
+                            rost: GlobalRost.toString(),
+                            hobbi: GlobalHobbi.toString(),
+                            city: GlobalCity.toString(),
+                            deti: GlobalDeti,
+                            pol: GlobalPol.toString(),
+                          ));
+                    }
                   },
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -243,22 +266,20 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () async {
+                    bool isLoading = true;
                     setState(() {
                       selectedIndex = 2;
                     });
-                    await FirebaseFirestore.instance
-                        .collection("users")
-                        .where("fullName", isEqualTo: userName)
-                        .get()
-                        .then((QuerySnapshot snapshot) {
-                      GlobalAge =
-                          snapshot.docs[0].get("age".toString()).toString();
-                      GlobalAbout =
-                          snapshot.docs[0].get("about".toString()).toString();
-                      GlobalPol = snapshot.docs[0]["пол"].toString();
-                      Group = snapshot.docs[0]["группа"];
+                    nextScreen(context, SplashScreen());
+
+                    setState(() {
+                      isLoading = false;
                     });
-                    nextScreenReplace(context, ProfilesList());
+                    if (isLoading) {
+                      nextScreen(context, SplashScreen());
+                    } else {
+                      nextScreenReplace(context, ProfilesList());
+                    }
                   },
                   leading: const Icon(
                     Icons.people,

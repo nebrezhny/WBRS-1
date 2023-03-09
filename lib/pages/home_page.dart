@@ -2,8 +2,10 @@
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/chatscreen.dart';
+import 'package:messenger/pages/profiles_list.dart';
 import 'package:messenger/service/auth_service.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/drawer.dart';
@@ -27,6 +29,8 @@ class _HomePageState extends State<HomePage> {
   Stream? chats;
   String id = "";
   String photoUrl = "";
+
+  var currentUser;
 
   bool isSearching = false;
   Stream? usersStream, chatRoomsStream;
@@ -195,8 +199,36 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             : Container(
-                color: Colors.red,
-                child: const Text('Нет чатов'),
+                height: MediaQuery.of(context).size.height - 160,
+                width: MediaQuery.of(context).size.width,
+                child: Center(
+                  child: SizedBox(
+                    height: 100,
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Нет чатов. ',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Flexible(
+                          child: TextButton(
+                            onPressed: () {
+                              selectedIndex = 2;
+                              nextScreen(context, ProfilesList());
+                            },
+                            child: const Text(
+                              'Начать общаться',
+                              softWrap: true,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
       },
     );
@@ -237,6 +269,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     requestPermission();
     getToken();
+    currentUser = FirebaseAuth.instance.currentUser;
+
     initInfo();
   }
 
@@ -285,7 +319,7 @@ class _HomePageState extends State<HomePage> {
   void saveUserToken(String token) {
     FirebaseFirestore.instance
         .collection('TOKENS')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(FirebaseAuth.instance.currentUser?.uid)
         .set({'token': token});
   }
 
@@ -359,11 +393,12 @@ class _HomePageState extends State<HomePage> {
                         textAlign: TextAlign.center,
                       );
                     } else {
-                      return chatRoomsList(
-                          snapshot,
-                          FirebaseAuth.instance.currentUser!.uid,
-                          FirebaseAuth.instance.currentUser!.displayName
-                              .toString());
+                      if (currentUser != null) {
+                        return chatRoomsList(
+                            snapshot, currentUser.uid, currentUser.displayName);
+                      } else {
+                        return Text('none');
+                      }
                     }
                   }),
             )),

@@ -89,14 +89,11 @@ class _GreenPageState extends State<GreenPage> {
             body: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 1200,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 1000,
                         child: ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,

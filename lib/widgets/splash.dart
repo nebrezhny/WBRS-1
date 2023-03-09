@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 class SplashScreen extends StatefulWidget {
-  dynamic page;
-
-  SplashScreen({required this.page, super.key});
+  SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -21,9 +19,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 5), () {
-      nextScreenReplace(context, widget.page);
-    });
   }
 
   @override
@@ -37,7 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
           fit: BoxFit.cover,
         ),
         const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+          body: Center(
+              child: CircularProgressIndicator.adaptive(
+            backgroundColor: Colors.orangeAccent,
+          )),
           backgroundColor: Colors.transparent,
         )
       ],
