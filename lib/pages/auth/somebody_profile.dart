@@ -54,24 +54,14 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         .doc(uid)
         .collection('visiters')
         .doc(myUid)
-        .snapshots()
-        .isEmpty;
-    var doc22 = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('visiters')
-        .doc(myUid)
-        .snapshots()
-        .length;
-
-    print(doc22);
+        .get();
 
     var MyUserInfo = await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    if (doc) {
+    if (!doc.exists) {
       FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
@@ -86,41 +76,18 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         "city": MyUserInfo.get('city')
       });
     } else {
-      var doc2 = await FirebaseFirestore.instance
+      FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('visiters')
           .doc(myUid)
-          .snapshots()
-          .isEmpty;
-      if (doc2) {
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('visiters')
-            .doc(myUid)
-            .set({
-          "uid": myUid,
-          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
-          "lastVisitTs": DateTime.now(),
-          "fullName": FirebaseAuth.instance.currentUser!.displayName,
-          "age": MyUserInfo.get('age'),
-          "city": MyUserInfo.get('city')
-        });
-      } else {
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('visiters')
-            .doc(myUid)
-            .update({
-          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
-          "lastVisitTs": DateTime.now(),
-          "fullName": FirebaseAuth.instance.currentUser!.displayName,
-          "age": MyUserInfo.get('age'),
-          "city": MyUserInfo.get('city')
-        });
-      }
+          .update({
+        "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+        "lastVisitTs": DateTime.now(),
+        "fullName": FirebaseAuth.instance.currentUser!.displayName,
+        "age": MyUserInfo.get('age'),
+        "city": MyUserInfo.get('city')
+      });
     }
   }
 

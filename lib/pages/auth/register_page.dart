@@ -82,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white)),
                             const SizedBox(
-                              height: 10,
+                              height: 50,
                             ),
                             TextFormField(
                               style: const TextStyle(color: Colors.white),

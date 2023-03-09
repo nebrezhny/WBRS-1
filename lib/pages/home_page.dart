@@ -384,6 +384,7 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
+                      .orderBy('lastMessageSendTs')
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -397,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                         return chatRoomsList(
                             snapshot, currentUser.uid, currentUser.displayName);
                       } else {
-                        return Text('none');
+                        return const Text('none');
                       }
                     }
                   }),

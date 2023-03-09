@@ -4,11 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
+import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/about_app.dart';
 import 'package:messenger/pages/auth/writing_data_user.dart';
 import 'package:messenger/pages/home_page.dart';
 import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/pages/shop.dart';
+import 'package:messenger/pages/test/red_group.dart';
 import 'package:messenger/pages/visiters.dart';
 import 'package:messenger/widgets/splash.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -167,7 +169,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   onTap: () {
                     //nextScreenReplace(context, const AboutUserWriting());
-                    nextScreen(context, const AboutUserWriting());
+                    nextScreen(context, const FirstGroupRed());
                   },
                 ),
                 ListTile(

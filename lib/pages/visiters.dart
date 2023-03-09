@@ -103,7 +103,36 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             child: StreamBuilder(
                 stream: widget.visiters,
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
+                  var length;
+                  if (snapshot.data != null) {
+                    length = snapshot.data!.docs.length;
+                  }
+                  if (snapshot.data != null) {
+                    if (length == 0) {
+                      return Container(
+                        height: 700,
+                        padding: const EdgeInsets.all(15),
+                        child: const Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Пока на вашей странице не было гостей.",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 30),
+                        height: 700,
+                        child: ListView.builder(
+                            itemCount: length,
+                            itemBuilder: (BuildContext context, index) {
+                              return visitersList(snapshot, index);
+                            }),
+                      );
+                    }
+                  } else {
                     return Container(
                       height: 700,
                       padding: const EdgeInsets.all(15),
@@ -114,17 +143,6 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
-                    );
-                  } else {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 30),
-                      height: 700,
-                      child: ListView.builder(
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (BuildContext context, index) {
-                            return visitersList(snapshot, index);
-                          }),
                     );
                   }
                 }),
