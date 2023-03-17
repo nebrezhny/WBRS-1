@@ -96,7 +96,6 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                   SizedBox(
-                    height: 1150,
                     child: ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,

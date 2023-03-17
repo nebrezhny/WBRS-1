@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print
+// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print, prefer_interpolation_to_compose_strings, unrelated_type_equality_checks
 
 import 'dart:io';
 
@@ -47,9 +47,32 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   FirebaseStorage storage = FirebaseStorage.instance;
   String imageUrl = " ";
-  XFile? _image;
   TextEditingController? name = TextEditingController();
   late User? user = FirebaseAuth.instance.currentUser;
+
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
+
+  Stream getImagesSnapshot() {
+    Stream imageSnapshot = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('images')
+        .snapshots();
+
+    return imageSnapshot;
+  }
+
+  void selectImages() async {
+    final List<XFile> selectedImages = await imagePicker.pickMultiImage();
+    if (selectedImages.isNotEmpty) {
+      imageFileList!.addAll(selectedImages);
+    }
+    print("Image List Length:");
+    print(selectedImages);
+    selectedImages.clear();
+  }
+
   void pickUploadImage() async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
@@ -326,7 +349,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 40,
                   ),
-                  CountImages == 0
+                  getImagesSnapshot().isEmpty == true
                       ? Column(
                           children: [
                             const Text(
@@ -335,28 +358,34 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                XFile? image = await ImagePicker()
-                                    .pickImage(source: ImageSource.gallery);
-                                setState(() {
-                                  _image = image;
-                                });
-
                                 FirebaseStorage storage =
                                     FirebaseStorage.instance;
-                                try {
-                                  await storage
-                                      .ref(
-                                          'images-${FirebaseAuth.instance.currentUser!.displayName}')
-                                      .putFile(File(_image!.path));
-                                } on FirebaseException {}
-                                var downloadUrl = await storage
-                                    .ref(
-                                        'images-${FirebaseAuth.instance.currentUser!.displayName}')
-                                    .getDownloadURL();
+                                selectImages();
+                                print(1);
 
-                                AddImages(
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                    downloadUrl);
+                                if (imageFileList!.isNotEmpty) {
+                                  print(2);
+                                  for (int i = 0;
+                                      i < imageFileList!.length;
+                                      i++) {
+                                    print(i);
+                                    try {
+                                      await storage
+                                          .ref(
+                                              '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                          .putFile(
+                                              File(imageFileList![i].path));
+                                    } on FirebaseException {}
+                                    var downloadUrl = await storage
+                                        .ref(
+                                            '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                        .getDownloadURL();
+
+                                    AddImages(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        downloadUrl);
+                                  }
+                                }
                               },
                               style: const ButtonStyle(
                                   backgroundColor: MaterialStatePropertyAll(
@@ -373,75 +402,94 @@ class _ProfilePageState extends State<ProfilePage> {
                             SizedBox(
                               height: 100,
                               width: MediaQuery.of(context).size.width,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(15),
-                                            bottomLeft: Radius.circular(15))),
-                                    height: 300,
-                                    child: InkWell(
-                                        onTap: () {
-                                          showDialog(
-                                            builder: (context) => AlertDialog(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              insetPadding:
-                                                  const EdgeInsets.all(2),
-                                              title: Container(
-                                                decoration:
-                                                    const BoxDecoration(),
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                child: Image.network(
-                                                  Images[index],
-                                                ),
-                                              ),
-                                            ),
-                                            context: context,
+                              child: StreamBuilder(
+                                  stream: getImagesSnapshot(),
+                                  builder: (context, snapshot) {
+                                    return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return Container(
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(15),
+                                                    bottomLeft:
+                                                        Radius.circular(15))),
+                                            height: 300,
+                                            child: InkWell(
+                                                onTap: () {
+                                                  showDialog(
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      insetPadding:
+                                                          const EdgeInsets.all(
+                                                              2),
+                                                      title: Container(
+                                                        decoration:
+                                                            const BoxDecoration(),
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: Image.network(
+                                                          snapshot.data
+                                                                  .docs[index]
+                                                              ['url'],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    context: context,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(
+                                                      right: 5),
+                                                  width: 100,
+                                                  child: Image.network(
+                                                      snapshot.data.docs[index]
+                                                          ['url'],
+                                                      fit: BoxFit.cover),
+                                                )),
                                           );
                                         },
-                                        child: Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 5),
-                                          width: 100,
-                                          child: Image.network(Images[index],
-                                              fit: BoxFit.cover),
-                                        )),
-                                  );
-                                },
-                                itemCount: CountImages,
-                              ),
+                                        itemCount: (snapshot.data != null
+                                            ? (snapshot.data!).docs.length
+                                            : 0));
+                                  }),
                             ),
                             ElevatedButton(
                                 onPressed: () async {
-                                  XFile? image = await ImagePicker()
-                                      .pickImage(source: ImageSource.gallery);
-                                  setState(() {
-                                    _image = image;
-                                  });
+                                  print(getImagesSnapshot());
+                                  selectImages();
 
                                   FirebaseStorage storage =
                                       FirebaseStorage.instance;
-                                  try {
-                                    await storage
-                                        .ref(
-                                            'images-${FirebaseAuth.instance.currentUser!.displayName}-${_image!.name}')
-                                        .putFile(File(_image!.path));
-                                  } on FirebaseException catch (e) {
-                                    print(e);
-                                  }
-                                  var downloadUrl = await storage
-                                      .ref(
-                                          'images-${FirebaseAuth.instance.currentUser!.displayName}-${_image!.name}')
-                                      .getDownloadURL();
+                                  if (imageFileList!.isNotEmpty) {
+                                    for (int i = 0;
+                                        i < imageFileList!.length;
+                                        i++) {
+                                      try {
+                                        await storage
+                                            .ref(
+                                                '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                            .putFile(
+                                                File(imageFileList![i].path));
+                                      } on FirebaseException {}
+                                      var downloadUrl = await storage
+                                          .ref(
+                                              '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                          .getDownloadURL();
 
-                                  AddImages(
-                                      FirebaseAuth.instance.currentUser!.uid,
-                                      downloadUrl);
+                                      AddImages(
+                                          FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                          downloadUrl);
+                                    }
+                                  }
+                                  imageFileList!.clear();
                                 },
                                 style: const ButtonStyle(
                                     backgroundColor: MaterialStatePropertyAll(
@@ -451,120 +499,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ))
                           ],
                         ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Имя", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Row(
-                  //       children: [
-                  //         Text(user!.displayName.toString(), style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //       ],
-                  //     )
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Email", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(user!.email.toString(), style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Возраст", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(widget.age.toString(),
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Группа", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Рост", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(
-                  //         widget.rost.toString(),
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Пол", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(
-                  //         widget.pol.toString(),
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Наличие детей", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(
-                  //         widget.deti
-                  //             ?"Есть"
-                  //             :"Нет",
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Город", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(
-                  //         widget.city.toString(),
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("Хобби", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white)),
-                  //     Text(
-                  //         widget.hobbi.toString(),
-                  //         style: const TextStyle(fontSize: 17,color: Colors.white)),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 20,),
-                  // Container(
-                  //   width: double.infinity,
-                  //   child: Column(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //
-                  //       const Text("О себе", style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold,color: Colors.white),textAlign: TextAlign.left),
-                  //       const Padding(padding: EdgeInsets.only(bottom: 20.0)),
-                  //       Column(
-                  //
-                  //         mainAxisAlignment: MainAxisAlignment.start,
-                  //         children: [
-                  //           Container(
-                  //             child: Text(widget.about.toString(),
-                  //               style: const TextStyle(fontSize: 17,color: Colors.white),textAlign: TextAlign.left,softWrap: true,),
-                  //           ),
-                  //         ],
-                  //       )
-                  //
-                  //
-                  //     ],
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 20,),
                 ],
               ),
             ),
@@ -575,8 +509,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   AddImages(String uid, String url) async {
-    await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      "images": FieldValue.arrayUnion([url])
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('images')
+        .add({
+      "url": url,
     });
   }
 }

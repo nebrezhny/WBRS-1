@@ -65,11 +65,8 @@ class _FilterPage2State extends State<FilterPage2> {
                           child: Column(
                             children: [
                               GestureDetector(
-                                child: Row(
-                                  children: const [
-                                    Text("Мужчины"),
-                                    Icon(Icons.man)
-                                  ],
+                                child: const Row(
+                                  children: [Text("Мужчины"), Icon(Icons.man)],
                                 ),
                                 onTap: () {
                                   setState(() {
@@ -82,8 +79,8 @@ class _FilterPage2State extends State<FilterPage2> {
                                 height: 15,
                               ),
                               GestureDetector(
-                                child: Row(
-                                  children: const [
+                                child: const Row(
+                                  children: [
                                     Text("Женщины"),
                                     Icon(Icons.woman)
                                   ],
@@ -232,11 +229,11 @@ class _FilterPage2State extends State<FilterPage2> {
               child: Container(
                 width: MediaQuery.of(context).size.width - 20,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+                child: const Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: const [
+                      children: [
                         Icon(CupertinoIcons.map),
                         SizedBox(
                           width: 10,
