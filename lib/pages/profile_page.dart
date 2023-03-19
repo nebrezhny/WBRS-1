@@ -63,13 +63,15 @@ class _ProfilePageState extends State<ProfilePage> {
     return imageSnapshot;
   }
 
+  var imageSnapshot;
+
   void selectImages() async {
     final List<XFile> selectedImages = await imagePicker.pickMultiImage();
     if (selectedImages.isNotEmpty) {
       imageFileList!.addAll(selectedImages);
     }
     print("Image List Length:");
-    print(selectedImages);
+    print(selectedImages[1].path);
     selectedImages.clear();
   }
 
@@ -91,6 +93,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   AuthService authService = AuthService();
+
+  @override
+  void initState(){
+    super.initState();
+    imageSnapshot = getImagesSnapshot();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,39 +163,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 200.0,
                                 width: 200.0,
                               )),
-                      // Positioned(
-                      //   bottom: 0,
-                      //     right: 4,
-                      //
-                      //     child: ClipOval(
-                      //
-                      //       child: Container(
-                      //         color: Colors.orange,
-                      //
-                      //         width: 50,
-                      //         height: 50,
-                      //         child: IconButton(
-                      //           onPressed: () async{
-                      //
-                      //             GlobalPol=widget.pol;
-                      //             nextScreen(context,
-                      //                 ProfilePageEdit(
-                      //                   email: widget.email,
-                      //                   userName: widget.userName,
-                      //                   about: widget.about,
-                      //                   age: widget.age,
-                      //                   hobbi: widget.hobbi,
-                      //                   deti: widget.deti,
-                      //                   city: widget.city,
-                      //                   rost:widget.rost ,
-                      //                 ));
-                      //           },
-                      //
-                      //           icon:
-                      //           const Icon(Icons.create,color: Colors.white,size: 30,),
-                      //         ),
-                      //       ),
-                      //     ),)
                     ],
                   ),
                   const SizedBox(
@@ -349,7 +324,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 40,
                   ),
-                  getImagesSnapshot().isEmpty == true
+
+                  imageSnapshot!=null
+                  ?imageSnapshot.isEmpty
                       ? Column(
                           children: [
                             const Text(
@@ -462,7 +439,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             ElevatedButton(
                                 onPressed: () async {
-                                  print(getImagesSnapshot());
                                   selectImages();
 
                                   FirebaseStorage storage =
@@ -472,6 +448,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         i < imageFileList!.length;
                                         i++) {
                                       try {
+                                        print(imageFileList![i].path);
                                         await storage
                                             .ref(
                                                 '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
@@ -498,7 +475,54 @@ class _ProfilePageState extends State<ProfilePage> {
                                   "Добавить фотографии",
                                 ))
                           ],
+                        )
+                      :Column(
+                    children: [
+                      const Text(
+                        "Нет фотографий",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          FirebaseStorage storage =
+                              FirebaseStorage.instance;
+                          selectImages();
+                          print(1);
+
+                          if (imageFileList!.isNotEmpty) {
+                            print(2);
+                            for (int i = 0;
+                            i < imageFileList!.length;
+                            i++) {
+                              print(i);
+                              try {
+                                await storage
+                                    .ref(
+                                    '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                    .putFile(
+                                    File(imageFileList![i].path));
+                              } on FirebaseException {}
+                              var downloadUrl = await storage
+                                  .ref(
+                                  '${imageFileList![i].name}-${FirebaseAuth.instance.currentUser!.uid}')
+                                  .getDownloadURL();
+
+                              AddImages(
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                  downloadUrl);
+                            }
+                          }
+                        },
+                        style: const ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll(
+                                Colors.orangeAccent)),
+                        child: const Text(
+                          "Добавить фотографии",
+                          style: TextStyle(color: Colors.black),
                         ),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),
