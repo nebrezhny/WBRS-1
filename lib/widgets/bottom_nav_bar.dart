@@ -12,6 +12,7 @@ import 'package:messenger/widgets/splash.dart';
 import 'package:messenger/widgets/widgets.dart';
 
 import '../helper/global.dart';
+import '../helper/helper_function.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
   const MyBottomNavigationBar({Key? key}) : super(key: key);
@@ -73,9 +74,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         });
 
         if (isLoading == false) {
+          var x = await getUserGroup();
           nextScreen(
               context,
               ProfilePage(
+                group: x,
                 email: FirebaseAuth.instance.currentUser!.email.toString(),
                 userName:
                     FirebaseAuth.instance.currentUser!.displayName.toString(),
@@ -86,6 +89,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 city: GlobalCity.toString(),
                 deti: GlobalDeti,
                 pol: GlobalPol.toString(),
+                imageSnapshot: getImagesUserStream(),
               ));
         } else {
           nextScreen(context, SplashScreen());
@@ -122,7 +126,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           nextScreen(context, SplashScreen());
           // ignore: dead_code
         } else {
-          nextScreen(context, ProfilesList());
+          var x = await getUserGroup();
+          nextScreen(
+              context,
+              ProfilesList(
+                group: x,
+              ));
         }
 
         break;
@@ -161,5 +170,13 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       onTap: _onItemTapped,
       height: 60,
     );
+  }
+
+  getImagesUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('images')
+        .snapshots();
   }
 }

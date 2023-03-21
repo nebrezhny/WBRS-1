@@ -241,6 +241,7 @@ class _OrangePageState extends State<OrangePage> {
                             nextScreen(
                                 context,
                                 ProfilePage(
+                                  group: Group,
                                   email: FirebaseAuth
                                       .instance.currentUser!.email
                                       .toString(),
@@ -254,6 +255,7 @@ class _OrangePageState extends State<OrangePage> {
                                   city: GlobalCity.toString(),
                                   hobbi: GlobalHobbi.toString(),
                                   pol: GlobalPol.toString(),
+                                  imageSnapshot: getImagesUserStream(),
                                 ));
                             showSnackbar(context, Colors.green,
                                 "Успешно! Ваша группа: $Group}");
@@ -329,5 +331,13 @@ class _OrangePageState extends State<OrangePage> {
         )
       ],
     );
+  }
+
+  getImagesUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('images')
+        .snapshots();
   }
 }

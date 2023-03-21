@@ -35,8 +35,9 @@ class _FilterPage2State extends State<FilterPage2> {
 
   static const List<String> _kOptions = <String>[
     'Чебоксары',
-    'bobcat',
-    'chameleon',
+    'Bobcat',
+    'Chameleon',
+    'Moscow'
   ];
   @override
   Widget build(BuildContext context) {

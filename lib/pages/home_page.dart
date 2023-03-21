@@ -212,9 +212,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                         Flexible(
                           child: TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               selectedIndex = 2;
-                              nextScreen(context, ProfilesList());
+                              var x = await getUserGroup();
+                              nextScreen(
+                                  context,
+                                  ProfilesList(
+                                    group: x,
+                                  ));
                             },
                             child: const Text(
                               'Начать общаться',

@@ -94,10 +94,12 @@ class _MyDrawerState extends State<MyDrawer> {
                     setState(() {
                       selectedIndex = 0;
                     });
+                    var x = await getUserGroup();
 
                     nextScreen(
                         context,
                         ProfilePage(
+                          group: x,
                           email: FirebaseAuth.instance.currentUser!.email
                               .toString(),
                           userName: FirebaseAuth
@@ -110,6 +112,7 @@ class _MyDrawerState extends State<MyDrawer> {
                           city: GlobalCity.toString(),
                           deti: GlobalDeti,
                           pol: GlobalPol.toString(),
+                          imageSnapshot: getImagesUserStream(),
                         ));
                   },
                   child: Column(
@@ -215,9 +218,11 @@ class _MyDrawerState extends State<MyDrawer> {
                     if (isLoading) {
                       nextScreen(context, SplashScreen());
                     } else {
+                      var x = await getUserGroup();
                       nextScreen(
                           context,
                           ProfilePage(
+                            group: x,
                             email: FirebaseAuth.instance.currentUser!.email
                                 .toString(),
                             userName: FirebaseAuth
@@ -230,6 +235,7 @@ class _MyDrawerState extends State<MyDrawer> {
                             city: GlobalCity.toString(),
                             deti: GlobalDeti,
                             pol: GlobalPol.toString(),
+                            imageSnapshot: getImagesUserStream(),
                           ));
                     }
                   },
@@ -280,7 +286,12 @@ class _MyDrawerState extends State<MyDrawer> {
                     if (isLoading) {
                       nextScreen(context, SplashScreen());
                     } else {
-                      nextScreenReplace(context, ProfilesList());
+                      var x = await getUserGroup();
+                      nextScreenReplace(
+                          context,
+                          ProfilesList(
+                            group: x,
+                          ));
                     }
                   },
                   leading: const Icon(
@@ -392,5 +403,13 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
       ],
     );
+  }
+
+  getImagesUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('images')
+        .snapshots();
   }
 }

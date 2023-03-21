@@ -18,7 +18,7 @@ bool GlobalDeti = false;
 
 //красная,зелёная,белая,оранжевая
 
-String? Group;
+String Group = '';
 int RedGroup = 0, WhiteGroup = 0, GreenGroup = 0, OrangeGroup = 0;
 bool testIsComlpete = false;
 
@@ -32,3 +32,5 @@ String FiltrPol = "";
 RangeValues currentValues = const RangeValues(18, 22);
 
 late List user_info;
+
+bool imageStream = true;

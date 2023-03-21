@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/profile_page.dart';
 import 'package:messenger/service/auth_service.dart';
 import 'package:messenger/service/database_service.dart';
@@ -598,10 +599,11 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                             global.GlobalAge = widget.age;
                             global.GlobalAbout = widget.about;
                           });
-
+                          var x = await getUserGroup();
                           nextScreenReplace(
                               context,
                               ProfilePage(
+                                group: x,
                                 email: widget.email,
                                 userName: widget.userName,
                                 about: widget.about,
@@ -611,6 +613,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                 city: widget.city,
                                 rost: widget.rost,
                                 pol: GlobalPol.toString(),
+                                imageSnapshot: getImagesUserStream(),
                               ));
                         },
                         style: const ButtonStyle(
@@ -635,5 +638,13 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
         ),
       ],
     );
+  }
+
+  getImagesUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('images')
+        .snapshots();
   }
 }
