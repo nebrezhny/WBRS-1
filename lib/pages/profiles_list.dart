@@ -282,87 +282,75 @@ class _ProfilesListState extends State<ProfilesList> {
 
   Widget createTable(AsyncSnapshot<QuerySnapshot> snapshot) {
     //getMyInfoFromSharedPreference();
+    List users = [];
+
+    for (int i = 0; i < snapshot.data!.docs.length; i++) {
+      if (snapshot.data!.docs[i]['age'] > 0) {
+        users.add(snapshot.data!.docs[i]);
+      }
+    }
+
     return GridView.builder(
       gridDelegate:
           const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      itemCount: snapshot.data!.docs.length,
+      itemCount: users.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
-        if (snapshot.data!.docs[index]['age'] == 20) {
-          return
-              //snapshot.data!.docs[index]["age"]>=10 && snapshot.data!.docs[index]["age"]<=19
-              Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: GestureDetector(
-              onTap: () async {
-                DocumentSnapshot doc = await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(snapshot.data!.docs[index].id)
-                    .get();
-                Images = doc.get('images');
-                CountImages = Images.length;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: GestureDetector(
+            onTap: () async {
+              DocumentSnapshot doc = await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(snapshot.data!.docs[index].id)
+                  .get();
+              Images = doc.get('images');
+              CountImages = Images.length;
 
-                DatabaseService().getUserByUserName(
-                    snapshot.data!.docs[index].get("fullName"));
+              DatabaseService().getUserByUserName(
+                  snapshot.data!.docs[index].get("fullName"));
 
-                setState(() {
-                  somebodyUid = snapshot.data!.docs[index].get("uid");
-                  somebodyFullname = snapshot.data!.docs[index].get("fullName");
-                  somebodyImageUrl =
-                      snapshot.data!.docs[index].get("profilePic");
-                });
-                // ignore: use_build_context_synchronously
-                nextScreen(
-                    context,
-                    SomebodyProfile(
-                      uid: somebodyUid.toString(),
-                      name: somebodyFullname.toString(),
-                      photoUrl: somebodyImageUrl.toString(),
-                      userInfo: await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(snapshot.data!.docs[index].get('uid'))
-                          .get(),
-                    ));
-              },
-
-              child: Container(
-                  decoration: BoxDecoration(
-                    image: (snapshot.data!.docs[index].get("profilePic") == "")
-                        ? const DecorationImage(
-                            image: AssetImage("assets/profile.png"),
-                            fit: BoxFit.cover)
-                        : DecorationImage(
-                            image: NetworkImage(snapshot.data!.docs[index]
-                                .get("profilePic")
-                                .toString()),
-                            fit: BoxFit.cover),
-                  ),
-                  child: Container(
-                      color: Colors.black38,
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      margin: const EdgeInsets.only(top: 110),
-                      child: Text(
-                        "${snapshot.data!.docs[index].get("fullName")}, ${snapshot.data!.docs[index].get("age")}",
-                        style: const TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ))),
-              // decoration: BoxDecoration(
-              //     image:
-              //     (snapshot.data!.docs[index].get("profilePic")=="")
-              //         ? DecorationImage(image: AssetImage("assets/profile.png"))
-              //         : DecorationImage(image: NetworkImage(snapshot.data!.docs[index].get("profilePic").toString())),
-              // ),
-              // child: Text(snapshot.data!.docs[index].get("fullName"), style: TextStyle(),textAlign: TextAlign.center,),
-            ),
-          );
-          //:Text("data",style: TextStyle(color: Colors.white),);
-        } else {
-          return Expanded(
-              child: SizedBox(
-            width: 1,
-          ));
-        }
+              setState(() {
+                somebodyUid = snapshot.data!.docs[index].get("uid");
+                somebodyFullname = snapshot.data!.docs[index].get("fullName");
+                somebodyImageUrl = snapshot.data!.docs[index].get("profilePic");
+              });
+              // ignore: use_build_context_synchronously
+              nextScreen(
+                  context,
+                  SomebodyProfile(
+                    uid: somebodyUid.toString(),
+                    name: somebodyFullname.toString(),
+                    photoUrl: somebodyImageUrl.toString(),
+                    userInfo: await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(snapshot.data!.docs[index].get('uid'))
+                        .get(),
+                  ));
+            },
+            child: Container(
+                decoration: BoxDecoration(
+                  image: (users[index]["profilePic"] == "")
+                      ? const DecorationImage(
+                          image: AssetImage("assets/profile.png"),
+                          fit: BoxFit.cover)
+                      : DecorationImage(
+                          image: NetworkImage(
+                              users[index]["profilePic"].toString()),
+                          fit: BoxFit.cover),
+                ),
+                child: Container(
+                    color: Colors.black38,
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    margin: const EdgeInsets.only(top: 110),
+                    child: Text(
+                      "${users[index]["fullName"]}, ${users[index]["age"]}",
+                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ))),
+          ),
+        );
       },
     );
   }
