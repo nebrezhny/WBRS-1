@@ -285,8 +285,22 @@ class _ProfilesListState extends State<ProfilesList> {
     List users = [];
 
     for (int i = 0; i < snapshot.data!.docs.length; i++) {
-      if (snapshot.data!.docs[i]['age'] > 0) {
-        users.add(snapshot.data!.docs[i]);
+      if (snapshot.data!.docs[i]['age'] >= currentValues.start.round() &&
+          snapshot.data!.docs[i]['age'] <= currentValues.end.round()) {
+        if (FiltrPol != '') {
+          if (snapshot.data!.docs[i]['pol'].toString().toLowerCase() ==
+              FiltrPol) {
+            if (filtrCity.text != '') {
+              if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
+                users.add(snapshot.data!.docs[i]);
+              }
+            } else {
+              users.add(snapshot.data!.docs[i]);
+            }
+          }
+        } else {
+          users.add(snapshot.data!.docs[i]);
+        }
       }
     }
 
@@ -303,7 +317,7 @@ class _ProfilesListState extends State<ProfilesList> {
             onTap: () async {
               DocumentSnapshot doc = await FirebaseFirestore.instance
                   .collection('users')
-                  .doc(snapshot.data!.docs[index].id)
+                  .doc(users[index].id)
                   .get();
               Images = doc.get('images');
               CountImages = Images.length;
@@ -312,9 +326,9 @@ class _ProfilesListState extends State<ProfilesList> {
                   snapshot.data!.docs[index].get("fullName"));
 
               setState(() {
-                somebodyUid = snapshot.data!.docs[index].get("uid");
-                somebodyFullname = snapshot.data!.docs[index].get("fullName");
-                somebodyImageUrl = snapshot.data!.docs[index].get("profilePic");
+                somebodyUid = users[index].get("uid");
+                somebodyFullname = users[index].get("fullName");
+                somebodyImageUrl = users[index].get("profilePic");
               });
               // ignore: use_build_context_synchronously
               nextScreen(
@@ -325,7 +339,7 @@ class _ProfilesListState extends State<ProfilesList> {
                     photoUrl: somebodyImageUrl.toString(),
                     userInfo: await FirebaseFirestore.instance
                         .collection('users')
-                        .doc(snapshot.data!.docs[index].get('uid'))
+                        .doc(users[index].get('uid'))
                         .get(),
                   ));
             },
@@ -341,13 +355,16 @@ class _ProfilesListState extends State<ProfilesList> {
                           fit: BoxFit.cover),
                 ),
                 child: Container(
+                    constraints: BoxConstraints(minHeight: 0, maxHeight: 100),
                     color: Colors.black38,
                     padding: const EdgeInsets.symmetric(vertical: 2),
-                    margin: const EdgeInsets.only(top: 110),
+                    margin: const EdgeInsets.only(top: 100),
                     child: Text(
                       "${users[index]["fullName"]}, ${users[index]["age"]}",
                       style: const TextStyle(color: Colors.white),
+                      softWrap: true,
                       textAlign: TextAlign.center,
+                      overflow: TextOverflow.visible,
                     ))),
           ),
         );

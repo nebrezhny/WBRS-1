@@ -96,6 +96,11 @@ class _MyDrawerState extends State<MyDrawer> {
                     });
                     var x = await getUserGroup();
 
+                    var doc = await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .get();
+
                     nextScreen(
                         context,
                         ProfilePage(
@@ -105,13 +110,13 @@ class _MyDrawerState extends State<MyDrawer> {
                           userName: FirebaseAuth
                               .instance.currentUser!.displayName
                               .toString(),
-                          about: GlobalAbout.toString(),
-                          age: GlobalAge.toString(),
-                          rost: GlobalRost.toString(),
-                          hobbi: GlobalHobbi.toString(),
-                          city: GlobalCity.toString(),
-                          deti: GlobalDeti,
-                          pol: GlobalPol.toString(),
+                          about: doc.get('about'),
+                          age: doc.get('age').toString(),
+                          rost: doc.get('rost'),
+                          hobbi: doc.get('hobbi'),
+                          city: doc.get('city'),
+                          deti: doc.get('deti'),
+                          pol: doc.get('pol'),
                           imageSnapshot: getImagesUserStream(),
                         ));
                   },
@@ -219,6 +224,12 @@ class _MyDrawerState extends State<MyDrawer> {
                       nextScreen(context, SplashScreen());
                     } else {
                       var x = await getUserGroup();
+
+                      var doc = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .get();
+
                       nextScreen(
                           context,
                           ProfilePage(
@@ -228,13 +239,13 @@ class _MyDrawerState extends State<MyDrawer> {
                             userName: FirebaseAuth
                                 .instance.currentUser!.displayName
                                 .toString(),
-                            about: GlobalAbout.toString(),
-                            age: GlobalAge.toString(),
-                            rost: GlobalRost.toString(),
-                            hobbi: GlobalHobbi.toString(),
-                            city: GlobalCity.toString(),
-                            deti: GlobalDeti,
-                            pol: GlobalPol.toString(),
+                            about: doc.get('about'),
+                            age: doc.get('age').toString(),
+                            rost: doc.get('rost'),
+                            hobbi: doc.get('hobbi'),
+                            city: doc.get('city'),
+                            deti: doc.get('deti'),
+                            pol: doc.get('pol'),
                             imageSnapshot: getImagesUserStream(),
                           ));
                     }

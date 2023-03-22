@@ -45,10 +45,12 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             width: 50,
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: Image.network(
-                  snapshot.data!.docs[index]['photoUrl'],
-                  fit: BoxFit.cover,
-                )),
+                child: snapshot.data!.docs[index]['photoUrl'] != ''
+                    ? Image.network(
+                        snapshot.data!.docs[index]['photoUrl'],
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset('assets/profile.png')),
           ),
           title: Text(
             snapshot.data!.docs[index]['fullName'],

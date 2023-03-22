@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger/helper/global.dart';
+import 'package:messenger/helper/helper_function.dart';
+import 'package:messenger/pages/profiles_list.dart';
+import 'package:messenger/widgets/widgets.dart';
 
 class FilterPage extends StatefulWidget {
   const FilterPage({Key? key}) : super(key: key);
@@ -32,6 +36,8 @@ class FilterPage2 extends StatefulWidget {
 
 class _FilterPage2State extends State<FilterPage2> {
   String pol = "";
+  RangeValues localValues = currentValues;
+  String city = filtrCity.text;
 
   static const List<String> _kOptions = <String>[
     'Чебоксары',
@@ -71,7 +77,8 @@ class _FilterPage2State extends State<FilterPage2> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    pol = "m";
+                                    pol = "м";
+                                    FiltrPol = "м";
                                   });
                                   Navigator.pop(context);
                                 },
@@ -88,7 +95,8 @@ class _FilterPage2State extends State<FilterPage2> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    pol = "zh";
+                                    pol = "ж";
+                                    FiltrPol = "ж";
                                   });
                                   Navigator.pop(context);
                                 },
@@ -115,7 +123,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(pol == "m" ? "Мужчины" : "Женщины")
+                        Text(FiltrPol == "м" ? "Мужчины" : "Женщины")
                       ],
                     ),
                   ],
@@ -125,58 +133,128 @@ class _FilterPage2State extends State<FilterPage2> {
             const SizedBox(
               height: 15,
             ),
-            GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return
-                          //
-                          Scaffold(
-                        backgroundColor: Colors.transparent,
-                        appBar: AppBar(
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                        body: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+            StatefulBuilder(builder: (context, state) {
+              localValues = currentValues;
+              return GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return
+                            //
+                            StatefulBuilder(builder:
+                                (BuildContext context, StateSetter setState) {
+                          return Scaffold(
+                            backgroundColor: Colors.transparent,
+                            appBar: AppBar(
+                              backgroundColor: Colors.orangeAccent,
+                            ),
+                            body: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Column(
                                 children: [
-                                  Text(
-                                    'от ${currentValues.start.round()} ',
-                                    style: const TextStyle(fontSize: 22),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'от ${currentValues.start.round()} ',
+                                        style: const TextStyle(fontSize: 22),
+                                      ),
+                                      Text(
+                                        'до ${currentValues.end.round()}',
+                                        style: const TextStyle(fontSize: 22),
+                                      )
+                                    ],
                                   ),
-                                  Text(
-                                    'до ${currentValues.end.round()}',
-                                    style: const TextStyle(fontSize: 22),
-                                  )
+                                  Column(
+                                    children: [
+                                      RangeSlider(
+                                          values: localValues,
+                                          min: 18,
+                                          max: 100,
+                                          divisions: 100,
+                                          activeColor: Colors.orange,
+                                          labels: RangeLabels(
+                                              localValues.start
+                                                  .round()
+                                                  .toString(),
+                                              localValues.end
+                                                  .round()
+                                                  .toString()),
+                                          onChanged: (RangeValues values) {
+                                            setState(() {
+                                              currentValues = values;
+                                              localValues = values;
+                                            });
+                                          }),
+                                      TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              localValues = currentValues;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Сохранить"))
+                                    ],
+                                  ),
                                 ],
                               ),
-                              StatefulBuilder(builder:
-                                  (BuildContext context, StateSetter setState) {
-                                return RangeSlider(
-                                    values: currentValues,
-                                    min: 18,
-                                    max: 100,
-                                    divisions: 100,
-                                    activeColor: Colors.orange,
-                                    labels: RangeLabels(
-                                        currentValues.start.round().toString(),
-                                        currentValues.end.round().toString()),
-                                    onChanged: (RangeValues values) {
-                                      setState(() {
-                                        currentValues = values;
-                                      });
-                                    });
-                              }),
-                            ],
+                            ),
+                          );
+                        });
+                      });
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(CupertinoIcons.calendar),
+                          SizedBox(
+                            width: 10,
                           ),
-                        ),
-                      );
-                    });
+                          Text("Возраст"),
+                          SizedBox(
+                            width: 10,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(
+              height: 15,
+            ),
+            GestureDetector(
+              onTap: () {
+                Scaffold.of(context)
+                    .showBottomSheet<void>((BuildContext context) {
+                  return Scaffold(
+                      body: Column(
+                    children: [
+                      TextField(
+                        controller: filtrCity,
+                        onChanged: (value) {
+                          setState(() {
+                            print(value);
+                            city = value;
+                          });
+                        },
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Сохранить'))
+                    ],
+                  ));
+                });
               },
               child: Container(
                 width: MediaQuery.of(context).size.width - 20,
@@ -186,70 +264,31 @@ class _FilterPage2State extends State<FilterPage2> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Icon(CupertinoIcons.calendar),
+                        const Icon(CupertinoIcons.map),
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text("Возраст:"),
+                        const Text("Город:"),
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(
-                            "${currentValues.start.round().toString()}-${currentValues.end.round().toString()}")
+                        Text(city)
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
-            GestureDetector(
-              onTap: () {
-                Scaffold.of(context)
-                    .showBottomSheet<void>((BuildContext context) {
-                  return Scaffold(
-                    body: Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-                        return _kOptions.where((String option) {
-                          return option
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
-                      onSelected: (String selection) {
-                        debugPrint('You just selected $selection');
-                      },
-                    ),
-                  );
-                });
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width - 20,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(CupertinoIcons.map),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text("Город:"),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text("Чебоксары")
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            TextButton(
+                onPressed: () async {
+                  filtrCity.text = city;
+                  FiltrPol = pol;
+                  currentValues = localValues;
+                  print(currentValues);
+                  var x = await getUserGroup();
+                  nextScreen(context, ProfilesList(group: x));
+                },
+                child: Text('Сохранить'))
           ],
         ),
       ),

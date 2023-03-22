@@ -140,9 +140,33 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                 elevation: 0,
                 centerTitle: true,
                 backgroundColor: Colors.transparent,
-                title: Text(
-                  widget.name,
-                  style: const TextStyle(color: Colors.white),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        showSnackbar(context, Colors.green,
+                            "Спасибо за отклик! Мы уже рассматриваем заявку.");
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.info,
+                            size: 30,
+                            color: Colors.red,
+                          ),
+                          Text(
+                            ' Пожаловаться',
+                            style: TextStyle(color: Colors.redAccent),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 )),
             body: isLoading
                 ? SingleChildScrollView(
@@ -242,159 +266,130 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       fontWeight: FontWeight.w500,
                                       fontStyle: FontStyle.normal),
                                 ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () async {
-                                          String chatID = '';
-                                          Map<String, dynamic> chatRoomInfoMap =
-                                              {
-                                            "user1": FirebaseAuth
-                                                .instance.currentUser!.uid
+                                TextButton(
+                                    onPressed: () async {
+                                      String chatID = '';
+                                      Map<String, dynamic> chatRoomInfoMap = {
+                                        "user1": FirebaseAuth
+                                            .instance.currentUser!.uid
+                                            .toString(),
+                                        "user2": widget.uid,
+                                        "user1Nickname": FirebaseAuth
+                                            .instance.currentUser!.displayName,
+                                        "user2Nickname": widget.name,
+                                        "user1_image": FirebaseAuth
+                                            .instance.currentUser!.photoURL,
+                                        "user2_image": widget.photoUrl,
+                                        "lastMessage": "",
+                                        "lastMessageSendBy": "",
+                                        "unreadMessage": 0,
+                                        "chatId": getChatRoomIdByUsernames(
+                                            FirebaseAuth.instance.currentUser!
+                                                .displayName
                                                 .toString(),
-                                            "user2": widget.uid,
-                                            "user1Nickname": FirebaseAuth
-                                                .instance
-                                                .currentUser!
-                                                .displayName,
-                                            "user2Nickname": widget.name,
-                                            "user1_image": FirebaseAuth
-                                                .instance.currentUser!.photoURL,
-                                            "user2_image": widget.photoUrl,
-                                            "lastMessage": "",
-                                            "unreadMessage": 0,
-                                            "chatId": getChatRoomIdByUsernames(
-                                                FirebaseAuth.instance
+                                            widget.name)
+                                      };
+                                      // await FirebaseFirestore.instance.collection("chats").where("chatId", isEqualTo: getChatRoomIdByUsernames(FirebaseAuth.instance.currentUser!.displayName.toString(), fullName))==null
+                                      // ?DatabaseService().createChatRoom(getChatRoomIdByUsernames(FirebaseAuth.instance.currentUser!.displayName.toString(), fullName),chatRoomInfoMap)
+                                      // :nextScreen(context, HomePage());
+                                      await FirebaseFirestore.instance
+                                          .collection("chats")
+                                          .where("user1",
+                                              isEqualTo: FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                          .where("user2", isEqualTo: widget.uid)
+                                          .get()
+                                          .then((QuerySnapshot snapshot) {
+                                        if (snapshot.docs.isEmpty) {
+                                        } else {
+                                          HaveOrNot = true;
+                                          chatID = snapshot.docs[0].id;
+                                        }
+                                      });
+                                      await FirebaseFirestore.instance
+                                          .collection("chats")
+                                          .where("user2",
+                                              isEqualTo: FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                          .where("user1", isEqualTo: widget.uid)
+                                          .get()
+                                          .then((QuerySnapshot snapshot) {
+                                        if (snapshot.docs.isEmpty) {
+                                        } else {
+                                          HaveOrNot = true;
+                                          chatID = snapshot.docs[0].id;
+                                        }
+                                      });
+                                      await FirebaseFirestore.instance
+                                          .collection("chats")
+                                          .where("chatId",
+                                              isEqualTo:
+                                                  getChatRoomIdByUsernames(
+                                                      FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .displayName
+                                                          .toString(),
+                                                      widget.name))
+                                          .get()
+                                          .then((QuerySnapshot snapshot) {
+                                        if (snapshot.docs.isEmpty) {
+                                        } else {
+                                          HaveOrNot = true;
+                                        }
+                                        if (HaveOrNot == false) {
+                                          DatabaseService().createChatRoom(
+                                              getChatRoomIdByUsernames(
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.displayName
+                                                      .toString(),
+                                                  widget.name),
+                                              chatRoomInfoMap);
+                                          DatabaseService().addChat(
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              getChatRoomIdByUsernames(
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.displayName
+                                                      .toString(),
+                                                  widget.name));
+                                          DatabaseService().addChatSecondUser(
+                                              widget.uid,
+                                              getChatRoomIdByUsernames(
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.displayName
+                                                      .toString(),
+                                                  widget.name));
+                                          nextScreen(context, const HomePage());
+                                        } else {
+                                          nextScreenReplace(
+                                              context,
+                                              ChatScreen(
+                                                chatId: chatID,
+                                                chatWithUsername: widget.name,
+                                                id: FirebaseAuth
+                                                    .instance.currentUser!.uid,
+                                                name: FirebaseAuth.instance
                                                     .currentUser!.displayName
                                                     .toString(),
-                                                widget.name)
-                                          };
-                                          // await FirebaseFirestore.instance.collection("chats").where("chatId", isEqualTo: getChatRoomIdByUsernames(FirebaseAuth.instance.currentUser!.displayName.toString(), fullName))==null
-                                          // ?DatabaseService().createChatRoom(getChatRoomIdByUsernames(FirebaseAuth.instance.currentUser!.displayName.toString(), fullName),chatRoomInfoMap)
-                                          // :nextScreen(context, HomePage());
-                                          await FirebaseFirestore.instance
-                                              .collection("chats")
-                                              .where("user1",
-                                                  isEqualTo: FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .uid)
-                                              .where("user2",
-                                                  isEqualTo: widget.uid)
-                                              .get()
-                                              .then((QuerySnapshot snapshot) {
-                                            if (snapshot.docs.isEmpty) {
-                                            } else {
-                                              HaveOrNot = true;
-                                              chatID = snapshot.docs[0].id;
-                                            }
-                                          });
-                                          await FirebaseFirestore.instance
-                                              .collection("chats")
-                                              .where("user2",
-                                                  isEqualTo: FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .uid)
-                                              .where("user1",
-                                                  isEqualTo: widget.uid)
-                                              .get()
-                                              .then((QuerySnapshot snapshot) {
-                                            if (snapshot.docs.isEmpty) {
-                                            } else {
-                                              HaveOrNot = true;
-                                              chatID = snapshot.docs[0].id;
-                                            }
-                                          });
-                                          await FirebaseFirestore.instance
-                                              .collection("chats")
-                                              .where("chatId",
-                                                  isEqualTo:
-                                                      getChatRoomIdByUsernames(
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .displayName
-                                                              .toString(),
-                                                          widget.name))
-                                              .get()
-                                              .then((QuerySnapshot snapshot) {
-                                            if (snapshot.docs.isEmpty) {
-                                            } else {
-                                              HaveOrNot = true;
-                                            }
-                                            if (HaveOrNot == false) {
-                                              DatabaseService().createChatRoom(
-                                                  getChatRoomIdByUsernames(
-                                                      FirebaseAuth
-                                                          .instance
-                                                          .currentUser!
-                                                          .displayName
-                                                          .toString(),
-                                                      widget.name),
-                                                  chatRoomInfoMap);
-                                              DatabaseService().addChat(
-                                                  FirebaseAuth.instance
-                                                      .currentUser!.uid,
-                                                  getChatRoomIdByUsernames(
-                                                      FirebaseAuth
-                                                          .instance
-                                                          .currentUser!
-                                                          .displayName
-                                                          .toString(),
-                                                      widget.name));
-                                              DatabaseService()
-                                                  .addChatSecondUser(
-                                                      widget.uid,
-                                                      getChatRoomIdByUsernames(
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .displayName
-                                                              .toString(),
-                                                          widget.name));
-                                              nextScreen(
-                                                  context, const HomePage());
-                                            } else {
-                                              nextScreenReplace(
-                                                  context,
-                                                  ChatScreen(
-                                                    chatId: chatID,
-                                                    chatWithUsername:
-                                                        widget.name,
-                                                    id: FirebaseAuth.instance
-                                                        .currentUser!.uid,
-                                                    name: FirebaseAuth
-                                                        .instance
-                                                        .currentUser!
-                                                        .displayName
-                                                        .toString(),
-                                                    photoUrl: widget.photoUrl,
-                                                  ));
-                                            }
-                                          });
-                                          setState(() {
-                                            selectedIndex = 1;
-                                          });
-                                        },
-                                        icon: const Icon(
+                                                photoUrl: widget.photoUrl,
+                                              ));
+                                        }
+                                      });
+                                      setState(() {
+                                        selectedIndex = 1;
+                                      });
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(
                                           Icons.messenger_outline,
                                           color: Colors.orange,
-                                          size: 35,
-                                        )),
-                                    IconButton(
-                                      onPressed: () {
-                                        showSnackbar(context, Colors.green,
-                                            "Спасибо за отклик! Мы уже рассматриваем заявку.");
-                                      },
-                                      icon: const Icon(
-                                        Icons.info,
-                                        size: 35,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ],
-                                )
+                                          size: 30,
+                                        ),
+                                      ],
+                                    ))
                               ],
                             ),
                             Column(
@@ -459,6 +454,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                         widget.userInfo.get('hobbi') != ""
                                             ? widget.userInfo.get('hobbi')
                                             : "не заполнено",
+                                        textAlign: TextAlign.end,
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 21),
                                         softWrap: true,
@@ -486,6 +482,48 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       widget.userInfo.get('deti')
                                           ? "есть"
                                           : "нет",
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 21),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Группа: ",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 23,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      widget.userInfo.get('группа'),
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 21),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Города: ",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 23,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      widget.userInfo.get('city'),
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 21),
                                     )

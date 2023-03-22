@@ -88,7 +88,7 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                 height: 30,
               ),
               TextField(
-                maxLength: 30,
+                maxLength: 300,
                 controller: description,
                 decoration: const InputDecoration(
                     hintText: 'Введите краткое описание встречи',

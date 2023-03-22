@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:messenger/helper/helper_function.dart';
+import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/profile_page.dart';
 import 'package:messenger/service/auth_service.dart';
 import 'package:messenger/service/database_service.dart';
@@ -99,7 +100,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: const Text(
-                "Редактирование профиляы",
+                "Редактирование профиля",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 27,
@@ -265,9 +266,12 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                       onSubmitted: (name) {
+                                        widget.userName = name.toString();
+                                      },
+                                      onChanged: (name) {
                                         widget.userName = name.toString();
                                       },
                                       controller: name,
@@ -276,7 +280,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         border: InputBorder.none,
                                         hintText: widget.userName,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black,
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1),
                                             fontWeight: FontWeight.w400,
                                             fontSize: 18),
                                       ),
@@ -310,17 +315,21 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                       keyboardType: TextInputType.number,
                                       onSubmitted: (age) {
                                         widget.age = age.toString();
                                       },
+                                      onChanged: (value) {
+                                        widget.age = value.toString();
+                                      },
                                       controller: age,
                                       decoration: InputDecoration(
                                         hintText: widget.age,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                         alignLabelWithHint: false,
                                         border: InputBorder.none,
                                       ),
@@ -354,16 +363,20 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                       onSubmitted: (email) {
+                                        widget.rost = email.toString();
+                                      },
+                                      onChanged: (email) {
                                         widget.rost = email.toString();
                                       },
                                       controller: email,
                                       decoration: InputDecoration(
                                         hintText: widget.rost,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                         alignLabelWithHint: false,
                                         border: InputBorder.none,
                                       ),
@@ -399,15 +412,19 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       minLines: 1,
                                       maxLines: 5,
                                       style:
-                                          const TextStyle(color: Colors.white),
+                                          const TextStyle(color: Colors.black),
                                       onSubmitted: (about) {
+                                        widget.about = about.toString();
+                                      },
+                                      onChanged: (about) {
                                         widget.about = about.toString();
                                       },
                                       controller: about,
                                       decoration: InputDecoration(
                                         hintText: widget.about,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                         alignLabelWithHint: false,
                                         border: InputBorder.none,
                                       ),
@@ -441,16 +458,20 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                       onSubmitted: (about) {
+                                        widget.hobbi = about.toString();
+                                      },
+                                      onChanged: (about) {
                                         widget.hobbi = about.toString();
                                       },
                                       controller: hobbi,
                                       decoration: InputDecoration(
                                         hintText: widget.hobbi,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                         alignLabelWithHint: false,
                                         border: InputBorder.none,
                                       ),
@@ -484,16 +505,20 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                       onSubmitted: (city) {
+                                        widget.city = city.toString();
+                                      },
+                                      onChanged: (city) {
                                         widget.city = city.toString();
                                       },
                                       controller: city,
                                       decoration: InputDecoration(
                                         hintText: widget.city,
                                         hintStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                         alignLabelWithHint: false,
                                         border: InputBorder.none,
                                       ),
@@ -547,7 +572,9 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       ),
                                       hint: const Text(
                                         "нет",
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(
+                                            color: Color.fromRGBO(
+                                                128, 128, 128, 1)),
                                       ),
                                       dropdownColor: Colors.white,
                                     ),
@@ -561,72 +588,151 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                       const SizedBox(
                         height: 20,
                       ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          var chats = await FirebaseFirestore.instance
-                              .collection('chats')
-                              .get();
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                var chats = await FirebaseFirestore.instance
+                                    .collection('chats')
+                                    .get();
 
-                          for (int i = 0; i < chats.size; i++) {
-                            if (chats.docs[i]['user1Nickname'] ==
-                                FirebaseAuth
-                                    .instance.currentUser!.displayName) {
-                              FirebaseFirestore.instance
-                                  .collection('chats')
-                                  .doc(chats.docs[i].id)
-                                  .update({'user1Nickname': widget.userName});
-                            } else if (chats.docs[i]['user2Nickname'] ==
-                                FirebaseAuth
-                                    .instance.currentUser!.displayName) {
-                              FirebaseFirestore.instance
-                                  .collection('chats')
-                                  .doc(chats.docs[i].id)
-                                  .update({'user2Nickname': widget.userName});
-                            } else {
-                              null;
-                            }
-                          }
-                          setState(() {
-                            DatabaseService().updateUserData(
-                                widget.userName,
-                                widget.email,
-                                int.parse(widget.age),
-                                widget.about,
-                                widget.hobbi,
-                                widget.city);
-                            FirebaseAuth.instance.currentUser!
-                                .updateDisplayName(widget.userName);
-                            global.GlobalAge = widget.age;
-                            global.GlobalAbout = widget.about;
-                          });
-                          var x = await getUserGroup();
-                          nextScreenReplace(
-                              context,
-                              ProfilePage(
-                                group: x,
-                                email: widget.email,
-                                userName: widget.userName,
-                                about: widget.about,
-                                age: widget.age,
-                                hobbi: widget.hobbi,
-                                deti: widget.deti,
-                                city: widget.city,
-                                rost: widget.rost,
-                                pol: GlobalPol.toString(),
-                                imageSnapshot: getImagesUserStream(),
-                              ));
-                        },
-                        style: const ButtonStyle(
-                          padding:
-                              MaterialStatePropertyAll(EdgeInsets.all(10.0)),
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.green),
-                        ),
-                        child: const Text(
-                          "Сохранить",
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
+                                for (int i = 0; i < chats.size; i++) {
+                                  if (chats.docs[i]['user1Nickname'] ==
+                                      FirebaseAuth
+                                          .instance.currentUser!.displayName) {
+                                    FirebaseFirestore.instance
+                                        .collection('chats')
+                                        .doc(chats.docs[i].id)
+                                        .update(
+                                            {'user1Nickname': widget.userName});
+                                  } else if (chats.docs[i]['user2Nickname'] ==
+                                      FirebaseAuth
+                                          .instance.currentUser!.displayName) {
+                                    FirebaseFirestore.instance
+                                        .collection('chats')
+                                        .doc(chats.docs[i].id)
+                                        .update(
+                                            {'user2Nickname': widget.userName});
+                                  } else {
+                                    null;
+                                  }
+                                }
+                                setState(() {
+                                  DatabaseService().updateUserData(
+                                      widget.userName,
+                                      widget.email,
+                                      int.parse(widget.age),
+                                      widget.about,
+                                      widget.hobbi,
+                                      widget.city);
+                                  FirebaseAuth.instance.currentUser!
+                                      .updateDisplayName(widget.userName);
+                                  global.GlobalAge = widget.age;
+                                  global.GlobalAbout = widget.about;
+                                });
+                                var x = await getUserGroup();
+                                nextScreenReplace(
+                                    context,
+                                    ProfilePage(
+                                      group: x,
+                                      email: widget.email,
+                                      userName: widget.userName,
+                                      about: widget.about,
+                                      age: widget.age,
+                                      hobbi: widget.hobbi,
+                                      deti: widget.deti,
+                                      city: widget.city,
+                                      rost: widget.rost,
+                                      pol: GlobalPol.toString(),
+                                      imageSnapshot: getImagesUserStream(),
+                                    ));
+                              },
+                              style: const ButtonStyle(
+                                padding: MaterialStatePropertyAll(
+                                    EdgeInsets.all(10.0)),
+                                backgroundColor:
+                                    MaterialStatePropertyAll(Colors.green),
+                              ),
+                              child: const Text(
+                                "Сохранить",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                                style: const ButtonStyle(
+                                  padding: MaterialStatePropertyAll(
+                                      EdgeInsets.all(10.0)),
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Colors.redAccent),
+                                ),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.12,
+                                          padding: const EdgeInsets.all(15),
+                                          child: Column(children: [
+                                            const Text('Вы уверены?'),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            backgroundColor: Colors
+                                                                .orangeAccent),
+                                                    onPressed: () {
+                                                      FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .doc(FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid)
+                                                          .delete();
+
+                                                      FirebaseAuth
+                                                          .instance.currentUser!
+                                                          .delete();
+
+                                                      nextScreen(
+                                                          context, LoginPage());
+                                                    },
+                                                    child: Text('Да')),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            backgroundColor: Colors
+                                                                .orangeAccent),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text('Нет')),
+                                              ],
+                                            )
+                                          ]),
+                                        );
+                                      });
+                                },
+                                child: const Text(
+                                  'Удалить профиль',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ))
+                          ],
                         ),
                       ),
                     ],

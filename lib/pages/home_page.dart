@@ -76,167 +76,168 @@ class _HomePageState extends State<HomePage> {
 
   chatRoomsList(
       AsyncSnapshot<QuerySnapshot> snapshot, String MyUID, String MyNickname) {
-    String nick;
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      itemCount: (snapshot.data != null ? (snapshot.data!).docs.length : 0),
-      itemBuilder: (BuildContext context, int index) {
-        return snapshot.data!.docs[index].get("user1") == MyUID ||
-                snapshot.data!.docs[index].get("user2") == MyUID
-            ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 9.0),
-                child: ListTile(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40.0)),
-                  subtitle: snapshot.data!.docs[index]["lastMessage"] != ""
-                      ? Container(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  "${snapshot.data!.docs[index]["lastMessageSendByID"] == MyUID ? "Вы" : snapshot.data!.docs[index]["lastMessageSendBy"]}: ${snapshot.data!.docs[index].get("lastMessage")}",
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              snapshot.data!.docs[index]
-                                          ["lastMessageSendByID"] !=
-                                      MyUID
-                                  ? snapshot.data!.docs[index]
-                                              ['unreadMessage'] !=
-                                          null
-                                      ? snapshot.data!.docs[index]
-                                                  ['unreadMessage'] !=
-                                              0
-                                          ? CircleAvatar(
-                                              backgroundColor: Colors.white,
-                                              radius: 10,
-                                              child: Text(
-                                                snapshot
-                                                    .data!
-                                                    .docs[index]
-                                                        ['unreadMessage']
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
-                                                    fontFamily: 'Roboto'),
-                                              ),
-                                            )
-                                          : const SizedBox()
-                                      : const SizedBox()
-                                  : const SizedBox(),
-                            ],
-                          ),
-                        )
-                      : const Text(
-                          "нет сообщений",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                  title: snapshot.data!.docs[index].get("user1") == MyUID
-                      ? Text(
-                          snapshot.data!.docs[index].get("user2Nickname"),
-                          style: const TextStyle(color: Colors.white),
-                        )
-                      : Text(
-                          snapshot.data!.docs[index].get("user1Nickname"),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                  onTap: () async {
-                    if (snapshot.data!.docs[index].get("user1") == MyUID) {
-                      nick = snapshot.data!.docs[index].get("user2Nickname");
-                      id = snapshot.data!.docs[index]['user2'];
-                      photoUrl = snapshot.data!.docs[index]['user2_image'];
-                    } else {
-                      nick = snapshot.data!.docs[index].get("user1Nickname");
-                      id = snapshot.data!.docs[index]['user1'];
-                      photoUrl = snapshot.data!.docs[index]['user1_image'];
-                    }
+    List chats = [];
 
-                    setState(() {
-                      nextScreen(
-                          context,
-                          ChatScreen(
-                              chatWithUsername: nick,
-                              name: MyNickname,
-                              photoUrl: photoUrl,
-                              id: id,
-                              chatId: snapshot.data!.docs[index].id));
-                    });
-                  },
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(100.0),
-                    child: snapshot.data!.docs[index].get("user1") == MyUID
-                        ? snapshot.data!.docs[index].get("user2_image") != ""
-                            ? Image.network(
-                                snapshot.data!.docs[index].get("user2_image"),
-                                width: 60,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                color: Colors.white,
-                                padding: const EdgeInsets.all(8),
-                                child: const Icon(Icons.person, size: 40))
-                        : snapshot.data!.docs[index].get("user1_image") != ""
-                            ? Image.network(
-                                snapshot.data!.docs[index].get("user1_image"),
-                                width: 60,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                color: Colors.white,
-                                padding: const EdgeInsets.all(8),
-                                child: const Icon(Icons.person, size: 40)),
-                  ),
-                  tileColor: Colors.white24,
-                  contentPadding: const EdgeInsets.all(10.0),
-                ),
-              )
-            : Container(
-                height: MediaQuery.of(context).size.height - 160,
-                width: MediaQuery.of(context).size.width,
-                child: Center(
-                  child: SizedBox(
-                    height: 100,
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Нет чатов. ',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Flexible(
-                          child: TextButton(
-                            onPressed: () async {
-                              selectedIndex = 2;
-                              var x = await getUserGroup();
-                              nextScreen(
-                                  context,
-                                  ProfilesList(
-                                    group: x,
-                                  ));
-                            },
-                            child: const Text(
-                              'Начать общаться',
-                              softWrap: true,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+    for (int i = 0; i < snapshot.data!.docs.length; i++) {
+      if (snapshot.data!.docs[i].get("user1") == MyUID ||
+          snapshot.data!.docs[i].get("user2") == MyUID) {
+        chats.add(snapshot.data!.docs[i]);
+      }
+    }
+    String nick;
+
+    if (chats.isNotEmpty) {
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        itemCount: chats.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40.0)),
+              subtitle: chats[index]["lastMessage"] != ""
+                  ? Container(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              "${chats[index]["lastMessageSendByID"] == MyUID ? "Вы" : chats[index]["lastMessageSendBy"]}: ${chats[index].get("lastMessage")}",
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
-                        ),
-                      ],
+                          chats[index]["lastMessageSendByID"] != MyUID
+                              ? chats[index]['unreadMessage'] != null
+                                  ? chats[index]['unreadMessage'] != 0
+                                      ? CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          radius: 10,
+                                          child: Text(
+                                            chats[index]['unreadMessage']
+                                                .toString(),
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                fontFamily: 'Roboto'),
+                                          ),
+                                        )
+                                      : const SizedBox()
+                                  : const SizedBox()
+                              : const SizedBox(),
+                        ],
+                      ),
+                    )
+                  : const Text(
+                      "нет сообщений",
+                      style: TextStyle(color: Colors.white),
+                    ),
+              title: chats[index].get("user1") == MyUID
+                  ? Text(
+                      chats[index].get("user2Nickname"),
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : Text(
+                      chats[index].get("user1Nickname"),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+              onTap: () async {
+                if (chats[index].get("user1") == MyUID) {
+                  nick = chats[index].get("user2Nickname");
+                  id = chats[index]['user2'];
+
+                  photoUrl = chats[index]['user2_image'];
+                } else {
+                  nick = chats[index].get("user1Nickname");
+                  id = chats[index]['user1'];
+                  photoUrl = chats[index]['user1_image'];
+                }
+
+                setState(() {
+                  nextScreen(
+                      context,
+                      ChatScreen(
+                          chatWithUsername: nick,
+                          name: MyNickname,
+                          photoUrl: photoUrl,
+                          id: id,
+                          chatId: chats[index].id));
+                });
+              },
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(100.0),
+                child: chats[index].get("user1") == MyUID
+                    ? chats[index].get("user2_image") != ""
+                        ? Image.network(
+                            chats[index].get("user2_image"),
+                            width: 60,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.person, size: 40))
+                    : chats[index].get("user1_image") != ""
+                        ? Image.network(
+                            chats[index].get("user1_image"),
+                            width: 60,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.person, size: 40)),
+              ),
+              tileColor: Colors.white24,
+              contentPadding: const EdgeInsets.all(10.0),
+            ),
+          );
+        },
+      );
+    } else {
+      return Container(
+        height: MediaQuery.of(context).size.height - 160,
+        width: MediaQuery.of(context).size.width,
+        child: Center(
+          child: SizedBox(
+            height: 100,
+            child: Column(
+              children: [
+                const Text(
+                  'Нет чатов. ',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Flexible(
+                  child: TextButton(
+                    onPressed: () async {
+                      selectedIndex = 2;
+                      var x = await getUserGroup();
+                      nextScreen(
+                          context,
+                          ProfilesList(
+                            group: x,
+                          ));
+                    },
+                    child: const Text(
+                      'Начать общаться',
+                      softWrap: true,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
-              );
-      },
-    );
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   // string manipulation
@@ -389,7 +390,7 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
-                      .orderBy('lastMessageSendTs')
+                      .orderBy('lastMessage')
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {

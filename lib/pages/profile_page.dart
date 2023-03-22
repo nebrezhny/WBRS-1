@@ -239,7 +239,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: IconButton(
                                   onPressed: () {
                                     global.GlobalPol = widget.pol;
-                                    nextScreen(
+                                    nextScreenReplace(
                                         context,
                                         ProfilePageEdit(
                                           email: widget.email,

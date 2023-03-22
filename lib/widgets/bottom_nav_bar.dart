@@ -75,6 +75,14 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
         if (isLoading == false) {
           var x = await getUserGroup();
+
+          var doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .get();
+
+          print(doc.get('about'));
+
           nextScreen(
               context,
               ProfilePage(
@@ -82,13 +90,13 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 email: FirebaseAuth.instance.currentUser!.email.toString(),
                 userName:
                     FirebaseAuth.instance.currentUser!.displayName.toString(),
-                about: GlobalAbout.toString(),
-                age: GlobalAge.toString(),
-                rost: GlobalRost.toString(),
-                hobbi: GlobalHobbi.toString(),
-                city: GlobalCity.toString(),
-                deti: GlobalDeti,
-                pol: GlobalPol.toString(),
+                about: doc.get('about'),
+                age: doc.get('age').toString(),
+                rost: doc.get('rost'),
+                hobbi: doc.get('hobbi'),
+                city: doc.get('city'),
+                deti: doc.get('deti'),
+                pol: doc.get('pol'),
                 imageSnapshot: getImagesUserStream(),
               ));
         } else {

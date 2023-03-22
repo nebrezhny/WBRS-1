@@ -98,6 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
           messageId = "";
         }
       });
+      print(widget.id);
 
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('TOKENS')
@@ -109,6 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .get();
       String token = doc.get('token');
       String name = snap.get('fullName');
+      print(token);
 
       !isUserInChat
           ? NotificationsService().sendPushMessage(token, message, name, 4,
@@ -296,12 +298,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                         .get(),
                                   ));
                             },
-                            child: Image.network(
-                              widget.photoUrl,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 45,
-                            )),
+                            child: widget.photoUrl != ''
+                                ? Image.network(
+                                    widget.photoUrl,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 45,
+                                  )
+                                : Image.asset('assets/profile.png')),
                       )),
                   const SizedBox(
                     width: 20,
