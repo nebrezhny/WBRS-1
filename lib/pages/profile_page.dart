@@ -538,6 +538,48 @@ class _ProfilePageState extends State<ProfilePage> {
                 backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
             child: const Text(
               "Добавить фотографии",
+            )),
+        ElevatedButton(
+            onPressed: () async {
+              var users =
+                  await FirebaseFirestore.instance.collection('users').get();
+
+              for (int i = 0; i < users.size; i++) {
+                if (users.docs[i].id !=
+                    FirebaseAuth.instance.currentUser!.uid) {
+                  var collections = FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(users.docs[i].id)
+                      .collection('visiters')
+                      .where('uid',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots();
+
+                  bool isEmpty = await collections.isEmpty;
+
+                  var snapshot = await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(users.docs[i].id)
+                      .collection('visiters')
+                      .get();
+
+                  if (!isEmpty && snapshot.docs.isNotEmpty) {
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(users.docs[i].id)
+                        .collection('visiters')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .update({'city': 'Irina'});
+                  } else {
+                    print(isEmpty);
+                  }
+                }
+              }
+            },
+            style: const ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+            child: const Text(
+              "Добавить фотографии",
             ))
       ],
     );

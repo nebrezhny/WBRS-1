@@ -29,7 +29,7 @@ int selectedIndex = 1;
 
 //Filter data
 String FiltrPol = "";
-RangeValues currentValues = const RangeValues(18, 22);
+RangeValues currentValues = const RangeValues(18, 100);
 TextEditingController filtrCity = TextEditingController();
 
 late List user_info;

@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
 import 'package:messenger/widgets/drawer.dart';
@@ -21,6 +22,15 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
 
   @override
   Widget build(BuildContext context) {
+    var userPhoto = '';
+
+    getUserPhotoUrl(String uid) async {
+      var doc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      userPhoto = doc.get('profilePic');
+    }
+
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       return Card(
         child: ListTile(
@@ -45,9 +55,9 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             width: 50,
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: snapshot.data!.docs[index]['photoUrl'] != ''
+                child: userPhoto != ''
                     ? Image.network(
-                        snapshot.data!.docs[index]['photoUrl'],
+                        userPhoto,
                         fit: BoxFit.cover,
                       )
                     : Image.asset('assets/profile.png')),

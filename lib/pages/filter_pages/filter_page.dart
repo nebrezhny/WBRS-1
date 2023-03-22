@@ -123,7 +123,11 @@ class _FilterPage2State extends State<FilterPage2> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(FiltrPol == "м" ? "Мужчины" : "Женщины")
+                        Text(FiltrPol == ""
+                            ? "Не выбрано"
+                            : FiltrPol == "м"
+                                ? "Мужчины"
+                                : "Женщины")
                       ],
                     ),
                   ],
@@ -242,7 +246,6 @@ class _FilterPage2State extends State<FilterPage2> {
                         controller: filtrCity,
                         onChanged: (value) {
                           setState(() {
-                            print(value);
                             city = value;
                           });
                         },

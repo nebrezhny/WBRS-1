@@ -291,15 +291,27 @@ class _ProfilesListState extends State<ProfilesList> {
           if (snapshot.data!.docs[i]['pol'].toString().toLowerCase() ==
               FiltrPol) {
             if (filtrCity.text != '') {
+              print(filtrCity.text);
               if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
+                print(filtrCity.text);
                 users.add(snapshot.data!.docs[i]);
               }
             } else {
+              print(filtrCity.text);
               users.add(snapshot.data!.docs[i]);
             }
           }
         } else {
-          users.add(snapshot.data!.docs[i]);
+          if (filtrCity.text != '') {
+            print(filtrCity.text);
+            if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
+              print(filtrCity.text);
+              users.add(snapshot.data!.docs[i]);
+            }
+          } else {
+            print(filtrCity.text);
+            users.add(snapshot.data!.docs[i]);
+          }
         }
       }
     }

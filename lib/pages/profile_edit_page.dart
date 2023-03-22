@@ -221,6 +221,18 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         null;
                                       }
                                     }
+
+                                    var doc = await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .collection('visiters')
+                                        .where('uid',
+                                            isEqualTo: FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                        .get();
+
+                                    print(doc);
                                   },
                                   icon: const Icon(
                                     Icons.camera_alt_outlined,
