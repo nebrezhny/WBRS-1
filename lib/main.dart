@@ -71,6 +71,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     checkInternet();
     super.initState();
+    selectedIndex = 1;
     getUserLoggedInStatus();
     if (_isSignedIn) {
       getUserRegistrationStatus();

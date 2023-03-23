@@ -111,18 +111,18 @@ class _ProfilesListState extends State<ProfilesList> {
           ),
           drawer: const MyDrawer(),
           body: SingleChildScrollView(
-              child: Group == "красно-зелёная" ||
-                      Group == "красно-белая" ||
-                      Group == "красно-оранжевая"
+              child: Group == "коричнево-красная" ||
+                      Group == "коричнево-синяя" ||
+                      Group == "коричнево-белая"
                   ? StreamBuilder<QuerySnapshot>(
                       stream: collection
                           //.where("age", isGreaterThan: 10)
                           .where("группа", whereIn: [
-                            "зелёно-белая",
-                            "бело-красная",
-                            "бело-зелёная",
-                            "бело-оранжевая",
-                            "оранжево-белая",
+                            "красно-синяя",
+                            "сине-коричневая",
+                            "сине-красная",
+                            "сине-белая",
+                            "бело-синяя",
                             "1"
                           ])
                           .orderBy('uid')
@@ -148,17 +148,19 @@ class _ProfilesListState extends State<ProfilesList> {
                         // );
                         //ListView(children:getExpenseItems(snapshot));
                       })
-                  : Group == "зелёно-красная" ||
-                          Group == "зелёно-белая" ||
-                          Group == "зелёно-оранжевая"
+                  : Group == "красно-коричневая" ||
+                          Group == "красно-синяя" ||
+                          Group == "красно-белая"
                       ? StreamBuilder<QuerySnapshot>(
                           stream: collection
                               .where("группа", whereIn: <String>[
-                                "красно-белая",
-                                "оранжево-красная",
-                                "оранжево-зелёная",
-                                "красно-оранжевая",
-                                "оранжево-белая"
+                                "красно-синяя",
+                                "коричнево-синяя",
+                                "бело-коричневая",
+                                "бело-красная",
+                                "коричнево-белая",
+                                "коричнево-красная",
+                                "бело-синяя"
                               ])
                               //.orderBy('age', descending: true)
                               .orderBy('uid')
@@ -180,16 +182,16 @@ class _ProfilesListState extends State<ProfilesList> {
                             // );
                             //ListView(children:getExpenseItems(snapshot));
                           })
-                      : Group == "бело-красная" ||
-                              Group == "бело-зелёная" ||
-                              Group == "бело-оранжевая"
+                      : Group == "сине-коричневая" ||
+                              Group == "сине-красная" ||
+                              Group == "сине-белая"
                           ? StreamBuilder<QuerySnapshot>(
                               stream: collection
                                   .where("группа", whereIn: [
-                                    "красно-белая",
-                                    "красно-зелёная",
-                                    "красно-оранжевая",
-                                    "оранжево-белая"
+                                    "коричнево-синяя",
+                                    "коричнево-красная",
+                                    "коричнево-белая",
+                                    "бело-синяя"
                                   ])
                                   //.orderBy('age', descending: true)
                                   .orderBy('uid')
@@ -211,15 +213,15 @@ class _ProfilesListState extends State<ProfilesList> {
                                 // );
                                 //ListView(children:getExpenseItems(snapshot));
                               })
-                          : Group == "оранжево-красная" ||
-                                  Group == "оранжево-белая" ||
-                                  Group == "оранжево-зелёная"
+                          : Group == "бело-коричневая" ||
+                                  Group == "бело-синяя" ||
+                                  Group == "бело-красная"
                               ? StreamBuilder<QuerySnapshot>(
                                   stream: collection
                                       .where("группа", whereIn: [
-                                        "зелёно-белая",
-                                        "оранжево-зелёная",
-                                        "зелёно-оранжевая"
+                                        "красно-синяя",
+                                        "бело-красная",
+                                        "красно-белая"
                                       ])
                                       .orderBy('uid')
                                       .snapshots(),
@@ -241,16 +243,16 @@ class _ProfilesListState extends State<ProfilesList> {
                                     // );
                                     //ListView(children:getExpenseItems(snapshot));
                                   })
-                              : Group == "оранжево-белая"
+                              : Group == "бело-синяя"
                                   ? StreamBuilder<QuerySnapshot>(
                                       stream: collection
                                           .where("группа", whereIn: [
-                                            "красно-зелёная",
-                                            "бело-красная",
-                                            "красно-оранжевая",
-                                            "зелёно-белая",
-                                            "зелёно-красная",
-                                            "зелёно-оранжевая"
+                                            "коричнево-красная",
+                                            "сине-коричневая",
+                                            "коричнево-белая",
+                                            "красно-синяя",
+                                            "красно-коричневая",
+                                            "красно-белая"
                                           ])
                                           .orderBy('age', descending: true)
                                           .snapshots(),

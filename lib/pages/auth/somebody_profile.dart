@@ -501,10 +501,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           fontSize: 23,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
-                                      widget.userInfo.get('группа'),
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 21),
+                                    Flexible(
+                                      child: Text(
+                                        widget.userInfo.get('группа'),
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 21),
+                                      ),
                                     )
                                   ],
                                 ),

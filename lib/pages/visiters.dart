@@ -22,15 +22,6 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
 
   @override
   Widget build(BuildContext context) {
-    var userPhoto = '';
-
-    getUserPhotoUrl(String uid) async {
-      var doc =
-          await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
-      userPhoto = doc.get('profilePic');
-    }
-
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       return Card(
         child: ListTile(
@@ -55,9 +46,9 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             width: 50,
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: userPhoto != ''
+                child: snapshot.data!.docs[index]['photoUrl'] != ''
                     ? Image.network(
-                        userPhoto,
+                        snapshot.data!.docs[index]['photoUrl'],
                         fit: BoxFit.cover,
                       )
                     : Image.asset('assets/profile.png')),

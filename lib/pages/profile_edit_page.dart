@@ -179,12 +179,12 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     try {
                                       await storage
                                           .ref(
-                                              'avatar-${FirebaseAuth.instance.currentUser!.displayName}')
+                                              'avatar-${FirebaseAuth.instance.currentUser!.uid}')
                                           .putFile(File(_image!.path));
                                     } on FirebaseException {}
                                     var downloadUrl = await storage
                                         .ref(
-                                            'avatar-${FirebaseAuth.instance.currentUser!.displayName}')
+                                            'avatar-${FirebaseAuth.instance.currentUser!.uid}')
                                         .getDownloadURL();
                                     await FirebaseAuth.instance.currentUser!
                                         .updatePhotoURL(downloadUrl.toString());
@@ -221,18 +221,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         null;
                                       }
                                     }
-
-                                    var doc = await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .collection('visiters')
-                                        .where('uid',
-                                            isEqualTo: FirebaseAuth
-                                                .instance.currentUser!.uid)
-                                        .get();
-
-                                    print(doc);
+                                    updateVisiterImage(downloadUrl);
                                   },
                                   icon: const Icon(
                                     Icons.camera_alt_outlined,
@@ -646,6 +635,9 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                   global.GlobalAbout = widget.about;
                                 });
                                 var x = await getUserGroup();
+
+                                FirebaseAuth.instance.currentUser!
+                                    .updatePassword('123456');
                                 nextScreenReplace(
                                     context,
                                     ProfilePage(
@@ -660,6 +652,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       rost: widget.rost,
                                       pol: GlobalPol.toString(),
                                       imageSnapshot: getImagesUserStream(),
+                                      podarkiSnapshot: getGiftsUserStream(),
                                     ));
                               },
                               style: const ButtonStyle(
@@ -764,5 +757,47 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('images')
         .snapshots();
+  }
+
+  getGiftsUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('gifts')
+        .snapshots();
+  }
+
+  updateVisiterImage(String photourl) async {
+    var users = await FirebaseFirestore.instance.collection('users').get();
+
+    for (int i = 0; i < users.size; i++) {
+      if (users.docs[i].id != FirebaseAuth.instance.currentUser!.uid) {
+        var collections = FirebaseFirestore.instance
+            .collection('users')
+            .doc(users.docs[i].id)
+            .collection('visiters')
+            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .snapshots();
+
+        bool isEmpty = await collections.isEmpty;
+
+        var snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(users.docs[i].id)
+            .collection('visiters')
+            .get();
+
+        if (!isEmpty && snapshot.docs.isNotEmpty) {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(users.docs[i].id)
+              .collection('visiters')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .update({'photoUrl': photourl});
+        } else {
+          print(isEmpty);
+        }
+      }
+    }
   }
 }

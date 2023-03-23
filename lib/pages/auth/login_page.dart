@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:messenger/helper/global.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/auth/register_page.dart';
 import 'package:messenger/pages/home_page.dart';
@@ -22,9 +23,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
+  final resetPasswordFormKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
   bool _isLoading = false;
+
+  TextEditingController resetPasswordEmail = TextEditingController();
   AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -72,10 +76,10 @@ class _LoginPageState extends State<LoginPage> {
                                     color: Colors.white),
                               ),
                               const SizedBox(height: 10),
-                              Row(
+                              const Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Image(
                                     image: AssetImage('assets/logo.png'),
                                     width: 40,
@@ -203,6 +207,63 @@ class _LoginPageState extends State<LoginPage> {
                                         }),
                                 ],
                               )),
+                              TextButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(children: [
+                                            TextFormField(
+                                              validator: (val) {
+                                                return RegExp(
+                                                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                        .hasMatch(val!)
+                                                    ? null
+                                                    : "Введите корректный email";
+                                              },
+                                              controller: resetPasswordEmail,
+                                              decoration: const InputDecoration(
+                                                  hintText: 'Email'),
+                                            ),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  if (resetPasswordEmail.text !=
+                                                      '') {
+                                                    await FirebaseAuth.instance
+                                                        .sendPasswordResetEmail(
+                                                            email:
+                                                                resetPasswordEmail
+                                                                    .text);
+                                                    showSnackbar(
+                                                        context,
+                                                        Colors.orangeAccent,
+                                                        'На вашу электронную почту отправлено письмо с ссылкой для сброса пароля.');
+                                                    Navigator.pop(context);
+                                                  } else {
+                                                    showSnackbar(
+                                                        context,
+                                                        Colors.red,
+                                                        'Введите email.');
+                                                  }
+                                                },
+                                                child: const Text(
+                                                  'Сбросить пароль',
+                                                  style: TextStyle(
+                                                      color:
+                                                          Colors.orangeAccent),
+                                                ))
+                                          ]),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Забыли пароль?',
+                                    style:
+                                        TextStyle(color: Colors.orangeAccent),
+                                  ))
                             ],
                           )),
                     ),
@@ -220,6 +281,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       authService.loginWithUserNameandPassword(email, password).then((value) {
         if (value == true) {
+          selectedIndex = 1;
           nextScreenReplace(context, const HomePage());
         } else {
           showSnackbar(context, Colors.red, value);

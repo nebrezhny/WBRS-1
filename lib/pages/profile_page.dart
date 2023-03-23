@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/profile_edit_page.dart';
 import 'package:messenger/pages/profiles_list.dart';
 import 'package:messenger/pages/visiters.dart';
@@ -30,6 +31,7 @@ class ProfilePage extends StatefulWidget {
   String pol;
   String group;
   Stream imageSnapshot;
+  Stream podarkiSnapshot;
   ProfilePage(
       {Key? key,
       required this.email,
@@ -42,7 +44,8 @@ class ProfilePage extends StatefulWidget {
       required this.rost,
       required this.city,
       required this.hobbi,
-      required this.imageSnapshot})
+      required this.imageSnapshot,
+      required this.podarkiSnapshot})
       : super(key: key);
 
   @override
@@ -87,6 +90,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   AuthService authService = AuthService();
+  String password = "";
+  String passwordConfirm = "";
+
+  var currentUser = FirebaseAuth.instance.currentUser;
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -115,6 +123,101 @@ class _ProfilePageState extends State<ProfilePage> {
           bottomNavigationBar: const MyBottomNavigationBar(),
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            actions: [
+              IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          child: Form(
+                            key: formKey,
+                            child: Column(children: [
+                              TextFormField(
+                                style: const TextStyle(color: Colors.black),
+                                obscureText: true,
+                                decoration: textInputDecoration.copyWith(
+                                    labelStyle:
+                                        const TextStyle(color: Colors.black),
+                                    labelText: "Введите пароль",
+                                    prefixIcon: Icon(
+                                      Icons.lock,
+                                      color: Theme.of(context).primaryColor,
+                                    )),
+                                validator: (val) {
+                                  if (val!.length < 6) {
+                                    return "Пароль должен содержать 6 символов";
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                                onChanged: (val) {
+                                  setState(() {
+                                    password = val;
+                                  });
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              TextFormField(
+                                style: const TextStyle(color: Colors.black),
+                                obscureText: true,
+                                decoration: textInputDecoration.copyWith(
+                                    labelStyle:
+                                        const TextStyle(color: Colors.black),
+                                    labelText: "Повторите пароль",
+                                    prefixIcon: Icon(
+                                      Icons.lock,
+                                      color: Theme.of(context).primaryColor,
+                                    )),
+                                validator: (val) {
+                                  if (val!.length < 6) {
+                                    return "Пароль должен содержать 6 символов";
+                                  } else {
+                                    if (val != password) {
+                                      return "Пароли не совпадают!";
+                                    }
+                                    return null;
+                                  }
+                                },
+                                onChanged: (val) {
+                                  setState(() {
+                                    passwordConfirm = val;
+                                  });
+                                },
+                              ),
+                              TextButton(
+                                  onPressed: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      try {
+                                        await FirebaseAuth.instance.currentUser!
+                                            .updatePassword(passwordConfirm);
+
+                                        FirebaseAuth.instance.signOut();
+                                        nextScreen(context, const LoginPage());
+                                        showSnackbar(context, Colors.green,
+                                            "Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.");
+                                      } on Exception catch (e) {
+                                        print(e);
+                                      }
+                                    }
+                                  },
+                                  child: const Text(
+                                    "Сменить пароль",
+                                    style:
+                                        TextStyle(color: Colors.orangeAccent),
+                                  )),
+                            ]),
+                          ),
+                        );
+                      });
+                },
+                icon: const Icon(Icons.more_horiz_rounded),
+                splashRadius: 20,
+              )
+            ],
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
@@ -130,210 +233,247 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 17),
             child: SizedBox(
               width: double.infinity,
-              child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Stack(
+              child: currentUser != null
+                  ? Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        (FirebaseAuth.instance.currentUser!.photoURL == "" ||
-                                FirebaseAuth.instance.currentUser!.photoURL ==
-                                    null)
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(100.0),
-                                child: Image.asset(
-                                  "assets/profile.png",
-                                  fit: BoxFit.cover,
-                                  height: 100.0,
-                                  width: 100.0,
-                                ))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(100.0),
-                                child: Image.network(
-                                  FirebaseAuth.instance.currentUser!.photoURL
-                                      .toString(),
-                                  fit: BoxFit.cover,
-                                  height: 200.0,
-                                  width: 200.0,
-                                )),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 140,
-                      child: Row(
-                        //mainAxisSize: MainAxisSize.values.first,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
+                          Stack(
                             children: [
-                              Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.orangeAccent,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.white.withOpacity(0.5),
-                                          spreadRadius: 3,
-                                          blurRadius:
-                                              7, // changes position of shadow
-                                        ),
-                                      ],
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(50.0))),
-                                  child: IconButton(
-                                      onPressed: () {
-                                        var visiters = FirebaseFirestore
-                                            .instance
-                                            .collection('users')
-                                            .doc(FirebaseAuth
-                                                .instance.currentUser!.uid)
-                                            .collection('visiters')
-                                            .snapshots();
-                                        nextScreen(
-                                            context,
-                                            MyVisitersPage(
-                                              visiters: visiters,
-                                            ));
-                                      },
-                                      icon: const Icon(
-                                        Icons.info,
-                                        size: 30,
-                                        color: Colors.white,
-                                      ))),
-                              const Text(
-                                "Мои гости",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 14),
-                              ),
-                              const SizedBox(
-                                height: 50,
-                              )
+                              (currentUser!.photoURL == "" ||
+                                      currentUser!.photoURL == null)
+                                  ? ClipRRect(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                      child: Image.asset(
+                                        "assets/profile.png",
+                                        fit: BoxFit.cover,
+                                        height: 100.0,
+                                        width: 100.0,
+                                      ))
+                                  : ClipRRect(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                      child: Image.network(
+                                        currentUser!.photoURL.toString(),
+                                        fit: BoxFit.cover,
+                                        height: 200.0,
+                                        width: 200.0,
+                                      )),
                             ],
                           ),
-                          Column(
-                            children: [
-                              const SizedBox(
-                                height: 30,
-                              ),
-                              Container(
-                                height: 70,
-                                width: 70,
-                                decoration: BoxDecoration(
-                                    color: Colors.orangeAccent,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.white.withOpacity(0.5),
-                                        spreadRadius: 3,
-                                        blurRadius:
-                                            7, // changes position of shadow
-                                      ),
-                                    ],
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(50.0))),
-                                child: IconButton(
-                                  onPressed: () {
-                                    global.GlobalPol = widget.pol;
-                                    nextScreenReplace(
-                                        context,
-                                        ProfilePageEdit(
-                                          email: widget.email,
-                                          userName: widget.userName,
-                                          about: widget.about,
-                                          age: widget.age,
-                                          hobbi: widget.hobbi,
-                                          deti: widget.deti,
-                                          city: widget.city,
-                                          rost: widget.rost,
-                                        ));
-                                  },
-                                  icon: const Icon(
-                                    Icons.mode_edit_sharp,
-                                    size: 35,
-                                    color: Colors.white,
-                                  ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            height: 140,
+                            child: Row(
+                              //mainAxisSize: MainAxisSize.values.first,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  children: [
+                                    Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.orangeAccent,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.white
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 3,
+                                                blurRadius:
+                                                    7, // changes position of shadow
+                                              ),
+                                            ],
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(50.0))),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              var visiters = FirebaseFirestore
+                                                  .instance
+                                                  .collection('users')
+                                                  .doc(FirebaseAuth.instance
+                                                      .currentUser!.uid)
+                                                  .collection('visiters')
+                                                  .snapshots();
+                                              nextScreen(
+                                                  context,
+                                                  MyVisitersPage(
+                                                    visiters: visiters,
+                                                  ));
+                                            },
+                                            icon: const Icon(
+                                              Icons.info,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ))),
+                                    const Text(
+                                      "Мои гости",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 14),
+                                    ),
+                                    const SizedBox(
+                                      height: 50,
+                                    )
+                                  ],
                                 ),
-                              ),
-                              const Text(
-                                "Изменить профиль",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 18),
-                              )
-                            ],
-                          ),
-                          //const SizedBox(width: 7,),
-                          Column(
-                            children: [
-                              Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.orangeAccent,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.white.withOpacity(0.5),
-                                          spreadRadius: 3,
-                                          blurRadius:
-                                              7, // changes position of shadow
+                                Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                    Container(
+                                      height: 70,
+                                      width: 70,
+                                      decoration: BoxDecoration(
+                                          color: Colors.orangeAccent,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.white.withOpacity(0.5),
+                                              spreadRadius: 3,
+                                              blurRadius:
+                                                  7, // changes position of shadow
+                                            ),
+                                          ],
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(50.0))),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          global.GlobalPol = widget.pol;
+                                          nextScreenReplace(
+                                              context,
+                                              ProfilePageEdit(
+                                                email: widget.email,
+                                                userName: widget.userName,
+                                                about: widget.about,
+                                                age: widget.age,
+                                                hobbi: widget.hobbi,
+                                                deti: widget.deti,
+                                                city: widget.city,
+                                                rost: widget.rost,
+                                              ));
+                                        },
+                                        icon: const Icon(
+                                          Icons.mode_edit_sharp,
+                                          size: 35,
+                                          color: Colors.white,
                                         ),
-                                      ],
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(50.0))),
-                                  child: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          global.selectedIndex = 2;
-                                        });
-                                        nextScreenReplace(
-                                            context,
-                                            ProfilesList(
-                                              group: widget.group,
-                                            ));
-                                      },
-                                      icon: const Icon(
-                                        Icons.person,
-                                        size: 35,
-                                        color: Colors.white,
-                                      ))),
-                              const Text(
-                                "Люди",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 14),
-                              ),
-                              const SizedBox(
-                                height: 50,
-                              )
-                            ],
+                                      ),
+                                    ),
+                                    const Text(
+                                      "Изменить профиль",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 18),
+                                    )
+                                  ],
+                                ),
+                                //const SizedBox(width: 7,),
+                                Column(
+                                  children: [
+                                    Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.orangeAccent,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.white
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 3,
+                                                blurRadius:
+                                                    7, // changes position of shadow
+                                              ),
+                                            ],
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(50.0))),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                global.selectedIndex = 2;
+                                              });
+                                              nextScreenReplace(
+                                                  context,
+                                                  ProfilesList(
+                                                    group: widget.group,
+                                                  ));
+                                            },
+                                            icon: const Icon(
+                                              Icons.person,
+                                              size: 35,
+                                              color: Colors.white,
+                                            ))),
+                                    const Text(
+                                      "Люди",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 14),
+                                    ),
+                                    const SizedBox(
+                                      height: 50,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    StreamBuilder(
-                        stream: widget.imageSnapshot,
-                        builder: (context, AsyncSnapshot snapshot) {
-                          if (snapshot.data != null) {
-                            if (snapshot.data!.docs.length != 0) {
-                              return ifImageSnapshotNotEmtpry(snapshot);
-                            } else {
-                              return ifImageSnaphotEmpty(snapshot);
-                            }
-                          } else {
-                            return ifImageSnaphotEmpty(snapshot);
-                          }
-                        })
-                  ]),
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          const Text(
+                            'Подарки',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.normal),
+                          ),
+                          StreamBuilder(
+                              stream: widget.podarkiSnapshot,
+                              builder: (context, AsyncSnapshot snapshot) {
+                                if (snapshot.data != null) {
+                                  if (snapshot.data!.docs.length != 0) {
+                                    return ifGiftsSnapshotNotEmtpry(snapshot);
+                                  } else {
+                                    return ifGiftsSnaphotEmpty(snapshot);
+                                  }
+                                } else {
+                                  return ifGiftsSnaphotEmpty(snapshot);
+                                }
+                              }),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Text(
+                            'Фотографии',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.normal),
+                          ),
+                          StreamBuilder(
+                              stream: widget.imageSnapshot,
+                              builder: (context, AsyncSnapshot snapshot) {
+                                if (snapshot.data != null) {
+                                  if (snapshot.data!.docs.length != 0) {
+                                    return ifImageSnapshotNotEmtpry(snapshot);
+                                  } else {
+                                    return ifImageSnaphotEmpty(snapshot);
+                                  }
+                                } else {
+                                  return ifImageSnaphotEmpty(snapshot);
+                                }
+                              }),
+                        ])
+                  : const SizedBox(),
             ),
           ),
         )
@@ -343,6 +483,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   snapshotIsEmpty() async {
     return await widget.imageSnapshot.isEmpty;
+  }
+
+  getGiftsUserStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('gifts')
+        .snapshots();
   }
 
   ifImageSnapshotNotEmtpry(
@@ -420,6 +568,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                               .orangeAccent),
                                                               onPressed:
                                                                   () async {
+                                                                FirebaseStorage
+                                                                    .instance
+                                                                    .refFromURL(snapshot
+                                                                            .data
+                                                                            .docs[index]
+                                                                        ['url'])
+                                                                    .delete();
                                                                 FirebaseFirestore
                                                                     .instance
                                                                     .collection(
@@ -447,6 +602,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                     .collection(
                                                                         'images')
                                                                     .snapshots();
+
                                                                 Navigator.of(context).push(MaterialPageRoute(
                                                                     builder: (context) => ProfilePage(
                                                                         group: widget
@@ -470,6 +626,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                             .city,
                                                                         hobbi: widget
                                                                             .hobbi,
+                                                                        podarkiSnapshot:
+                                                                            getGiftsUserStream(),
                                                                         imageSnapshot:
                                                                             x)));
                                                               },
@@ -539,48 +697,6 @@ class _ProfilePageState extends State<ProfilePage> {
             child: const Text(
               "Добавить фотографии",
             )),
-        ElevatedButton(
-            onPressed: () async {
-              var users =
-                  await FirebaseFirestore.instance.collection('users').get();
-
-              for (int i = 0; i < users.size; i++) {
-                if (users.docs[i].id !=
-                    FirebaseAuth.instance.currentUser!.uid) {
-                  var collections = FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(users.docs[i].id)
-                      .collection('visiters')
-                      .where('uid',
-                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                      .snapshots();
-
-                  bool isEmpty = await collections.isEmpty;
-
-                  var snapshot = await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(users.docs[i].id)
-                      .collection('visiters')
-                      .get();
-
-                  if (!isEmpty && snapshot.docs.isNotEmpty) {
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(users.docs[i].id)
-                        .collection('visiters')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .update({'city': 'Irina'});
-                  } else {
-                    print(isEmpty);
-                  }
-                }
-              }
-            },
-            style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
-            child: const Text(
-              "Добавить фотографии",
-            ))
       ],
     );
   }
@@ -626,5 +742,67 @@ class _ProfilePageState extends State<ProfilePage> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('images')
         .add({"url": downloadUrl});
+  }
+
+  ifGiftsSnapshotNotEmtpry(
+    AsyncSnapshot snapshot,
+  ) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 100,
+          width: MediaQuery.of(context).size.width,
+          child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          bottomLeft: Radius.circular(15))),
+                  height: 300,
+                  child: InkWell(
+                      onTap: () {
+                        showDialog(
+                          builder: (context) => AlertDialog(
+                            iconPadding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.8),
+                            backgroundColor: Colors.transparent,
+                            insetPadding: const EdgeInsets.all(2),
+                            title: Container(
+                              decoration: const BoxDecoration(),
+                              width: MediaQuery.of(context).size.width,
+                              child: Image.network(
+                                snapshot.data.docs[index]['url'],
+                              ),
+                            ),
+                          ),
+                          context: context,
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 5),
+                        width: 100,
+                        child: Image.network(snapshot.data.docs[index]['url'],
+                            fit: BoxFit.cover),
+                      )),
+                );
+              },
+              itemCount:
+                  (snapshot.data != null ? (snapshot.data!).docs.length : 0)),
+        ),
+      ],
+    );
+  }
+
+  ifGiftsSnaphotEmpty(AsyncSnapshot snapshot) {
+    return const Column(
+      children: [
+        Text(
+          "Нет подарков",
+          style: TextStyle(color: Colors.white),
+        ),
+      ],
+    );
   }
 }

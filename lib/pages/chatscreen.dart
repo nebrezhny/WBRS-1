@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/helper/global.dart';
 import 'package:messenger/pages/auth/somebody_profile.dart';
+import 'package:messenger/pages/shop.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/service/notifications.dart';
@@ -173,31 +174,51 @@ class _ChatScreenState extends State<ChatScreen> {
       stream: messageStream,
       builder: (context, snapshot) {
         return snapshot.hasData
-            ? ListView.builder(
-                padding: const EdgeInsets.only(bottom: 70, top: 16),
-                itemCount: snapshot.data.docs.length,
-                reverse: true,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  ds.id;
-                  if (ds["sendByID"] !=
-                      FirebaseAuth.instance.currentUser!.uid) {
-                    FirebaseFirestore.instance
-                        .collection('chats')
-                        .doc(widget.chatId)
-                        .collection('chats')
-                        .doc(ds.id)
-                        .update({'isRead': true});
-                  }
+            ? snapshot.data.docs.length != 0
+                ? ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 70, top: 16),
+                    itemCount: snapshot.data.docs.length,
+                    reverse: true,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot ds = snapshot.data.docs[index];
+                      ds.id;
+                      if (ds["sendByID"] !=
+                          FirebaseAuth.instance.currentUser!.uid) {
+                        FirebaseFirestore.instance
+                            .collection('chats')
+                            .doc(widget.chatId)
+                            .collection('chats')
+                            .doc(ds.id)
+                            .update({'isRead': true});
+                      }
 
-                  return MessageTile(
-                      sender: ds["sendBy"],
-                      name: ds["sendBy"],
-                      message: ds["message"],
-                      sentByMe: FirebaseAuth.instance.currentUser!.uid ==
-                          ds["sendByID"],
-                      isRead: ds["isRead"]);
-                })
+                      return MessageTile(
+                          sender: ds["sendBy"],
+                          name: ds["sendBy"],
+                          message: ds["message"],
+                          sentByMe: FirebaseAuth.instance.currentUser!.uid ==
+                              ds["sendByID"],
+                          isRead: ds["isRead"]);
+                    })
+                : Center(
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Самый простой способ начать общение - это',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              nextScreen(context, const ShopPage());
+                            },
+                            child: const Text(
+                              'Подарок',
+                              style: TextStyle(color: Colors.green),
+                            ))
+                      ],
+                    ),
+                  )
             : const Center(child: CircularProgressIndicator());
       },
     );
