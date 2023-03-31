@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HelperFunctions {
@@ -98,4 +99,61 @@ getUserGroup() async {
       .get();
 
   return doc.get('группа');
+}
+
+getLikeGroup(myGroup) {
+  List<Widget> spisok = [];
+  if (myGroup == "коричнево-красная" ||
+      myGroup == "коричнево-синяя" ||
+      myGroup == "коричнево-белая") {
+    spisok = [
+      "красно-синяя",
+      "сине-коричневая",
+      "сине-красная",
+      "сине-белая",
+      "бело-синяя"
+    ];
+  } else if (myGroup == "красно-коричневая" ||
+      myGroup == "красно-синяя" ||
+      myGroup == "красно-белая") {
+    spisok = [
+      "красно-синяя",
+      "коричнево-синяя",
+      "бело-коричневая",
+      "бело-красная",
+      "коричнево-белая",
+      "коричнево-красная",
+      "бело-синяя"
+    ];
+  } else if (myGroup == "сине-коричневая" ||
+      myGroup == "сине-красная" ||
+      myGroup == "сине-белая") {
+    spisok = [
+      "коричнево-синяя",
+      "коричнево-красная",
+      "коричнево-белая",
+      "бело-синяя"
+    ];
+  } else if (myGroup == "бело-коричневая" ||
+      myGroup == "бело-синяя" ||
+      myGroup == "бело-красная") {
+    return ["красно-синяя", "бело-красная", "красно-белая"];
+  } else if (myGroup == "бело-синяя") {
+    spisok = [
+      "коричнево-красная",
+      "сине-коричневая",
+      "коричнево-белая",
+      "красно-синяя",
+      "красно-коричневая",
+      "красно-белая"
+    ];
+  }
+
+  for (int i = 0; i < spisok.length; i++) {
+    spisok[i] = Text(
+      spisok[i],
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+    );
+  }
+  return spisok;
 }
