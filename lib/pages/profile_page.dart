@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:messenger/helper/helper_function.dart';
 import 'package:messenger/pages/auth/login_page.dart';
 import 'package:messenger/pages/profile_edit_page.dart';
 import 'package:messenger/pages/profiles_list.dart';
@@ -130,86 +131,97 @@ class _ProfilePageState extends State<ProfilePage> {
                       context: context,
                       builder: (context) {
                         return Container(
+                          height: MediaQuery.of(context).size.height,
                           padding: const EdgeInsets.all(20),
-                          child: Form(
-                            key: formKey,
-                            child: Column(children: [
-                              TextFormField(
-                                style: const TextStyle(color: Colors.black),
-                                obscureText: true,
-                                decoration: textInputDecoration.copyWith(
-                                    labelStyle:
-                                        const TextStyle(color: Colors.black),
-                                    labelText: "Введите пароль",
-                                    prefixIcon: Icon(
-                                      Icons.lock,
-                                      color: Theme.of(context).primaryColor,
-                                    )),
-                                validator: (val) {
-                                  if (val!.length < 6) {
-                                    return "Пароль должен содержать 6 символов";
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                onChanged: (val) {
-                                  setState(() {
-                                    password = val;
-                                  });
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              TextFormField(
-                                style: const TextStyle(color: Colors.black),
-                                obscureText: true,
-                                decoration: textInputDecoration.copyWith(
-                                    labelStyle:
-                                        const TextStyle(color: Colors.black),
-                                    labelText: "Повторите пароль",
-                                    prefixIcon: Icon(
-                                      Icons.lock,
-                                      color: Theme.of(context).primaryColor,
-                                    )),
-                                validator: (val) {
-                                  if (val!.length < 6) {
-                                    return "Пароль должен содержать 6 символов";
-                                  } else {
-                                    if (val != password) {
-                                      return "Пароли не совпадают!";
-                                    }
-                                    return null;
-                                  }
-                                },
-                                onChanged: (val) {
-                                  setState(() {
-                                    passwordConfirm = val;
-                                  });
-                                },
-                              ),
-                              TextButton(
-                                  onPressed: () async {
-                                    if (formKey.currentState!.validate()) {
-                                      try {
-                                        await FirebaseAuth.instance.currentUser!
-                                            .updatePassword(passwordConfirm);
-
-                                        FirebaseAuth.instance.signOut();
-                                        nextScreen(context, const LoginPage());
-                                        showSnackbar(context, Colors.green,
-                                            "Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.");
-                                      } on Exception catch (e) {
-                                        print(e);
+                          child: Container(
+                            padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom),
+                            child: SingleChildScrollView(
+                              child: Form(
+                                key: formKey,
+                                child: Column(children: [
+                                  TextFormField(
+                                    style: const TextStyle(color: Colors.black),
+                                    obscureText: true,
+                                    decoration: textInputDecoration.copyWith(
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black),
+                                        labelText: "Введите пароль",
+                                        prefixIcon: Icon(
+                                          Icons.lock,
+                                          color: Theme.of(context).primaryColor,
+                                        )),
+                                    validator: (val) {
+                                      if (val!.length < 6) {
+                                        return "Пароль должен содержать 6 символов";
+                                      } else {
+                                        return null;
                                       }
-                                    }
-                                  },
-                                  child: const Text(
-                                    "Сменить пароль",
-                                    style:
-                                        TextStyle(color: Colors.orangeAccent),
-                                  )),
-                            ]),
+                                    },
+                                    onChanged: (val) {
+                                      setState(() {
+                                        password = val;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextFormField(
+                                    style: const TextStyle(color: Colors.black),
+                                    obscureText: true,
+                                    decoration: textInputDecoration.copyWith(
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black),
+                                        labelText: "Повторите пароль",
+                                        prefixIcon: Icon(
+                                          Icons.lock,
+                                          color: Theme.of(context).primaryColor,
+                                        )),
+                                    validator: (val) {
+                                      if (val!.length < 6) {
+                                        return "Пароль должен содержать 6 символов";
+                                      } else {
+                                        if (val != password) {
+                                          return "Пароли не совпадают!";
+                                        }
+                                        return null;
+                                      }
+                                    },
+                                    onChanged: (val) {
+                                      setState(() {
+                                        passwordConfirm = val;
+                                      });
+                                    },
+                                  ),
+                                  TextButton(
+                                      onPressed: () async {
+                                        if (formKey.currentState!.validate()) {
+                                          try {
+                                            await FirebaseAuth
+                                                .instance.currentUser!
+                                                .updatePassword(
+                                                    passwordConfirm);
+
+                                            FirebaseAuth.instance.signOut();
+                                            nextScreen(
+                                                context, const LoginPage());
+                                            showSnackbar(context, Colors.green,
+                                                "Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.");
+                                          } on Exception catch (e) {
+                                            print(e);
+                                          }
+                                        }
+                                      },
+                                      child: const Text(
+                                        "Сменить пароль",
+                                        style: TextStyle(
+                                            color: Colors.orangeAccent),
+                                      )),
+                                ]),
+                              ),
+                            ),
                           ),
                         );
                       });
@@ -260,6 +272,38 @@ class _ProfilePageState extends State<ProfilePage> {
                                         height: 200.0,
                                         width: 200.0,
                                       )),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Ваша группа: ',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              Text(widget.group,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 18))
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Вам подходят: ',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              Column(
+                                children: getLikeGroup(widget.group),
+                              )
                             ],
                           ),
                           const SizedBox(

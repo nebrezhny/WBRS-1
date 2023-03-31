@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -24,12 +25,24 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   final resetPasswordFormKey = GlobalKey<FormState>();
+
+  bool _isChecked = false;
+
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   String email = "";
   String password = "";
   bool _isLoading = false;
 
   TextEditingController resetPasswordEmail = TextEditingController();
   AuthService authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmailPassword();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -104,6 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 50,
                               ),
                               TextFormField(
+                                controller: _emailController,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: textInputDecoration.copyWith(
                                     labelStyle:
@@ -130,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               const SizedBox(height: 15),
                               TextFormField(
+                                controller: _passwordController,
                                 style: const TextStyle(color: Colors.white),
                                 cursorColor: Colors.white,
                                 obscureText: true,
@@ -155,6 +170,40 @@ class _LoginPageState extends State<LoginPage> {
                                   });
                                 },
                               ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                        height: 24.0,
+                                        width: 24.0,
+                                        child: Theme(
+                                            data: ThemeData(
+                                                unselectedWidgetColor:
+                                                    const Color.fromARGB(
+                                                        255,
+                                                        255,
+                                                        179,
+                                                        15) // Your color
+                                                ),
+                                            child: Checkbox(
+                                              activeColor: const Color.fromARGB(
+                                                  255, 247, 175, 21),
+                                              value: _isChecked,
+                                              onChanged: ((value) {
+                                                _handleRemeberme(
+                                                    value ?? false);
+                                              }),
+                                            ))),
+                                    const SizedBox(width: 10.0),
+                                    const Text("Запомнить меня",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontFamily: 'Rubic'))
+                                  ]),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -279,7 +328,10 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = true;
       });
-      authService.loginWithUserNameandPassword(email, password).then((value) {
+      authService
+          .loginWithUserNameandPassword(
+              _emailController.text, _passwordController.text)
+          .then((value) {
         if (value == true) {
           selectedIndex = 1;
           nextScreenReplace(context, const HomePage());
@@ -290,6 +342,46 @@ class _LoginPageState extends State<LoginPage> {
           });
         }
       });
+    }
+  }
+
+  void _handleRemeberme(bool value) {
+    print("Handle Rember Me");
+    _isChecked = value;
+    print(_emailController);
+    print(_passwordController);
+    SharedPreferences.getInstance().then(
+      (prefs) {
+        prefs.setBool("remember_me", value);
+        prefs.setString('email', _emailController.text);
+        prefs.setString('password', _passwordController.text);
+      },
+    );
+    setState(() {
+      _isChecked = value;
+    });
+  }
+
+  void _loadUserEmailPassword() async {
+    print("Load Email");
+    try {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      var _email = _prefs.getString("email") ?? "";
+      var _password = _prefs.getString("password") ?? "";
+      var _remeberMe = _prefs.getBool("remember_me") ?? false;
+
+      print(_remeberMe);
+      print(_email);
+      print(_password);
+      if (_remeberMe) {
+        setState(() {
+          _isChecked = true;
+        });
+        _emailController.text = _email ?? "";
+        _passwordController.text = _password ?? "";
+      }
+    } catch (e) {
+      print(e);
     }
   }
 }

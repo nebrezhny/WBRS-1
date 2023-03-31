@@ -123,7 +123,6 @@ class _ProfilesListState extends State<ProfilesList> {
                             "сине-красная",
                             "сине-белая",
                             "бело-синяя",
-                            "1"
                           ])
                           .orderBy('uid')
                           //.orderBy('age', descending: true)
