@@ -102,7 +102,7 @@ getUserGroup() async {
 }
 
 getLikeGroup(myGroup) {
-  List<Widget> spisok = [];
+  List spisok = [];
   if (myGroup == "коричнево-красная" ||
       myGroup == "коричнево-синяя" ||
       myGroup == "коричнево-белая") {
