@@ -33,30 +33,12 @@ class _ShopPageState extends State<ShopPage> {
   @override
   Widget build(BuildContext context) {
     final podarki = <Podarok>[
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg'),
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg'),
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg'),
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg'),
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg'),
-      Podarok(
-          name: 'name',
-          price: 100,
-          img: 'https://bumper-stickers.ru/43054-thickbox_default/podarok.jpg')
+      Podarok(name: 'name', price: 100, img: "assets/gifts/1.jpg"),
+      Podarok(name: 'name', price: 200, img: "assets/gifts/2.jpg"),
+      Podarok(name: 'name', price: 300, img: "assets/gifts/3.jpg"),
+      Podarok(name: 'name', price: 400, img: "assets/gifts/2.jpg"),
+      Podarok(name: 'name', price: 500, img: "assets/gifts/1.jpg"),
+      Podarok(name: 'name', price: 600, img: "assets/gifts/3.jpg")
     ];
 
     return Stack(
@@ -102,7 +84,7 @@ class _ShopPageState extends State<ShopPage> {
 
   kartochkaTovara(String name, String url, int price) {
     return ListTile(
-      leading: Image.network(url),
+      leading: Image.asset(url),
       title: Text(name),
       subtitle: Text(price.toString()),
       trailing: ElevatedButton(
