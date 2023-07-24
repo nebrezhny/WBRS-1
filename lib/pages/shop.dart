@@ -18,7 +18,8 @@ class ShopPage extends StatefulWidget {
   State<ShopPage> createState() => _ShopPageState();
 }
 
-class _ShopPageState extends State<ShopPage> {
+class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
+  TabController? _controller;
   final TinkoffAcquiring acquiring = TinkoffAcquiring(
       TinkoffAcquiringConfig.credential(
           terminalKey: terminalKey, isDebugMode: true));
@@ -29,6 +30,24 @@ class _ShopPageState extends State<ShopPage> {
   ValueNotifier<bool> threeDsV2 = ValueNotifier<bool>(false);
   ValueNotifier<String?> status = ValueNotifier<String?>('');
   ValueNotifier<String?> cardType = ValueNotifier<String?>('');
+
+  final List<Tab> topTabs = <Tab>[
+    new Tab(text: 'Магазин'),
+    new Tab(text: 'История покупок'),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = TabController(vsync: this, length: 2);
+  }
+
+  @override
+  void dispose() {
+    _controller!.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,51 +127,43 @@ class _ShopPageState extends State<ShopPage> {
           fit: BoxFit.cover,
         ),
         Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            centerTitle: true,
             backgroundColor: Colors.transparent,
-            title: const Text("Магазин"),
-          ),
-          drawer: const MyDrawer(),
-          bottomNavigationBar: const MyBottomNavigationBar(),
-          body: SingleChildScrollView(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: ListView.builder(
-                  itemCount: podarki.length,
-                  itemBuilder: (context, int index) {
-                    return Column(
-                      children: [
-                        SizedBox(
-                          height: 100,
-                          child: kartochkaTovara(podarki[index].name,
-                              podarki[index].img, podarki[index].price),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        )
-                      ],
-                    );
-                  }),
+            appBar: AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              title: const Text("Магазин"),
+              bottom: TabBar(
+                controller: _controller,
+                tabs: topTabs,
+              ),
             ),
-          ),
-        ),
+            drawer: const MyDrawer(),
+            bottomNavigationBar: const MyBottomNavigationBar(),
+            body: TabBarView(controller: _controller, children: [
+              first(),
+              Center(
+                child: Text(
+                  'Пока нет заказов.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ])),
       ],
     );
   }
 
   kartochkaTovara(String name, String url, int price) {
     return ListTile(
-      leading: Image.asset(
-        url,
-        width: 60,
-        height: 120,
-        fit: BoxFit.cover,
+      leading: SizedBox(
+        width: 80,
+        height: 80,
+        child: Image.asset(
+          url,
+          fit: BoxFit.cover,
+        ),
       ),
       title: Text(name),
-      subtitle: Text(price.toString()),
+      subtitle: Text(price.toString() + " серебра"),
       trailing: ElevatedButton(
         onPressed: () {},
         style: const ButtonStyle(
@@ -161,5 +172,75 @@ class _ShopPageState extends State<ShopPage> {
       ),
       tileColor: Colors.white,
     );
+  }
+
+  first() {
+    final podarki = <Podarok>[
+      Podarok(name: 'name', price: 12, img: "assets/gifts/1.jpg"),
+      Podarok(name: 'name', price: 12, img: "assets/gifts/2.jpg"),
+      Podarok(name: 'name', price: 12, img: "assets/gifts/3.jpg"),
+    ];
+    return SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Услуги",
+              style: TextStyle(color: Colors.white, fontSize: 21),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(Colors.orangeAccent)),
+              child: const Text("Пополнить баланс (от 100 руб.)"),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(Colors.orangeAccent)),
+              child: const Text("Отключить рекламу"),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(Colors.orangeAccent)),
+              child: const Text("Режим невидимки"),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const Text(
+              "Подарки",
+              style: TextStyle(color: Colors.white, fontSize: 21),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: ListView.builder(
+                  itemCount: podarki.length,
+                  itemBuilder: (context, int index) {
+                    return Column(
+                      children: [
+                        kartochkaTovara(podarki[index].name, podarki[index].img,
+                            podarki[index].price),
+                        const SizedBox(
+                          height: 10,
+                        )
+                      ],
+                    );
+                  }),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+          ],
+        ));
   }
 }
