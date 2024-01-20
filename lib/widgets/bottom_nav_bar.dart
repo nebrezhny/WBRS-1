@@ -81,8 +81,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .get();
 
-          print(doc.get('about'));
-
           nextScreen(
               context,
               ProfilePage(

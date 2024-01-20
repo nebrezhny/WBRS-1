@@ -124,6 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
           bottomNavigationBar: const MyBottomNavigationBar(),
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
             actions: [
               IconButton(
                 onPressed: () {
@@ -756,7 +757,6 @@ class _ProfilePageState extends State<ProfilePage> {
           onPressed: () async {
             FirebaseStorage storage = FirebaseStorage.instance;
             selectImages();
-            print(1);
           },
           style: const ButtonStyle(
               backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
@@ -776,7 +776,6 @@ class _ProfilePageState extends State<ProfilePage> {
     await storage
         .ref('$name+$time+${FirebaseAuth.instance.currentUser!.uid}')
         .putFile(File(image.path));
-    print(time);
     var downloadUrl = await storage
         .ref('$name+$time+${FirebaseAuth.instance.currentUser!.uid}')
         .getDownloadURL();

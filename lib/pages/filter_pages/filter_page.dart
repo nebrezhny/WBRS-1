@@ -237,8 +237,7 @@ class _FilterPage2State extends State<FilterPage2> {
             ),
             GestureDetector(
               onTap: () {
-                Scaffold.of(context)
-                    .showBottomSheet<void>((BuildContext context) {
+                Scaffold.of(context).showBottomSheet((BuildContext context) {
                   return Scaffold(
                       body: Column(
                     children: [
@@ -287,7 +286,6 @@ class _FilterPage2State extends State<FilterPage2> {
                   filtrCity.text = city;
                   FiltrPol = pol;
                   currentValues = localValues;
-                  print(currentValues);
                   var x = await getUserGroup();
                   nextScreen(context, ProfilesList(group: x));
                 },

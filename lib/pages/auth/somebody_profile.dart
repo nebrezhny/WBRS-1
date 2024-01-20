@@ -369,9 +369,6 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                 chatWithUsername: widget.name,
                                                 id: FirebaseAuth
                                                     .instance.currentUser!.uid,
-                                                name: FirebaseAuth.instance
-                                                    .currentUser!.displayName
-                                                    .toString(),
                                                 photoUrl: widget.photoUrl,
                                               ));
                                         }

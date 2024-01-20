@@ -101,7 +101,6 @@ class _MyAppState extends State<MyApp> {
     await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {
         setState(() {
-          print(value);
           _isSignedIn = value;
         });
       }
@@ -124,11 +123,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme tema =
-        GoogleFonts.robotoMonoTextTheme(Theme.of(context).textTheme);
+    TextTheme tema = GoogleFonts.robotoTextTheme(Theme.of(context).textTheme);
     //getToken();
     return MaterialApp(
       theme: ThemeData(
+          fontFamily: 'Times New Roman',
           primaryColor: Constants().primaryColor,
           scaffoldBackgroundColor: Colors.white,
           textTheme: tema),

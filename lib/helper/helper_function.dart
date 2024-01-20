@@ -101,7 +101,7 @@ getUserGroup() async {
   return doc.get('группа');
 }
 
-getLikeGroup(myGroup) {
+List<Widget> getLikeGroup(myGroup) {
   List spisok = [];
   if (myGroup == "коричнево-красная" ||
       myGroup == "коричнево-синяя" ||
@@ -137,7 +137,7 @@ getLikeGroup(myGroup) {
   } else if (myGroup == "бело-коричневая" ||
       myGroup == "бело-синяя" ||
       myGroup == "бело-красная") {
-    return ["красно-синяя", "бело-красная", "красно-белая"];
+    spisok = ["красно-синяя", "бело-красная", "красно-белая"];
   } else if (myGroup == "бело-синяя") {
     spisok = [
       "коричнево-красная",
@@ -149,11 +149,21 @@ getLikeGroup(myGroup) {
     ];
   }
 
+  List<Widget> spisokOfWidgets = [];
+
   for (int i = 0; i < spisok.length; i++) {
-    spisok[i] = Text(
+    spisokOfWidgets.add(Text(
       spisok[i],
       style: const TextStyle(color: Colors.white, fontSize: 14),
-    );
+    ));
   }
-  return spisok;
+  if (spisok.length != 0) {
+    return spisokOfWidgets;
+  } else {
+    return [
+      Text(
+        myGroup,
+      )
+    ];
+  }
 }

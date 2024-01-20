@@ -97,13 +97,37 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
             bottomNavigationBar: const MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
               elevation: 0,
+              leading: IconButton(
+                  onPressed: () async {
+                    var x = await getUserGroup();
+                    nextScreenReplace(
+                        context,
+                        ProfilePage(
+                          group: x,
+                          email: widget.email,
+                          userName: widget.userName,
+                          about: widget.about,
+                          age: widget.age,
+                          hobbi: widget.hobbi,
+                          deti: widget.deti,
+                          city: widget.city,
+                          rost: widget.rost,
+                          pol: GlobalPol.toString(),
+                          imageSnapshot: getImagesUserStream(),
+                          podarkiSnapshot: getGiftsUserStream(),
+                        ));
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                  )),
               title: const Text(
                 "Редактирование профиля",
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 27,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold),
               ),
             ),
@@ -635,9 +659,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                   global.GlobalAbout = widget.about;
                                 });
                                 var x = await getUserGroup();
-
-                                FirebaseAuth.instance.currentUser!
-                                    .updatePassword('123456');
                                 nextScreenReplace(
                                     context,
                                     ProfilePage(

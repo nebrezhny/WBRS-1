@@ -57,6 +57,7 @@ class _MeetingPageState extends State<MeetingPage> {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
               actions: [
                 IconButton(
                     onPressed: () {

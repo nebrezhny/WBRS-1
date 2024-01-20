@@ -88,6 +88,7 @@ class _ProfilesListState extends State<ProfilesList> {
           bottomNavigationBar: const MyBottomNavigationBar(),
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
             actions: [
               Builder(builder: (context) {
                 return IconButton(
@@ -292,25 +293,19 @@ class _ProfilesListState extends State<ProfilesList> {
           if (snapshot.data!.docs[i]['pol'].toString().toLowerCase() ==
               FiltrPol) {
             if (filtrCity.text != '') {
-              print(filtrCity.text);
               if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
-                print(filtrCity.text);
                 users.add(snapshot.data!.docs[i]);
               }
             } else {
-              print(filtrCity.text);
               users.add(snapshot.data!.docs[i]);
             }
           }
         } else {
           if (filtrCity.text != '') {
-            print(filtrCity.text);
             if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
-              print(filtrCity.text);
               users.add(snapshot.data!.docs[i]);
             }
           } else {
-            print(filtrCity.text);
             users.add(snapshot.data!.docs[i]);
           }
         }

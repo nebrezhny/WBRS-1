@@ -162,7 +162,6 @@ class _HomePageState extends State<HomePage> {
                       context,
                       ChatScreen(
                           chatWithUsername: nick,
-                          name: MyNickname,
                           photoUrl: photoUrl,
                           id: id,
                           chatId: chats[index].id));
@@ -373,6 +372,7 @@ class _HomePageState extends State<HomePage> {
             bottomNavigationBar: const MyBottomNavigationBar(),
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
               elevation: 0,
               centerTitle: true,
               backgroundColor: Colors.transparent,

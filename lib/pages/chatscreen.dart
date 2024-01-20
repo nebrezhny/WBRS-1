@@ -14,11 +14,10 @@ import 'package:messenger/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String chatWithUsername, name, photoUrl, id, chatId;
+  final String chatWithUsername, photoUrl, id, chatId;
   const ChatScreen(
       {Key? key,
       required this.chatWithUsername,
-      required this.name,
       required this.photoUrl,
       required this.id,
       required this.chatId})
@@ -99,7 +98,6 @@ class _ChatScreenState extends State<ChatScreen> {
           messageId = "";
         }
       });
-      print(widget.id);
 
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('TOKENS')
@@ -111,7 +109,6 @@ class _ChatScreenState extends State<ChatScreen> {
           .get();
       String token = doc.get('token');
       String name = snap.get('fullName');
-      print(token);
 
       !isUserInChat
           ? NotificationsService().sendPushMessage(token, message, name, 4,
@@ -192,13 +189,23 @@ class _ChatScreenState extends State<ChatScreen> {
                             .update({'isRead': true});
                       }
 
-                      return MessageTile(
-                          sender: ds["sendBy"],
-                          name: ds["sendBy"],
-                          message: ds["message"],
-                          sentByMe: FirebaseAuth.instance.currentUser!.uid ==
-                              ds["sendByID"],
-                          isRead: ds["isRead"]);
+                      if (ds["message"] == null) {
+                        return MessageTile(
+                            sender: ds["sendBy"],
+                            name: ds["sendBy"],
+                            message: ds["image"],
+                            sentByMe: FirebaseAuth.instance.currentUser!.uid ==
+                                ds["sendByID"],
+                            isRead: ds["isRead"]);
+                      } else {
+                        return MessageTile(
+                            sender: ds["sendBy"],
+                            name: ds["sendBy"],
+                            message: ds["message"],
+                            sentByMe: FirebaseAuth.instance.currentUser!.uid ==
+                                ds["sendByID"],
+                            isRead: ds["isRead"]);
+                      }
                     })
                 : Center(
                     child: Column(
@@ -291,6 +298,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
               title: Row(
                 children: [
                   ClipRRect(

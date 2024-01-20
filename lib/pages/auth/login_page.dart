@@ -346,10 +346,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleRemeberme(bool value) {
-    print("Handle Rember Me");
     _isChecked = value;
-    print(_emailController);
-    print(_passwordController);
     SharedPreferences.getInstance().then(
       (prefs) {
         prefs.setBool("remember_me", value);
@@ -363,16 +360,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _loadUserEmailPassword() async {
-    print("Load Email");
     try {
       SharedPreferences _prefs = await SharedPreferences.getInstance();
       var _email = _prefs.getString("email") ?? "";
       var _password = _prefs.getString("password") ?? "";
       var _remeberMe = _prefs.getBool("remember_me") ?? false;
-
-      print(_remeberMe);
-      print(_email);
-      print(_password);
       if (_remeberMe) {
         setState(() {
           _isChecked = true;

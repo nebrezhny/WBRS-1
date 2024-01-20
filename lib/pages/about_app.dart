@@ -30,6 +30,8 @@ class About_App extends StatelessWidget {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 22),
               title: const Text("О приложении"),
               backgroundColor: Colors.transparent,
             ),
