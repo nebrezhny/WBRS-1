@@ -95,8 +95,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 city: doc.get('city'),
                 deti: doc.get('deti'),
                 pol: doc.get('pol'),
-                imageSnapshot: getImagesUserStream(),
-                podarkiSnapshot: getGiftsUserStream(),
               ));
         } else {
           nextScreen(context, SplashScreen());
@@ -177,21 +175,5 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       onTap: _onItemTapped,
       height: 60,
     );
-  }
-
-  getImagesUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('images')
-        .snapshots();
-  }
-
-  getGiftsUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('gifts')
-        .snapshots();
   }
 }

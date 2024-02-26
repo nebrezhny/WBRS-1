@@ -117,8 +117,6 @@ class _MyDrawerState extends State<MyDrawer> {
                           city: doc.get('city'),
                           deti: doc.get('deti'),
                           pol: doc.get('pol'),
-                          imageSnapshot: getImagesUserStream(),
-                          podarkiSnapshot: getGiftsUserStream(),
                         ));
                   },
                   child: Column(
@@ -247,8 +245,6 @@ class _MyDrawerState extends State<MyDrawer> {
                             city: doc.get('city'),
                             deti: doc.get('deti'),
                             pol: doc.get('pol'),
-                            imageSnapshot: getImagesUserStream(),
-                            podarkiSnapshot: getGiftsUserStream(),
                           ));
                     }
                   },
@@ -416,21 +412,5 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
       ],
     );
-  }
-
-  getImagesUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('images')
-        .snapshots();
-  }
-
-  getGiftsUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('gifts')
-        .snapshots();
   }
 }

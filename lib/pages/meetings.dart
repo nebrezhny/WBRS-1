@@ -22,7 +22,10 @@ class _MeetingPageState extends State<MeetingPage> {
   @override
   void initState() {
     super.initState();
-    meets = FirebaseFirestore.instance.collection('meets').snapshots();
+    meets = FirebaseFirestore.instance
+        .collection('meets')
+        .orderBy('recentMessageTime', descending: true)
+        .snapshots();
   }
 
   TextEditingController city = TextEditingController();
@@ -41,11 +44,7 @@ class _MeetingPageState extends State<MeetingPage> {
       home: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Colors.green,
-              )
-            ]),
+            decoration: const BoxDecoration(boxShadow: []),
             child: Image.asset(
               "assets/fon.jpg",
               height: MediaQuery.of(context).size.height,
@@ -181,6 +180,7 @@ class _MeetingPageState extends State<MeetingPage> {
         ? Container(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
+                color: Colors.orangeAccent,
                 border: Border.all(color: Colors.black),
                 borderRadius: const BorderRadius.all(Radius.circular(18))),
             child: GestureDetector(
@@ -225,17 +225,19 @@ class _MeetingPageState extends State<MeetingPage> {
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    color: Colors.white),
+                    color: Colors.orangeAccent),
                 width: double.infinity,
                 child: ListTile(
                   title: Row(children: [
-                    Text(snapshot.data.docs[index]['name']),
+                    SizedBox(
+                        width: 80,
+                        child: Text(snapshot.data.docs[index]['name'])),
                     const SizedBox(
-                      width: 10,
+                      width: 5,
                     ),
                     Text(snapshot.data.docs[index]['city']),
                     const SizedBox(
-                      width: 10,
+                      width: 5,
                     ),
                     Flexible(
                         child: Text(snapshot.data.docs[index]['datetime'])),
@@ -244,7 +246,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     Text(
                         snapshot.data.docs[index]['recentMessageSender'] + ':'),
                     const SizedBox(
-                      width: 10,
+                      width: 5,
                     ),
                     Flexible(
                         child:

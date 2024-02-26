@@ -83,12 +83,12 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: const Text(
-              "Tecт",
+              "Ответьте на вопросы",
             ),
           ),
           body: SingleChildScrollView(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
               child: Column(
                 children: [
                   const Text(
@@ -156,7 +156,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                     ),
                   ),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   ElevatedButton(
                     onPressed: () {

@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/helper/helper_function.dart';
+import 'package:messenger/service/notifications.dart';
 
 class DatabaseService {
   final String? uid;
@@ -181,6 +182,35 @@ class DatabaseService {
       "recentMessageSender": chatMessageData['sender'],
       "recentMessageTime": chatMessageData['time'].toString(),
     });
+
+    var usersDoc = await groupCollection.doc(chatId).get();
+
+    var users = usersDoc.get('users');
+
+    for (int i = 0; i < users.length; i++) {
+      if (users[i] != FirebaseAuth.instance.currentUser!.uid) {
+        var doc = await FirebaseFirestore.instance
+            .collection('TOKENS')
+            .doc(users[i])
+            .get();
+
+        var snap = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(users[i])
+            .get();
+
+        String token = doc.get('token');
+        String name = snap.get('fullName');
+
+        NotificationsService().sendPushMessage(
+            token,
+            chatMessageData['message'],
+            name,
+            1,
+            FirebaseAuth.instance.currentUser!.photoURL,
+            chatId);
+      }
+    }
   }
 
   Future<Stream<QuerySnapshot>> getUserByUserName(String username) async {

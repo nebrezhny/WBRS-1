@@ -1,5 +1,6 @@
-// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print, prefer_interpolation_to_compose_strings, unrelated_type_equality_checks
+// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print, prefer_interpolation_to_compose_strings, unrelated_type_equality_checks, use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,23 +32,19 @@ class ProfilePage extends StatefulWidget {
   bool deti;
   String pol;
   String group;
-  Stream imageSnapshot;
-  Stream podarkiSnapshot;
-  ProfilePage(
-      {Key? key,
-      required this.email,
-      required this.userName,
-      required this.about,
-      required this.age,
-      required this.pol,
-      required this.group,
-      required this.deti,
-      required this.rost,
-      required this.city,
-      required this.hobbi,
-      required this.imageSnapshot,
-      required this.podarkiSnapshot})
-      : super(key: key);
+  ProfilePage({
+    Key? key,
+    required this.email,
+    required this.userName,
+    required this.about,
+    required this.age,
+    required this.pol,
+    required this.group,
+    required this.deti,
+    required this.rost,
+    required this.city,
+    required this.hobbi,
+  }) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -107,11 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Stack(
       children: [
         Container(
-          decoration: const BoxDecoration(boxShadow: [
-            BoxShadow(
-              color: Colors.green,
-            )
-          ]),
+          decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
             "assets/fon.jpg",
             height: MediaQuery.of(context).size.height,
@@ -482,7 +475,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.normal),
                           ),
                           StreamBuilder(
-                              stream: widget.podarkiSnapshot,
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .collection('gifts')
+                                  .snapshots(),
                               builder: (context, AsyncSnapshot snapshot) {
                                 if (snapshot.data != null) {
                                   if (snapshot.data!.docs.length != 0) {
@@ -505,8 +502,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.normal),
                           ),
                           StreamBuilder(
-                              stream: widget.imageSnapshot,
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .collection('images')
+                                  .snapshots(),
                               builder: (context, AsyncSnapshot snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
                                 if (snapshot.data != null) {
                                   if (snapshot.data!.docs.length != 0) {
                                     return ifImageSnapshotNotEmtpry(snapshot);
@@ -526,21 +533,28 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  snapshotIsEmpty() async {
-    return await widget.imageSnapshot.isEmpty;
-  }
-
-  getGiftsUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('gifts')
-        .snapshots();
-  }
-
   ifImageSnapshotNotEmtpry(
     AsyncSnapshot snapshot,
   ) {
+    List urls = [];
+    List initList = [];
+    for (int i = 0; i < snapshot.data.docs.length; i++) {
+      urls.add(snapshot.data.docs[i]['url']);
+      initList.add(snapshot.data.docs[i]['url']);
+    }
+    urls.sort(
+      (a, b) {
+        return a.toString().contains('avatar')
+            ? -1
+            : b.toString().contains('avatar')
+                ? 1
+                : 0;
+      },
+    );
+
+    print(urls);
+    print(initList);
+
     return Column(
       children: [
         SizedBox(
@@ -571,134 +585,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       return TextButton(
                                         child: const Text('Удалить'),
                                         onPressed: () {
-                                          showCupertinoModalPopup(
-                                              context: context,
-                                              builder: (context) {
-                                                return Container(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
-                                                  color: Colors.white,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.17,
-                                                  child: Column(
-                                                    children: [
-                                                      const DefaultTextStyle(
-                                                        style: TextStyle(
-                                                            decorationColor:
-                                                                Colors.white,
-                                                            fontStyle: FontStyle
-                                                                .normal,
-                                                            color: Colors.black,
-                                                            fontSize: 16),
-                                                        child: Text(
-                                                            "Вы уверены, что хотите удалить это фото?"),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 20,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          ElevatedButton(
-                                                              style: ElevatedButton
-                                                                  .styleFrom(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .orangeAccent),
-                                                              onPressed:
-                                                                  () async {
-                                                                FirebaseStorage
-                                                                    .instance
-                                                                    .refFromURL(snapshot
-                                                                            .data
-                                                                            .docs[index]
-                                                                        ['url'])
-                                                                    .delete();
-                                                                FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'users')
-                                                                    .doc(FirebaseAuth
-                                                                        .instance
-                                                                        .currentUser!
-                                                                        .uid)
-                                                                    .collection(
-                                                                        'images')
-                                                                    .doc(snapshot
-                                                                        .data
-                                                                        .docs[
-                                                                            index]
-                                                                        .id)
-                                                                    .delete();
-                                                                var x = FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'users')
-                                                                    .doc(FirebaseAuth
-                                                                        .instance
-                                                                        .currentUser!
-                                                                        .uid)
-                                                                    .collection(
-                                                                        'images')
-                                                                    .snapshots();
-
-                                                                Navigator.of(context).push(MaterialPageRoute(
-                                                                    builder: (context) => ProfilePage(
-                                                                        group: widget
-                                                                            .group,
-                                                                        email: widget
-                                                                            .email,
-                                                                        userName:
-                                                                            widget
-                                                                                .userName,
-                                                                        about: widget
-                                                                            .about,
-                                                                        age: widget
-                                                                            .age,
-                                                                        pol: widget
-                                                                            .pol,
-                                                                        deti: widget
-                                                                            .deti,
-                                                                        rost: widget
-                                                                            .rost,
-                                                                        city: widget
-                                                                            .city,
-                                                                        hobbi: widget
-                                                                            .hobbi,
-                                                                        podarkiSnapshot:
-                                                                            getGiftsUserStream(),
-                                                                        imageSnapshot:
-                                                                            x)));
-                                                              },
-                                                              child: const Icon(
-                                                                  Icons.check)),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          ElevatedButton(
-                                                              style: ElevatedButton
-                                                                  .styleFrom(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .orangeAccent),
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: const Icon(
-                                                                  Icons.close)),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                );
-                                              });
+                                          print(initList.indexOf(urls[index]));
+                                          deleteImage(snapshot,
+                                              initList.indexOf(urls[index]));
                                         },
                                       );
                                     });
@@ -711,7 +600,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: const BoxDecoration(),
                               width: MediaQuery.of(context).size.width,
                               child: Image.network(
-                                snapshot.data.docs[index]['url'],
+                                urls[index],
                               ),
                             ),
                           ),
@@ -721,19 +610,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         margin: const EdgeInsets.only(right: 5),
                         width: 100,
-                        child: Image.network(snapshot.data.docs[index]['url'],
-                            fit: BoxFit.cover),
+                        child: Image.network(urls[index], fit: BoxFit.cover),
                       )),
                 );
               },
-              itemCount:
-                  (snapshot.data != null ? (snapshot.data!).docs.length : 0)),
+              itemCount: urls.length),
         ),
         ElevatedButton(
             onPressed: () async {
               selectImages();
-
-              FirebaseStorage storage = FirebaseStorage.instance;
 
               imageFileList!.clear();
             },
@@ -741,6 +626,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
             child: const Text(
               "Добавить фотографии",
+              style: TextStyle(color: Colors.white, fontSize: 16),
             )),
       ],
     );
@@ -755,7 +641,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         ElevatedButton(
           onPressed: () async {
-            FirebaseStorage storage = FirebaseStorage.instance;
             selectImages();
           },
           style: const ButtonStyle(
@@ -780,7 +665,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .ref('$name+$time+${FirebaseAuth.instance.currentUser!.uid}')
         .getDownloadURL();
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('images')
@@ -847,5 +732,77 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ],
     );
+  }
+
+  deleteImage(snapshot, index) {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return Container(
+            padding: const EdgeInsets.all(20),
+            color: Colors.white,
+            height: MediaQuery.of(context).size.height * 0.17,
+            child: Column(
+              children: [
+                const DefaultTextStyle(
+                  style: TextStyle(
+                      decorationColor: Colors.white,
+                      fontStyle: FontStyle.normal,
+                      color: Colors.black,
+                      fontSize: 16),
+                  child: Text("Вы уверены, что хотите удалить это фото?"),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent),
+                        onPressed: () async {
+                          FirebaseStorage.instance
+                              .refFromURL(snapshot.data.docs[index]['url'])
+                              .delete();
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .collection('images')
+                              .doc(snapshot.data.docs[index].id)
+                              .delete();
+
+                          nextScreenReplace(
+                              context,
+                              ProfilePage(
+                                  email: widget.email,
+                                  userName: widget.userName,
+                                  about: widget.about,
+                                  age: widget.age,
+                                  pol: widget.pol,
+                                  group: widget.group,
+                                  deti: widget.deti,
+                                  rost: widget.rost,
+                                  city: widget.city,
+                                  hobbi: widget.hobbi));
+                        },
+                        child: const Icon(Icons.check)),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.close)),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
   }
 }

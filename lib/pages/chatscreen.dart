@@ -112,7 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       !isUserInChat
           ? NotificationsService().sendPushMessage(token, message, name, 4,
-              FirebaseAuth.instance.currentUser!.photoURL, 'dcscscs')
+              FirebaseAuth.instance.currentUser!.photoURL, widget.chatId)
           : null;
     }
   }
@@ -172,41 +172,63 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, snapshot) {
         return snapshot.hasData
             ? snapshot.data.docs.length != 0
-                ? ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 70, top: 16),
-                    itemCount: snapshot.data.docs.length,
-                    reverse: true,
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot ds = snapshot.data.docs[index];
-                      ds.id;
-                      if (ds["sendByID"] !=
-                          FirebaseAuth.instance.currentUser!.uid) {
-                        FirebaseFirestore.instance
-                            .collection('chats')
-                            .doc(widget.chatId)
-                            .collection('chats')
-                            .doc(ds.id)
-                            .update({'isRead': true});
-                      }
+                ? Column(
+                    children: [
+                      const Text(
+                        'Самый простой способ начать общение - это',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            nextScreen(context, const ShopPage());
+                          },
+                          child: const Text(
+                            'Подарок',
+                            style: TextStyle(color: Colors.green),
+                          )),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height - 150,
+                        child: ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 70, top: 16),
+                            itemCount: snapshot.data.docs.length,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              DocumentSnapshot ds = snapshot.data.docs[index];
+                              ds.id;
+                              if (ds["sendByID"] !=
+                                  FirebaseAuth.instance.currentUser!.uid) {
+                                FirebaseFirestore.instance
+                                    .collection('chats')
+                                    .doc(widget.chatId)
+                                    .collection('chats')
+                                    .doc(ds.id)
+                                    .update({'isRead': true});
+                              }
 
-                      if (ds["message"] == null) {
-                        return MessageTile(
-                            sender: ds["sendBy"],
-                            name: ds["sendBy"],
-                            message: ds["image"],
-                            sentByMe: FirebaseAuth.instance.currentUser!.uid ==
-                                ds["sendByID"],
-                            isRead: ds["isRead"]);
-                      } else {
-                        return MessageTile(
-                            sender: ds["sendBy"],
-                            name: ds["sendBy"],
-                            message: ds["message"],
-                            sentByMe: FirebaseAuth.instance.currentUser!.uid ==
-                                ds["sendByID"],
-                            isRead: ds["isRead"]);
-                      }
-                    })
+                              if (ds["message"] == null) {
+                                return MessageTile(
+                                    sender: ds["sendBy"],
+                                    name: ds["sendBy"],
+                                    message: ds["image"],
+                                    sentByMe: FirebaseAuth
+                                            .instance.currentUser!.uid ==
+                                        ds["sendByID"],
+                                    isRead: ds["isRead"]);
+                              } else {
+                                return MessageTile(
+                                    sender: ds["sendBy"],
+                                    name: ds["sendBy"],
+                                    message: ds["message"],
+                                    sentByMe: FirebaseAuth
+                                            .instance.currentUser!.uid ==
+                                        ds["sendByID"],
+                                    isRead: ds["isRead"]);
+                              }
+                            }),
+                      ),
+                    ],
+                  )
                 : Center(
                     child: Column(
                       children: [

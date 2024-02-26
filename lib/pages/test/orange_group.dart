@@ -85,7 +85,7 @@ class _OrangePageState extends State<OrangePage> {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: const Text(
-                "Tecт",
+                "Ответьте на вопросы",
               ),
             ),
             body: SingleChildScrollView(
@@ -117,12 +117,15 @@ class _OrangePageState extends State<OrangePage> {
                             if (RedGroup > max) {
                               max = RedGroup;
                             }
+
                             if (GreenGroup > max) {
                               max = GreenGroup;
                             }
+
                             if (WhiteGroup > max) {
                               max = WhiteGroup;
                             }
+
                             if (OrangeGroup > max) {
                               max = OrangeGroup;
                             }
@@ -130,15 +133,19 @@ class _OrangePageState extends State<OrangePage> {
                             if (RedGroup > max2 && RedGroup != max) {
                               max2 = RedGroup;
                             }
+
                             if (GreenGroup > max2 && GreenGroup != max) {
                               max2 = GreenGroup;
                             }
+
                             if (WhiteGroup > max2 && WhiteGroup != max) {
                               max2 = WhiteGroup;
                             }
+
                             if (OrangeGroup > max2 && OrangePage != max) {
                               max2 = OrangeGroup;
                             }
+
                             if (max == RedGroup) {
                               if (max2 == GreenGroup) {
                                 FirebaseFirestore.instance
@@ -151,17 +158,18 @@ class _OrangePageState extends State<OrangePage> {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "коричнево-синяя"});
-                                Group = "коричнево-синяя";
+                                    .update({"группа": "коричнево-белая"});
+                                Group = "коричнево-белая";
                               }
                               if (max2 == OrangeGroup) {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "коричнево-белая"});
-                                Group = "коричнево-белая";
+                                    .update({"группа": "коричнево-синяя"});
+                                Group = "коричнево-синяя";
                               }
                             }
+
                             if (max == GreenGroup) {
                               if (max2 == RedGroup) {
                                 FirebaseFirestore.instance
@@ -174,54 +182,25 @@ class _OrangePageState extends State<OrangePage> {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "красно-синяя"});
-                                Group = "красно-синяя";
-                              }
-                              if (max2 == OrangeGroup) {
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
                                     .update({"группа": "красно-белая"});
                                 Group = "красно-белая";
                               }
-                            }
-                            if (max == WhiteGroup) {
-                              if (max2 == GreenGroup) {
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "сине-красная"});
-                                Group = "сине-красная";
-                              }
-                              if (max2 == RedGroup) {
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "сине-коричневая"});
-                                Group = "сине-коричневая";
-                              }
                               if (max2 == OrangeGroup) {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "сине-белая"});
-                                Group = "сине-белая";
+                                    .update({"группа": "красно-синяя"});
+                                Group = "красно-синяя";
                               }
                             }
-                            if (max == OrangeGroup) {
+
+                            if (max == WhiteGroup) {
                               if (max2 == GreenGroup) {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
                                     .update({"группа": "бело-красная"});
                                 Group = "бело-красная";
-                              }
-                              if (max2 == WhiteGroup) {
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({"группа": "бело-синяя"});
-                                Group = "бело-синяя";
                               }
                               if (max2 == RedGroup) {
                                 FirebaseFirestore.instance
@@ -230,7 +209,39 @@ class _OrangePageState extends State<OrangePage> {
                                     .update({"группа": "бело-коричневая"});
                                 Group = "бело-коричневая";
                               }
+                              if (max2 == OrangeGroup) {
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({"группа": "бело-синяя"});
+                                Group = "бело-синяя";
+                              }
                             }
+
+                            if (max == OrangeGroup) {
+                              if (max2 == GreenGroup) {
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({"группа": "сине-красная"});
+                                Group = "сине-красная";
+                              }
+                              if (max2 == WhiteGroup) {
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({"группа": "сине-белая"});
+                                Group = "сине-белая";
+                              }
+                              if (max2 == RedGroup) {
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({"группа": "сине-коричневая"});
+                                Group = "сине-коричневая";
+                              }
+                            }
+
                             FirebaseFirestore.instance
                                 .collection('users')
                                 .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -255,8 +266,6 @@ class _OrangePageState extends State<OrangePage> {
                                   city: GlobalCity.toString(),
                                   hobbi: GlobalHobbi.toString(),
                                   pol: GlobalPol.toString(),
-                                  imageSnapshot: getImagesUserStream(),
-                                  podarkiSnapshot: getGiftsUserStream(),
                                 ));
                             showSnackbar(context, Colors.green,
                                 "Успешно! Ваша группа: $Group}");
@@ -300,7 +309,7 @@ class _OrangePageState extends State<OrangePage> {
                     ),
                   ),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -332,21 +341,5 @@ class _OrangePageState extends State<OrangePage> {
         )
       ],
     );
-  }
-
-  getImagesUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('images')
-        .snapshots();
-  }
-
-  getGiftsUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('gifts')
-        .snapshots();
   }
 }

@@ -67,8 +67,11 @@ class _MyAppState extends State<MyApp> {
       FlutterLocalNotificationsPlugin();
   String? mtoken = " ";
 
+  var doc;
+
   @override
   void initState() {
+    getUserInfo();
     checkInternet();
     super.initState();
     selectedIndex = 1;
@@ -80,6 +83,13 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isIOS) {
       firebaseMessaging.requestPermission();
     }
+  }
+
+  getUserInfo() async {
+    doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
   }
 
   checkInternet() async {
@@ -132,6 +142,22 @@ class _MyAppState extends State<MyApp> {
           scaffoldBackgroundColor: Colors.white,
           textTheme: tema),
       debugShowCheckedModeBanner: false,
+      routes: {
+        'profile': (context) {
+          return ProfilePage(
+            group: getUserGroup(),
+            email: FirebaseAuth.instance.currentUser!.email.toString(),
+            userName: FirebaseAuth.instance.currentUser!.displayName.toString(),
+            about: doc.get('about'),
+            age: doc.get('age').toString(),
+            rost: doc.get('rost'),
+            hobbi: doc.get('hobbi'),
+            city: doc.get('city'),
+            deti: doc.get('deti'),
+            pol: doc.get('pol'),
+          );
+        }
+      },
       home: _isSignedIn
           ? _isRegistrationEnd
               ? const HomePage()

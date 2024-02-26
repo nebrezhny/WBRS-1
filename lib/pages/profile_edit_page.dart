@@ -116,8 +116,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                           city: widget.city,
                           rost: widget.rost,
                           pol: GlobalPol.toString(),
-                          imageSnapshot: getImagesUserStream(),
-                          podarkiSnapshot: getGiftsUserStream(),
                         ));
                   },
                   icon: const Icon(
@@ -198,54 +196,68 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       _image = image;
                                     });
 
-                                    FirebaseStorage storage =
-                                        FirebaseStorage.instance;
-                                    try {
-                                      await storage
+                                    if (_image != null) {
+                                      FirebaseStorage storage =
+                                          FirebaseStorage.instance;
+                                      try {
+                                        await storage
+                                            .ref(
+                                                'avatar-${FirebaseAuth.instance.currentUser!.uid}')
+                                            .putFile(File(_image!.path));
+                                      } on FirebaseException {}
+                                      var downloadUrl = await storage
                                           .ref(
                                               'avatar-${FirebaseAuth.instance.currentUser!.uid}')
-                                          .putFile(File(_image!.path));
-                                    } on FirebaseException {}
-                                    var downloadUrl = await storage
-                                        .ref(
-                                            'avatar-${FirebaseAuth.instance.currentUser!.uid}')
-                                        .getDownloadURL();
-                                    await FirebaseAuth.instance.currentUser!
-                                        .updatePhotoURL(downloadUrl.toString());
-                                    await FirebaseFirestore.instance
-                                        .collection("users")
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .update({
-                                      'profilePic': downloadUrl
-                                    }).then((value) => print("done"));
+                                          .getDownloadURL();
+                                      await FirebaseAuth.instance.currentUser!
+                                          .updatePhotoURL(
+                                              downloadUrl.toString());
+                                      await FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .update({
+                                        'profilePic': downloadUrl,
+                                      }).then((value) => print("done"));
 
-                                    var chats = await FirebaseFirestore.instance
-                                        .collection('chats')
-                                        .get();
+                                      await FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .collection("images")
+                                          .doc('avatar')
+                                          .set({
+                                        'url': downloadUrl,
+                                      }).then((value) => print("done"));
 
-                                    for (int i = 0; i < chats.size; i++) {
-                                      if (chats.docs[i]['user1'] ==
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid) {
-                                        FirebaseFirestore.instance
-                                            .collection('chats')
-                                            .doc(chats.docs[i].id)
-                                            .update(
-                                                {'user1_image': downloadUrl});
-                                      } else if (chats.docs[i]['user2'] ==
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid) {
-                                        FirebaseFirestore.instance
-                                            .collection('chats')
-                                            .doc(chats.docs[i].id)
-                                            .update(
-                                                {'user2_image': downloadUrl});
-                                      } else {
-                                        null;
+                                      var chats = await FirebaseFirestore
+                                          .instance
+                                          .collection('chats')
+                                          .get();
+
+                                      for (int i = 0; i < chats.size; i++) {
+                                        if (chats.docs[i]['user1'] ==
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid) {
+                                          FirebaseFirestore.instance
+                                              .collection('chats')
+                                              .doc(chats.docs[i].id)
+                                              .update(
+                                                  {'user1_image': downloadUrl});
+                                        } else if (chats.docs[i]['user2'] ==
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid) {
+                                          FirebaseFirestore.instance
+                                              .collection('chats')
+                                              .doc(chats.docs[i].id)
+                                              .update(
+                                                  {'user2_image': downloadUrl});
+                                        } else {
+                                          null;
+                                        }
                                       }
+                                      updateVisiterImage(downloadUrl);
                                     }
-                                    updateVisiterImage(downloadUrl);
                                   },
                                   icon: const Icon(
                                     Icons.camera_alt_outlined,
@@ -672,8 +684,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       city: widget.city,
                                       rost: widget.rost,
                                       pol: GlobalPol.toString(),
-                                      imageSnapshot: getImagesUserStream(),
-                                      podarkiSnapshot: getGiftsUserStream(),
                                     ));
                               },
                               style: const ButtonStyle(
@@ -772,22 +782,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     );
   }
 
-  getImagesUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('images')
-        .snapshots();
-  }
-
-  getGiftsUserStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('gifts')
-        .snapshots();
-  }
-
   updateVisiterImage(String photourl) async {
     var users = await FirebaseFirestore.instance.collection('users').get();
 
@@ -806,6 +800,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
             .collection('users')
             .doc(users.docs[i].id)
             .collection('visiters')
+            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .get();
 
         if (!isEmpty && snapshot.docs.isNotEmpty) {

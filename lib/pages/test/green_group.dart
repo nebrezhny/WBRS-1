@@ -83,7 +83,7 @@ class _GreenPageState extends State<GreenPage> {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: const Text(
-                "Tecт",
+                "Ответьте на вопросы",
               ),
             ),
             body: SingleChildScrollView(
@@ -151,7 +151,7 @@ class _GreenPageState extends State<GreenPage> {
                     ),
                   ),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   ElevatedButton(
                     onPressed: () {

@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:messenger/pages/meetings.dart';
 import 'package:messenger/service/database_service.dart';
 import 'package:messenger/widgets/message_tile.dart';
 import 'package:messenger/widgets/widgets.dart';
@@ -51,9 +52,10 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    getAndSetMessages();
     getUsers();
     is_user_join = widget.is_user_join;
+
+    getAndSetMessages();
 
     getToken();
   }
@@ -64,115 +66,196 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarTextStyle: const TextStyle(color: Colors.black),
-        title: Text(widget.groupName),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                for (int i = 0; i < widget.users.length; i++) {
-                  DocumentSnapshot doc = await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(widget.users[i])
-                      .get();
-                  try {
-                    UserInfo some_user_info = UserInfo(
-                        doc.get('fullName'),
-                        doc.get('age').toString(),
-                        doc.get('city'),
-                        doc.get('profilePic'));
-                    user_info.add(some_user_info);
-                  } on Exception catch (e) {
-                    showSnackbar(context, Colors.red, e);
-                  }
-                }
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Scaffold(
-                        appBar: AppBar(
-                          backgroundColor: Colors.orangeAccent,
-                          title: const Text('Список пользователей'),
-                        ),
-                        body: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 15),
-                          child: listUsers(),
-                        ),
-                      );
-                    });
-              },
-              icon: const Icon(Icons.people))
-        ],
-        backgroundColor: Colors.orangeAccent,
-      ),
-      body: Stack(
-        children: [
-          chatMessages(),
-          const Padding(padding: EdgeInsets.only(bottom: 50.0)),
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(boxShadow: []),
+          child: Image.asset(
+            "assets/fon.jpg",
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+            scale: 0.6,
+          ),
+        ),
+        Scaffold(
+          appBar: AppBar(
+            toolbarTextStyle: const TextStyle(color: Colors.black),
+            title: Text(widget.groupName),
+            actions: [
+              is_user_join
+                  ? IconButton(
+                      onPressed: () async {
+                        for (int i = 0; i < widget.users.length; i++) {
+                          DocumentSnapshot doc = await FirebaseFirestore
+                              .instance
+                              .collection('users')
+                              .doc(widget.users[i])
+                              .get();
+                          try {
+                            UserInfo some_user_info = UserInfo(
+                                doc.get('fullName'),
+                                doc.get('age').toString(),
+                                doc.get('city'),
+                                doc.get('profilePic'));
+                            user_info.add(some_user_info);
+                          } on Exception catch (e) {
+                            showSnackbar(context, Colors.red, e);
+                          }
+                        }
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Scaffold(
+                                appBar: AppBar(
+                                  backgroundColor: Colors.orangeAccent,
+                                  title: const Text('Список пользователей'),
+                                ),
+                                body: Column(
+                                  children: [
+                                    Container(
+                                      height: 330,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 15),
+                                      child: listUsers(),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          getOutFromChat();
+                                        },
+                                        child: Text('Выйти из встречи'))
+                                  ],
+                                ),
+                              );
+                            });
+                      },
+                      icon: const Icon(Icons.people))
+                  : SizedBox()
+            ],
+            backgroundColor: Colors.orangeAccent,
+          ),
+          body: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(boxShadow: []),
+                child: Image.asset(
+                  "assets/fon.jpg",
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.cover,
+                  scale: 0.6,
+                ),
+              ),
+              chatMessages(),
+              const Padding(padding: EdgeInsets.only(bottom: 50.0)),
 
-          Container(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              width: MediaQuery.of(context).size.width,
-              color: Colors.grey[700],
-              child: is_user_join
-                  ? Row(children: [
-                      Expanded(
-                          child: TextFormField(
-                        controller: messageController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: "Отправить сообщение...",
-                          hintStyle:
-                              TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      )),
-                      GestureDetector(
-                        onTap: () {
-                          sendMessage();
-                        },
-                        child: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                        ),
-                      )
-                    ])
-                  : Row(
-                      children: [
-                        Expanded(
-                            child: TextFormField(
-                          controller: messageController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            hintText: "Вы не являетесь участником встречи",
-                            hintStyle:
-                                TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        )),
-                        TextButton(
-                            onPressed: () {
-                              joinUser(FirebaseAuth.instance.currentUser!.uid,
-                                  widget.groupId);
-                              setState(() {
-                                is_user_join = true;
-                              });
+              Container(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey[700],
+                  child: is_user_join
+                      ? Row(children: [
+                          Expanded(
+                              child: TextFormField(
+                            controller: messageController,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: "Отправить сообщение...",
+                              hintStyle:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          )),
+                          GestureDetector(
+                            onTap: () {
+                              sendMessage();
                             },
-                            child: const Text('Присоедениться'))
-                      ],
-                    ),
-            ),
-          )
-          // chat messages here
-        ],
-      ),
+                            child: const Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
+                          )
+                        ])
+                      : Row(
+                          children: [
+                            Expanded(
+                                child: TextFormField(
+                              controller: messageController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: const InputDecoration(
+                                hintText: "Вы не являетесь участником встречи",
+                                hintStyle: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
+                            )),
+                            TextButton(
+                                onPressed: () {
+                                  joinUser(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      widget.groupId);
+                                  setState(() {
+                                    is_user_join = true;
+                                  });
+                                },
+                                child: const Text(
+                                  'Присоедениться',
+                                  style: TextStyle(color: Colors.blueAccent),
+                                ))
+                          ],
+                        ),
+                ),
+              )
+              // chat messages here
+            ],
+          ),
+        ),
+      ],
     );
   }
 
+  getOutFromChat() async {
+    var chat =
+        FirebaseFirestore.instance.collection('meets').doc(widget.groupId);
+
+    String myId = FirebaseAuth.instance.currentUser!.uid;
+
+    var chatDoc = await chat.get();
+    List users = chatDoc.get('users');
+    users.remove(myId);
+
+    chat.update({'users': users});
+
+    var messages = await chat.collection('messages').get();
+
+    for (var element in messages.docs) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(myId)
+          .collection('removed_meets')
+          .doc(widget.groupId)
+          .collection('messages')
+          .doc(element.id)
+          .set(element.data());
+    }
+
+    nextScreenReplace(context, const MeetingPage());
+  }
+
   getAndSetMessages() async {
-    chats = await DatabaseService().getGroupMessages(widget.groupId);
+    if (is_user_join) {
+      chats = await DatabaseService().getGroupMessages(widget.groupId);
+    } else {
+      chats = FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('removed_meets')
+          .doc(widget.groupId)
+          .collection('messages')
+          .orderBy('time')
+          .snapshots();
+    }
     setState(() {});
   }
 
@@ -230,7 +313,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ? Text('${user_info[index].age} года')
                                     : Text('${user_info[index].age} лет'),
                         const SizedBox(
-                          width: 20,
+                          width: 10,
                         ),
                         Text("Город ${user_info[index].city}")
                       ],
