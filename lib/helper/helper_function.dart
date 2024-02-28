@@ -101,16 +101,23 @@ getUserGroup() async {
   return doc.get('группа');
 }
 
+circleImageByGroup(group) {}
+
 userImageWithCircle(userPhotoUrl) {
-  return userPhotoUrl != null
-      ? CircleAvatar(
-          radius: 50,
-          backgroundImage: NetworkImage(userPhotoUrl),
-        )
-      : const CircleAvatar(
-          radius: 50,
-          backgroundImage: AssetImage('assets/images/user.png'),
-        );
+  return Stack(
+    alignment: Alignment.center,
+    children: [
+      CircleAvatar(
+        radius: 47,
+        backgroundImage: AssetImage("assets/circles/кр14.png"),
+        backgroundColor: Colors.transparent,
+      ),
+      CircleAvatar(
+        radius: 35,
+        backgroundImage: NetworkImage(userPhotoUrl),
+      ),
+    ],
+  );
 }
 
 List<Widget> getLikeGroup(myGroup) {

@@ -131,19 +131,18 @@ class _MyDrawerState extends State<MyDrawer> {
                                   size: 150,
                                   color: Colors.white,
                                 )
-                              : Column(children: [
-                                  ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      child: Image.network(
-                                        FirebaseAuth
-                                            .instance.currentUser!.photoURL
-                                            .toString(),
-                                        fit: BoxFit.cover,
-                                        height: 100.0,
-                                        width: 100.0,
-                                      )),
-                                ]),
+                              : userImageWithCircle(FirebaseAuth
+                                  .instance.currentUser!.photoURL
+                                  .toString()),
+                          // : ClipRRect(
+                          //     borderRadius: BorderRadius.circular(100.0),
+                          //     child: Image.network(
+                          //       FirebaseAuth.instance.currentUser!.photoURL
+                          //           .toString(),
+                          //       fit: BoxFit.cover,
+                          //       height: 100.0,
+                          //       width: 100.0,
+                          //     )),
                           const SizedBox(
                             height: 15,
                           ),

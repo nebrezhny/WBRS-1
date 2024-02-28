@@ -94,6 +94,22 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/circles/кр1.png
+    - assets/circles/кр2.png
+    - assets/circles/кр3.png
+    - assets/circles/кр4.png
+    - assets/circles/кр5.png
+    - assets/circles/кр6.png
+    - assets/circles/кр7.png
+    - assets/circles/кр8.png
+    - assets/circles/кр9.png
+    - assets/circles/кр10.png
+    - assets/circles/кр11.png
+    - assets/circles/кр12.png
+    - assets/circles/кр13.png
+    - assets/circles/кр14.png
+    - assets/circles/кр15.png
+    - assets/circles/кр16.png
     - assets/gifts/1.png
     - assets/gifts/2.png
     - assets/gifts/3.png
