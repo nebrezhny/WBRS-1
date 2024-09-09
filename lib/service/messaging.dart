@@ -11,8 +11,7 @@ initializeMessaging() async {
   _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings("@mipmap/launcher_icon");
-  const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+  const InitializationSettings(android: initializationSettingsAndroid);
   // await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
   //     onSelectNotification: selectionNotification);
 

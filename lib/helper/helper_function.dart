@@ -1,6 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -105,7 +105,7 @@ userImageWithCircle(userPhotoUrl, group, [width, height]) {
   return Container(
     width: width ?? 100,
     height: height ?? 100,
-    padding: EdgeInsets.all(9),
+    padding: const EdgeInsets.all(9),
     decoration: BoxDecoration(
       image: DecorationImage(
         image: AssetImage(getUserGroupCircle(group)),
@@ -114,31 +114,12 @@ userImageWithCircle(userPhotoUrl, group, [width, height]) {
     ),
     child:       userPhotoUrl != ''
         ? CircleAvatar(
-      backgroundImage: NetworkImage(userPhotoUrl),
+      backgroundImage: CachedNetworkImageProvider(userPhotoUrl),
     )
         : const CircleAvatar(
       radius: 39,
       backgroundImage: AssetImage("assets/profile.png"),
     ),
-  );
-  return Stack(
-    alignment: Alignment.center,
-    children: [
-      CircleAvatar(
-        radius: 44,
-        backgroundImage: AssetImage(getUserGroupCircle(group)),
-        backgroundColor: Colors.transparent,
-      ),
-      userPhotoUrl != ''
-          ? CircleAvatar(
-              radius: 37,
-              backgroundImage: NetworkImage(userPhotoUrl),
-            )
-          : const CircleAvatar(
-              radius: 39,
-              backgroundImage: AssetImage("assets/profile.png"),
-            ),
-    ],
   );
 }
 
@@ -186,35 +167,62 @@ List<Widget> getLikeGroup(myGroup) {
   List spisok = [];
   if (myGroup == "коричнево-красная" ||
       myGroup == "коричнево-синяя" ||
-      myGroup == "коричнево-белая") {
-    spisok = ["Все белые", "Красно-белая", "Сине-белая", "Коричнево-белая"];
-  } else if (myGroup == "красно-коричневая" ||
-      myGroup == "красно-синяя" ||
-      myGroup == "красно-белая") {
+      myGroup == "коричнево-белая" ||
+      myGroup == "коричневая") {
+    spisok = ["Все белые", "Все коричневые", "Сине-белая"];
+  }else if (myGroup == "красно-белая"
+      || myGroup == "красно-синяя") {
     spisok = [
-      "Все синие",
-      "Коричнево-синяя",
+      "Чистая синяя",
+      "Сине-коричневая",
+    ];
+  } else if (myGroup == "красная") {
+    spisok = [
+      "Чистая синяя",
+      "Сине-коричневая",
+    ];
+  } else if (myGroup == "красно-коричневая") {
+    spisok = [
+      "Все белые",
       "Коричнево-белая",
+      "Сине-белая",
     ];
-  } else if (myGroup == "сине-коричневая" ||
-      myGroup == "сине-красная" ||
-      myGroup == "сине-белая") {
+  } else if (myGroup == "коричнево-белая") {
     spisok = [
-      "Красно-синяя",
-      "Сине-красная",
-      "Красно-белая",
+      "Все белые",
+      "Сине-белая",
+      "Все коричневые",
+      "Красно-коричневая",
     ];
-  } else if (myGroup == "бело-коричневая" ||
-      myGroup == "бело-синяя" ||
-      myGroup == "бело-красная") {
-    spisok = ["Все коричневые", "Сине-белая"];
-  } else if (myGroup == "Сине-белая") {
+  } else if (myGroup == "синяя" || myGroup == "сине-коричневая") {
+    spisok = [
+      "Чисто красная",
+      "Красно-белая",
+      "Сине-красная",
+      "Красно-синяя"
+    ];
+  } else if (myGroup == "сине-белая") {
     spisok = [
       "Все коричневые",
-      "Бело-коричневая",
+      "Все белые",
+      "Красно-коричневая",
+    ];
+  } else if (myGroup == "сине-красная") {
+    spisok = [
+      "Чисто синяя",
+      "Сине-коричневая",
+    ];
+  } else if (myGroup == "бело-красная" ||
+      myGroup == "бело-синяя" ||
+      myGroup == "бело-коричневая" ||
+      myGroup == "белая"){
+    spisok =[
+      "Все коричневые",
+      "Сине-белая",
       "Красно-коричневая",
     ];
   }
+
 
   List<Widget> spisokOfWidgets = [];
 
@@ -224,12 +232,13 @@ List<Widget> getLikeGroup(myGroup) {
       style: const TextStyle(color: Colors.white, fontSize: 14),
     ));
   }
-  if (spisok.length != 0) {
+  if (spisok.isNotEmpty) {
     return spisokOfWidgets;
   } else {
     return [
       Text(
         myGroup,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
       )
     ];
   }

@@ -1,11 +1,8 @@
-// ignore_for_file: unnecessary_string_escapes, non_constant_identifier_names
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/pages/about_meet.dart';
 import 'package:wbrs/pages/chatscreen.dart';
-import 'package:wbrs/pages/profiles_list.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/widgets/chat_room_list.dart';
@@ -76,14 +73,6 @@ class _HomePageState extends State<HomePage> {
     getChatRooms();
   }
 
-  chatRoomsList(
-      AsyncSnapshot<QuerySnapshot> snapshot, String MyUID, String MyNickname) {
-
-    String nick;
-
-
-  }
-
   // string manipulation
   String getId(String res) {
     return res.substring(0, res.indexOf("_"));
@@ -124,22 +113,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   initInfo() {
-    var androidInitialize =
-        const AndroidInitializationSettings('@mipmap/launcher_icon');
-    var iosInitialize = const DarwinInitializationSettings();
-    var initializationsSettings =
-        InitializationSettings(android: androidInitialize, iOS: iosInitialize);
-
-    // flutterLocalNotificationsPlugin.initialize(initializationsSettings,
-    //     onSelectNotification: (String? payload) async {
-    //   try {
-    //     if (payload != null && payload.isNotEmpty) {
-    //     } else {}
-    //   } on Exception catch (e) {
-    //     e.hashCode;
-    //   }
-    //   return;
-    // });
+    const AndroidInitializationSettings('@mipmap/launcher_icon');
+    const DarwinInitializationSettings();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
@@ -154,14 +129,50 @@ class _HomePageState extends State<HomePage> {
               importance: Importance.max,
               styleInformation: bigTextStyleInformation,
               priority: Priority.max,
-              playSound: false);
+              playSound: true);
 
       NotificationDetails platformChannelSpecifics =
           NotificationDetails(android: androidNotificationDetails);
 
-      await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
-          message.notification?.body, platformChannelSpecifics,
-          payload: message.data['title']);
+      print(message.data);
+
+      try {
+        await flutterLocalNotificationsPlugin.show(
+            0,
+            message.notification?.title,
+            message.notification?.body,
+            platformChannelSpecifics,
+            payload: message.data['body']['message']);
+      } on Exception catch (e) {
+        showSnackbar(context, Colors.red, e);
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      Map body = message.data;
+      if (body['isChat'] == 'true') {
+        nextScreen(
+            context,
+            ChatScreen(
+              chatWithUsername: body['chatWith'],
+              photoUrl: body['photoUrl'],
+              id: body['id'],
+              chatId: body['chatId'],
+            ));
+      } else {
+        body['users'] =
+            body['users'].toString().replaceAll('[', '').replaceAll(']', '');
+        List users = body['users'].toString().split(',');
+        print(users);
+        nextScreen(
+            context,
+            AboutMeet(
+              id: body['groupId'],
+              users: users,
+              name: body['groupName'],
+              is_user_join: body['isUserJoin'].toString() == 'true',
+            ));
+      }
     });
   }
 
@@ -192,7 +203,10 @@ class _HomePageState extends State<HomePage> {
       } else {}
     } on Exception catch (e) {
       showSnackbar(context, Colors.red, e);
-      FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({'token': e});
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'token': e});
     }
   }
 
@@ -239,24 +253,44 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
-                      .orderBy('lastMessage')
+                      .where(Filter.or(
+                        Filter('user1', isEqualTo: currentUser!.uid),
+                        Filter('user2', isEqualTo: currentUser!.uid),
+                      ))
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Text(
-                        "Нет чатов",
-                        textAlign: TextAlign.center,
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
                       );
                     } else {
-                      if (currentUser != null) {
-                        return ListView.builder(
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              return ChatRoomList(snapshot: snapshot.data!.docs[index]);
-                            });
+                      if (!snapshot.hasData) {
+                        return const Text(
+                          "Нет чатов",
+                          textAlign: TextAlign.center,
+                        );
                       } else {
-                        return const Text('none');
+                        List sorted_list = snapshot.data!.docs;
+                        sorted_list.sort((a, b) {
+                          return b
+                              .get('lastMessageSendTs')
+                              .compareTo(a.get('lastMessageSendTs'));
+                        });
+                        if (currentUser != null) {
+                          return ListView.builder(
+                              itemCount: sorted_list.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0),
+                                  child: ChatRoomList(
+                                      snapshot: sorted_list[index]),
+                                );
+                              });
+                        } else {
+                          return const Text('none');
+                        }
                       }
                     }
                   }),

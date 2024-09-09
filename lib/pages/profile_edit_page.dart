@@ -58,6 +58,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
   TextEditingController? city = TextEditingController();
   String? deti;
   late User? user = FirebaseAuth.instance.currentUser;
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
   void pickUploadImage() async {
     final image = await ImagePicker().pickImage(
@@ -74,6 +75,13 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
         imageUrl = value;
       });
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    about!.text = widget.about;
+    hobbi!.text = widget.hobbi;
   }
 
   AuthService authService = AuthService();
@@ -186,8 +194,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                 height: 50,
                                 child: IconButton(
                                   onPressed: () async {
-                                    // print(await FirebaseFirestore.instance.collection('chats').where('user2',isEqualTo: AuthName)
-                                    //     .snapshots().length);
 
                                     XFile? image = await ImagePicker()
                                         .pickImage(source: ImageSource.gallery);
@@ -202,17 +208,18 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       try {
                                         await storage
                                             .ref(
-                                                'avatar-${FirebaseAuth.instance.currentUser!.uid}')
+                                                '${FirebaseAuth.instance.currentUser!.uid}/avatar-${FirebaseAuth.instance.currentUser!.uid}')
                                             .putFile(File(_image!.path));
                                       } on FirebaseException {}
                                       var downloadUrl = await storage
                                           .ref(
-                                              'avatar-${FirebaseAuth.instance.currentUser!.uid}')
+                                              '${FirebaseAuth.instance.currentUser!.uid}/avatar-${FirebaseAuth.instance.currentUser!.uid}')
                                           .getDownloadURL();
                                       await FirebaseAuth.instance.currentUser!
                                           .updatePhotoURL(
                                               downloadUrl.toString());
-                                      await FirebaseFirestore.instance
+                                      print(downloadUrl);
+                                      await db
                                           .collection("users")
                                           .doc(FirebaseAuth
                                               .instance.currentUser!.uid)
@@ -220,13 +227,12 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         'profilePic': downloadUrl,
                                       }).then((value) => print("done"));
 
-                                      await FirebaseFirestore.instance
+                                      await db
                                           .collection("users")
                                           .doc(FirebaseAuth
                                               .instance.currentUser!.uid)
                                           .collection("images")
-                                          .doc('avatar')
-                                          .set({
+                                      .add({
                                         'url': downloadUrl,
                                       }).then((value) => print("done"));
 
@@ -239,7 +245,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         if (chats.docs[i]['user1'] ==
                                             FirebaseAuth
                                                 .instance.currentUser!.uid) {
-                                          FirebaseFirestore.instance
+                                          db
                                               .collection('chats')
                                               .doc(chats.docs[i].id)
                                               .update(
@@ -247,7 +253,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         } else if (chats.docs[i]['user2'] ==
                                             FirebaseAuth
                                                 .instance.currentUser!.uid) {
-                                          FirebaseFirestore.instance
+                                          db
                                               .collection('chats')
                                               .doc(chats.docs[i].id)
                                               .update(
@@ -444,7 +450,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(
-                                    width: 150,
+                                    width: 290,
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       minLines: 1,
@@ -492,7 +498,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(
-                                    width: 150,
+                                    width: 290,
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
@@ -505,7 +511,10 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         widget.hobbi = about.toString();
                                       },
                                       controller: hobbi,
+                                      minLines: 1,
+                                      maxLines: 5,
                                       decoration: InputDecoration(
+
                                         hintText: widget.hobbi,
                                         hintStyle: const TextStyle(
                                             color: Colors.white),
@@ -632,7 +641,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                var chats = await FirebaseFirestore.instance
+                                var chats = await db
                                     .collection('chats')
                                     .get();
 
@@ -640,7 +649,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                   if (chats.docs[i]['user1Nickname'] ==
                                       FirebaseAuth
                                           .instance.currentUser!.displayName) {
-                                    FirebaseFirestore.instance
+                                    db
                                         .collection('chats')
                                         .doc(chats.docs[i].id)
                                         .update(
@@ -648,7 +657,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                   } else if (chats.docs[i]['user2Nickname'] ==
                                       FirebaseAuth
                                           .instance.currentUser!.displayName) {
-                                    FirebaseFirestore.instance
+                                    db
                                         .collection('chats')
                                         .doc(chats.docs[i].id)
                                         .update(
@@ -728,17 +737,47 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                         .styleFrom(
                                                             backgroundColor: Colors
                                                                 .orangeAccent),
-                                                    onPressed: () {
-                                                      FirebaseFirestore.instance
-                                                          .collection('users')
-                                                          .doc(FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid)
-                                                          .delete();
+                                                    onPressed: () async {
+                                                      var currentUser = FirebaseAuth.instance.currentUser;
+                                                      
+                                                      FirebaseStorage.instance
+                                                      .ref(currentUser!.uid)
+                                                      .listAll()
+                                                      .then((value) {
+                                                        for (var element
+                                                            in value.items) {
+                                                          element
+                                                              .delete();
+                                                        }
+                                                      });
 
-                                                      FirebaseAuth
-                                                          .instance.currentUser!
+                                                      List chatsId = [];
+                                                      
+                                                      await db
+                                                      .collection('chats')
+                                                      .where(Filter.or(
+                                                        Filter('user1', isEqualTo: currentUser.uid), Filter('user2', isEqualTo: currentUser.uid)))
+                                                      .get()
+                                                      .then((value) {
+                                                        setState(() {
+                                                          chatsId.add(value.docs[0].data());
+                                                        });
+                                                      });
+
+                                                      for (int i = 0; i < chatsId.length; i++) {
+                                                        print(chatsId[i]);
+                                                        db.collection('removedChats').add(chatsId[i]);
+                                                        db
+                                                            .collection('chats')
+                                                            .doc(chatsId[i]['chatId'])
+                                                            .delete();
+                                                      }
+
+                                                      currentUser.delete();
+
+                                                      db
+                                                          .collection('users')
+                                                          .doc(currentUser.uid)
                                                           .delete();
 
                                                       nextScreen(
@@ -785,11 +824,11 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
   }
 
   updateVisiterImage(String photourl) async {
-    var users = await FirebaseFirestore.instance.collection('users').get();
+    var users = await db.collection('users').get();
 
     for (int i = 0; i < users.size; i++) {
       if (users.docs[i].id != FirebaseAuth.instance.currentUser!.uid) {
-        var collections = FirebaseFirestore.instance
+        var collections = db
             .collection('users')
             .doc(users.docs[i].id)
             .collection('visiters')
@@ -798,7 +837,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
 
         bool isEmpty = await collections.isEmpty;
 
-        var snapshot = await FirebaseFirestore.instance
+        var snapshot = await db
             .collection('users')
             .doc(users.docs[i].id)
             .collection('visiters')
@@ -806,7 +845,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
             .get();
 
         if (!isEmpty && snapshot.docs.isNotEmpty) {
-          FirebaseFirestore.instance
+          db
               .collection('users')
               .doc(users.docs[i].id)
               .collection('visiters')

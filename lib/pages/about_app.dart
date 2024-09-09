@@ -31,7 +31,7 @@ class About_App extends StatelessWidget {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               iconTheme: const IconThemeData(color: Colors.white),
-              titleTextStyle: TextStyle(color: Colors.white, fontSize: 22),
+              titleTextStyle: const TextStyle(color: Colors.white, fontSize: 22),
               title: const Text("О приложении"),
               backgroundColor: Colors.transparent,
             ),
@@ -48,7 +48,7 @@ class About_App extends StatelessWidget {
                     },
                     style: const ButtonStyle(
                         backgroundColor:
-                            MaterialStatePropertyAll(Colors.transparent)),
+                            WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
                       'Политика конфиденциальности',
                       style: TextStyle(fontSize: 18),
@@ -63,7 +63,7 @@ class About_App extends StatelessWidget {
                       onPressed: () {},
                       style: const ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.transparent)),
+                              WidgetStatePropertyAll(Colors.transparent)),
                       child: const Text(
                         'Пользовательское соглашение',
                         style: TextStyle(fontSize: 18),
@@ -75,9 +75,9 @@ class About_App extends StatelessWidget {
                   ),
                   Container(
                     padding: const EdgeInsets.all(15),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
                         Text(
                           'Версия приложения',
                           style: TextStyle(fontSize: 18, color: Colors.white),

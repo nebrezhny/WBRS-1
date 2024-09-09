@@ -1,13 +1,8 @@
-// ignore_for_file: must_be_immutable
-
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:wbrs/widgets/widgets.dart';
-
 class SplashScreen extends StatefulWidget {
-  SplashScreen({super.key});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();

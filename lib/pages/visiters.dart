@@ -1,9 +1,6 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/somebody_profile.dart';
 import 'package:wbrs/widgets/drawer.dart';
@@ -12,8 +9,8 @@ import 'package:wbrs/widgets/widgets.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class MyVisitersPage extends StatefulWidget {
-  Stream? visiters;
-  MyVisitersPage({Key? key, required this.visiters}) : super(key: key);
+  final Stream? visiters;
+  const MyVisitersPage({super.key, required this.visiters});
 
   @override
   State<MyVisitersPage> createState() => _MyVisitersPageState();
@@ -26,7 +23,8 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
   @override
   Widget build(BuildContext context) {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
-      print(snapshot.data!.docs[index]['group']);
+
+      Timestamp time = snapshot.data!.docs[index]['lastVisitTs'];
       return Card(
         color: Colors.white.withOpacity(0.25),
         child: ListTile(
@@ -46,48 +44,46 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                   userInfo: doc,
                 ));
           },
-          title: Text(
-            snapshot.data!.docs[index]['fullName'],
-            style: const TextStyle(color: Colors.white),
+          leading: SizedBox(
+            width: 50,
+            child: userImageWithCircle(
+                (snapshot.data!.docs[index]['photoUrl'] == "" ||
+                    snapshot.data!.docs[index]['photoUrl'] == null)
+                    ? "assets/profile.png"
+                    : snapshot.data!.docs[index]['photoUrl'].toString(),
+                snapshot.data!.docs[index]['group'], 50.0, 50.0),
           ),
-          subtitle: Row(
+          title: Row(
             children: [
-              SizedBox(
-                width: 50,
-                child: userImageWithCircle(
-                    (snapshot.data!.docs[index]['photoUrl'] == "" ||
-                        snapshot.data!.docs[index]['photoUrl'] == null)
-                        ? "assets/profile.png"
-                        : snapshot.data!.docs[index]['photoUrl'].toString(),
-                    snapshot.data!.docs[index]['group']),
+              Text(
+                snapshot.data!.docs[index]['fullName'],
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(
+                width: 10,
               ),
               int.parse(snapshot.data!.docs[index]['age'].toString()) % 10 == 0
                   ? Text('${snapshot.data!.docs[index]['age'].toString()} лет',
                 style: const TextStyle(color: Colors.white),)
                   : int.parse(snapshot.data!.docs[index]['age'].toString()) %
-                              10 ==
-                          1
-                      ? Text(
-                          '${snapshot.data!.docs[index]['age'].toString()} год',
+                  10 ==
+                  1
+                  ? Text(
+                '${snapshot.data!.docs[index]['age'].toString()} год',
                 style: const TextStyle(color: Colors.white),)
-                      : int.parse(snapshot.data!.docs[index]['age']
-                                      .toString()) %
-                                  10 !=
-                              5
-                          ? Text('${snapshot.data!.docs[index]['age']} года',
+                  : int.parse(snapshot.data!.docs[index]['age']
+                  .toString()) %
+                  10 !=
+                  5
+                  ? Text('${snapshot.data!.docs[index]['age']} года',
                 style: const TextStyle(color: Colors.white),)
-                          : Text('${snapshot.data!.docs[index]['age']} лет',
+                  : Text('${snapshot.data!.docs[index]['age']} лет',
                 style: const TextStyle(color: Colors.white),),
-              const SizedBox(
-                width: 20,
-              ),
-              Flexible(
-                child: Text(
-                    "Последнее посещение:${snapshot.data!.docs[index]['lastVisitTs'].toDate()}",
-                  style: const TextStyle(color: Colors.white),),
-              )
             ],
           ),
+          subtitle: Text(
+              "Последнее посещение: \n${time.toDate().toString().substring(0, 16)}",
+            style: const TextStyle(color: Colors.white),),
           dense: false,
         ),
       );

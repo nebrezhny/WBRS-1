@@ -63,13 +63,12 @@ class _ProfilesListState extends State<ProfilesList> {
 
   //int age = int.parse(GlobalAge.toString());
 
-  var collection = FirebaseFirestore.instance
-      .collection('users')
+  var collection = FirebaseFirestore.instance.collection('users')
       // .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
       // .orderBy('uid')
-  // .orderBy('age')
-  // .startAt([int.parse(GlobalAge.toString()) - 10])
-  // .endAt([int.parse(GlobalAge.toString()) + 10])
+      // .orderBy('age')
+      // .startAt([int.parse(GlobalAge.toString()) - 10])
+      // .endAt([int.parse(GlobalAge.toString()) + 10])
       ;
 
   String? pol;
@@ -84,146 +83,160 @@ class _ProfilesListState extends State<ProfilesList> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-      Image.asset(
-      "assets/fon.jpg",
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
-      fit: BoxFit.cover,
-    ),
-    Scaffold(
-    bottomNavigationBar: const MyBottomNavigationBar(),
-    backgroundColor: Colors.transparent,
-    appBar: AppBar(
-    iconTheme: const IconThemeData(color: Colors.white),
-    actions: [
-    Builder(builder: (context) {
-    return IconButton(
-    icon: const Icon(Icons.filter_alt_rounded),
-    onPressed: () {
-    Navigator.of(context)
-        .push(createRoute(() => const FilterPage()));
-    },
-    );
-    }),
-    ],
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    title: const Text(
-    "Пользователи",
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 27,
-    fontWeight: FontWeight.bold),
-    ),
-    ),
-    drawer: const MyDrawer(),
-    body: SingleChildScrollView(
-    child: checkGroup ? usersList() : usersList(),
-    )
-    ,
-    )]
-    ,
+        Image.asset(
+          "assets/fon.jpg",
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          fit: BoxFit.cover,
+        ),
+        Scaffold(
+          resizeToAvoidBottomInset: true,
+          bottomNavigationBar: const MyBottomNavigationBar(),
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
+            actions: [
+              Builder(builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.filter_alt_rounded),
+                  onPressed: () {
+                  },
+                );
+              }),
+            ],
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              "Пользователи",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          drawer: const MyDrawer(),
+          body: SingleChildScrollView(
+            child: checkGroup ? usersList() : usersList(),
+          ),
+        )
+      ],
     );
   }
 
   Widget usersList() {
     var filtered_col;
-    print(Group);
     switch (Group) {
       case "коричнево-красная" ||
-      "коричнево-синяя" ||
-      "коричнево-белая":
-        filtered_col = collection.
-        where("группа",
-            whereIn: [
-              "коричнево-красная",
-              "коричнево-синяя",
-              "коричнево-белая",
-              "бело-коричневая",
-              "бело-красная",
-              "бело-синяя",
-              "сине-белая"
-            ]);
+            "коричнево-синяя" ||
+            "коричневая" ||
+            "коричнево-белая":
+        filtered_col = collection.where("группа", whereIn: [
+          "коричнево-красная",
+          "коричнево-синяя",
+          "коричневая",
+          "коричнево-белая",
+          "бело-коричневая",
+          "бело-красная",
+          "бело-синяя",
+          "белая",
+          "сине-белая"
+        ]);
         break;
 
-      case
-      "красно-коричневая" ||
-      "красно-синяя" ||
-      "красно-белая":
-        filtered_col = collection.
-        where("группа",
-            whereIn: [
-              "сине-красная",
-              "сине-коричневая",
-              "сине-белая",
-            ]
-        );
-      break;
-
-      case
-      "бело-коричневая" ||
-      "бело-синяя" ||
-      "бело-красная":
-        filtered_col = collection.
-        where("группа",
-            whereIn: [
-              "коричнево-красная",
-              "коричнево-синяя",
-              "коричнево-белая",
-              "сине-белая",
-            ]
-        );
-      break;
-
-      case
-      "сине-коричневая" ||
-      "сине-красная":
-        filtered_col = collection.
-        where("группа",
-            whereIn: [
-              "сине-красная",
-              "красно-синяя",
-              "красно-белая",
-            ]
-        );
+      case "красно-синяя" || "красно-белая" || "красная":
+        filtered_col = collection.where("группа", whereIn: [
+          "синяя",
+          "сине-коричневая",
+        ]);
         break;
 
-      case
-      "сине-белая":
-        filtered_col = collection.
-        where("группа",
-            whereIn: [
-              "коричнево-красная",
-              "коричнево-синяя",
-              "коричнево-белая",
-              "сине-красная",
-              "красно-синяя",
-              "красно-белая",
-              "красно-коричневая",
-            ]
-        );
+      case "красно-коричневая":
+        filtered_col = collection.where("группа", whereIn: [
+          "коричнево-белая",
+          "сине-белая",
+          "бело-коричневая",
+          "бело-красная",
+          "бело-синяя",
+          "белая",
+        ]);
+        break;
+
+      case "коричнево-белая":
+        filtered_col = collection.where("группа", whereIn: [
+          "коричнево-красная",
+          "коричнево-синяя",
+          "коричневая",
+          "коричнево-белая",
+          "бело-коричневая",
+          "бело-красная",
+          "бело-синяя",
+          "белая",
+          "сине-белая",
+          "красно-коричневая",
+        ]);
+        break;
+
+      case "синяя" || "сине-коричневая":
+        filtered_col = collection.where("группа", whereIn: [
+          "красная",
+          "красно-белая",
+          "сине-красная",
+          "красно-синяя",
+        ]);
+        break;
+
+      case "сине-белая":
+        filtered_col = collection.where("группа", whereIn: [
+          "коричнево-красная",
+          "коричнево-синяя",
+          "коричневая",
+          "коричнево-белая",
+          "бело-коричневая",
+          "бело-красная",
+          "бело-синяя",
+          "белая",
+          "красно-коричневая",
+        ]);
+        break;
+
+      case "сине-красная":
+        filtered_col = collection.where("группа", whereIn: [
+          "синяя",
+          "сине-коричневая",
+        ]);
+        break;
+
+      case "бело-красная" || "бело-синяя" || "белая" || "бело-коричневая":
+        filtered_col = collection.where("группа", whereIn: [
+          "коричнево-красная",
+          "коричнево-синяя",
+          "коричневая",
+          "коричнево-белая",
+          "сине-белая",
+          "красно-коричневая",
+        ]);
         break;
 
       default:
+        filtered_col = collection;
         break;
     }
-    return StreamBuilder<QuerySnapshot>(
-        stream: filtered_col
-            .orderBy('uid')
-            .snapshots() //.takeWhile((element) => element.docs[0]["age"]>=20)
 
-        ,
-        builder: (BuildContext context,
-            AsyncSnapshot<QuerySnapshot> snapshot) {
+    var stream = filterByGroup
+        ? filtered_col
+            .where('uid', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .orderBy('uid')
+            .snapshots()
+        : collection
+            .where('uid', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .orderBy('uid')
+            .snapshots();
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: stream, //.takeWhile((element) => element.docs[0]["age"]>=20)
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-                child: Text("Пользователи не найдены"));
+            return const Center(child: Text("Пользователи не найдены"));
           }
           return createTable(snapshot);
           // return Table(
@@ -243,8 +256,8 @@ class _ProfilesListState extends State<ProfilesList> {
     List users = [];
 
     for (int i = 0; i < snapshot.data!.docs.length; i++) {
-      if (snapshot.data!.docs[i]['age'] >= currentValues.start.round() &&
-          snapshot.data!.docs[i]['age'] <= currentValues.end.round()) {
+      if (snapshot.data!.docs[i]['age'] >= ageStart &&
+          snapshot.data!.docs[i]['age'] <= ageEnd) {
         if (FiltrPol != '') {
           if (snapshot.data!.docs[i]['pol'].toString().toLowerCase() ==
               FiltrPol) {
@@ -268,67 +281,67 @@ class _ProfilesListState extends State<ProfilesList> {
       }
     }
 
-    return GridView.builder(
-      gridDelegate:
-      const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      itemCount: users.length,
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      itemBuilder: (BuildContext context, int index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
-          child: GestureDetector(
-            onTap: () async {
-              DocumentSnapshot doc = await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(users[index].id)
-                  .get();
-              Images = doc.get('images');
-              CountImages = Images.length;
+    return Column(
+      children: [
+        const FilterPage2(),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: GridView.builder(
+            gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+            itemCount: users.length,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: GestureDetector(
+                  onTap: () async {
+                    DatabaseService().getUserByUserName(
+                        snapshot.data!.docs[index].get("fullName"));
 
-              DatabaseService().getUserByUserName(
-                  snapshot.data!.docs[index].get("fullName"));
-
-              setState(() {
-                somebodyUid = users[index].get("uid");
-                somebodyFullname = users[index].get("fullName");
-                somebodyImageUrl = users[index].get("profilePic");
-              });
-              // ignore: use_build_context_synchronously
-              nextScreen(
-                  context,
-                  SomebodyProfile(
-                    uid: somebodyUid.toString(),
-                    name: somebodyFullname.toString(),
-                    photoUrl: somebodyImageUrl.toString(),
-                    userInfo: await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(users[index].get('uid'))
-                        .get(),
-                  ));
-            },
-            child: SizedBox(
-              height: 150,
-              child: Column(children: [
-                userImageWithCircle(
-                  users[index]["profilePic"],
-                  users[index]["группа"],
+                    setState(() {
+                      somebodyUid = users[index].get("uid");
+                      somebodyFullname = users[index].get("fullName");
+                      somebodyImageUrl = users[index].get("profilePic");
+                    });
+                    nextScreen(
+                        context,
+                        SomebodyProfile(
+                          uid: somebodyUid.toString(),
+                          name: somebodyFullname.toString(),
+                          photoUrl: somebodyImageUrl.toString(),
+                          userInfo: await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(users[index].get('uid'))
+                              .get(),
+                        ));
+                  },
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    child: Column(children: [
+                      userImageWithCircle(
+                        users[index]["profilePic"],
+                        users[index]["группа"] ?? '',
+                          MediaQuery.of(context).size.height * 0.1,MediaQuery.of(context).size.height * 0.1
+                      ),
+                      Container(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            "${users[index]["fullName"]}, ${users[index]["age"]},\n ${users[index]["city"]}",
+                            style: const TextStyle(color: Colors.white),
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.visible,
+                          )),
+                    ]),
+                  ),
                 ),
-                Container(
-                    color: Colors.black38,
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Text(
-                      "${users[index]["fullName"]}, ${users[index]["age"]}",
-                      style: const TextStyle(color: Colors.white),
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.visible,
-                    )),
-              ]),
-            ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

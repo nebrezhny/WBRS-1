@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/profiles_list.dart';
@@ -28,7 +28,7 @@ class _FilterPageState extends State<FilterPage> {
 }
 
 class FilterPage2 extends StatefulWidget {
-  const FilterPage2({Key? key}) : super(key: key);
+  const FilterPage2({super.key});
 
   @override
   State<FilterPage2> createState() => _FilterPage2State();
@@ -36,76 +36,125 @@ class FilterPage2 extends StatefulWidget {
 
 class _FilterPage2State extends State<FilterPage2> {
   String pol = "";
-  RangeValues localValues = currentValues;
   String city = filtrCity.text;
+  TextEditingController filtrAgeStart = TextEditingController();
+  TextEditingController filtrAgeEnd = TextEditingController();
 
-  static const List<String> _kOptions = <String>[
-    'Чебоксары',
-    'Bobcat',
-    'Chameleon',
-    'Moscow'
-  ];
+  @override
+  void initState() {
+    super.initState();
+    filtrAgeStart.text = ageStart.toString();
+    filtrAgeEnd.text = ageEnd.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-        height: 500,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        constraints: const BoxConstraints(maxHeight: 400, minHeight: 20),
-        child: Column(
-          children: [
-            GestureDetector(
+    return Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+      height: MediaQuery.of(context).size.height*0.3,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                filterByGroup = !filterByGroup;
+              });
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width - 20,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(filterByGroup ? Icons.check_box_outlined : Icons.check_box_outline_blank, color: Colors.white,),
+                  const SizedBox(width: 10),
+                  const Text("Фильтр по группам", style: TextStyle(color: Colors.white)),
+                  const Spacer(),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width - 20,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Icon(CupertinoIcons.person),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text("Пол:", style: TextStyle(color: Colors.white)),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          FiltrPol = "м";
+                          nextScreenReplace(context, ProfilesList(group: Group));
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Text('M', style: TextStyle(color: FiltrPol == "м" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          FiltrPol = "ж";
+                          nextScreenReplace(context, ProfilesList(group: Group));
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Text('Ж', style: TextStyle(color: FiltrPol == "ж" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          FiltrPol = "";
+                          nextScreenReplace(context, ProfilesList(group: Group));
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Text('Все', style: TextStyle(color: FiltrPol == "" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          StatefulBuilder(builder: (context, state) {
+            return GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Scaffold(
-                        backgroundColor: Colors.transparent,
-                        appBar: AppBar(
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                        body: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                child: const Row(
-                                  children: [Text("Мужчины"), Icon(Icons.man)],
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    pol = "м";
-                                    FiltrPol = "м";
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              GestureDetector(
-                                child: const Row(
-                                  children: [
-                                    Text("Женщины"),
-                                    Icon(Icons.woman)
-                                  ],
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    pol = "ж";
-                                    FiltrPol = "ж";
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    });
               },
               child: Container(
                 width: MediaQuery.of(context).size.width - 20,
@@ -115,183 +164,133 @@ class _FilterPage2State extends State<FilterPage2> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Icon(CupertinoIcons.person),
+                        const Icon(CupertinoIcons.calendar),
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text("Пол:"),
+                        const Text("Возраст", style: TextStyle(color: Colors.white)),
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(FiltrPol == ""
-                            ? "Не выбрано"
-                            : FiltrPol == "м"
-                                ? "Мужчины"
-                                : "Женщины")
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'от ${filtrAgeStart.text} ',
+                              style: const TextStyle(fontSize: 13, color: Colors.white),
+                            ),
+                            Text(
+                              'до ${filtrAgeEnd.text}',
+                              style: const TextStyle(fontSize: 13, color: Colors.white),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          width: 150,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              SizedBox(
+                                width: 50,
+                                height: 30,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(color: Colors.white)),
+                                    filled: true,
+                                    fillColor: Colors.white24,
+                                  ),
+                                  controller: filtrAgeStart,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              const Text("-", style: TextStyle(color: Colors.white)),
+                              SizedBox(
+                                width: 50,
+                                height: 30,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(color: Colors.white)),
+                                    filled: true,
+                                    fillColor: Colors.white24,
+                                  ),
+                                  controller: filtrAgeEnd,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          )
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            StatefulBuilder(builder: (context, state) {
-              localValues = currentValues;
-              return GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return
-                            //
-                            StatefulBuilder(builder:
-                                (BuildContext context, StateSetter setState) {
-                          return Scaffold(
-                            backgroundColor: Colors.transparent,
-                            appBar: AppBar(
-                              backgroundColor: Colors.orangeAccent,
-                            ),
-                            body: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'от ${currentValues.start.round()} ',
-                                        style: const TextStyle(fontSize: 22),
-                                      ),
-                                      Text(
-                                        'до ${currentValues.end.round()}',
-                                        style: const TextStyle(fontSize: 22),
-                                      )
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      RangeSlider(
-                                          values: localValues,
-                                          min: 18,
-                                          max: 100,
-                                          divisions: 100,
-                                          activeColor: Colors.orange,
-                                          labels: RangeLabels(
-                                              localValues.start
-                                                  .round()
-                                                  .toString(),
-                                              localValues.end
-                                                  .round()
-                                                  .toString()),
-                                          onChanged: (RangeValues values) {
-                                            setState(() {
-                                              currentValues = values;
-                                              localValues = values;
-                                            });
-                                          }),
-                                      TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              localValues = currentValues;
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Сохранить"))
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        });
-                      });
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 20,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(CupertinoIcons.calendar),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text("Возраст"),
-                          SizedBox(
-                            width: 10,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(
-              height: 15,
-            ),
-            GestureDetector(
-              onTap: () {
-                Scaffold.of(context).showBottomSheet((BuildContext context) {
-                  return Scaffold(
-                      body: Column(
-                    children: [
-                      TextField(
+            );
+          }),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width - 20,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Icon(CupertinoIcons.map),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text("Город:", style: TextStyle(color: Colors.white)),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: TextField(
                         controller: filtrCity,
+                        style: const TextStyle(color: Colors.white),
                         onChanged: (value) {
                           setState(() {
-                            city = value;
+                            city = value.split(RegExp(r"(?! )\s{2,}")).join(' ').split(RegExp(r"\s+$")).join('');
                           });
                         },
                       ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('Сохранить'))
-                    ],
-                  ));
-                });
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width - 20,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Icon(CupertinoIcons.map),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Text("Город:"),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(city)
-                      ],
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-            TextButton(
-                onPressed: () async {
+          ),
+          TextButton(
+              onPressed: () async {
+                var x = await getUserGroup();
+                setState(() {
                   filtrCity.text = city;
-                  FiltrPol = pol;
-                  currentValues = localValues;
-                  var x = await getUserGroup();
-                  nextScreen(context, ProfilesList(group: x));
-                },
-                child: Text('Сохранить'))
-          ],
-        ),
+                  ageStart = int.parse(filtrAgeStart.text);
+                  ageEnd = int.parse(filtrAgeEnd.text);
+                  nextScreenReplace(context, ProfilesList(group: x));
+                });
+              },
+              child: const Text('Применить фильтры', style: TextStyle(color: Colors.white)))
+        ],
       ),
     );
   }

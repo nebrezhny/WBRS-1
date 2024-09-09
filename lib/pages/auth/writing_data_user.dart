@@ -13,7 +13,7 @@ import '../../helper/helper_function.dart';
 import '../test/red_group.dart';
 
 class AboutUserWriting extends StatefulWidget {
-  const AboutUserWriting({Key? key}) : super(key: key);
+  const AboutUserWriting({super.key});
 
   @override
   State<AboutUserWriting> createState() => _AboutUserWritingState();
@@ -95,7 +95,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                   child: IconButton(
                                       style: const ButtonStyle(
                                           backgroundColor:
-                                              MaterialStatePropertyAll(
+                                              WidgetStatePropertyAll(
                                                   Colors.white)),
                                       onPressed: () {},
                                       icon: const Icon(
@@ -449,7 +449,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                               });
                             },
                             checkColor: Colors.deepOrangeAccent,
-                            fillColor: const MaterialStatePropertyAll(
+                            fillColor: const WidgetStatePropertyAll(
                                 Color.fromARGB(255, 209, 204, 204)),
                           ),
                         ],
@@ -460,7 +460,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                   ),
                   ElevatedButton(
                       style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
+                          backgroundColor: WidgetStatePropertyAll(
                               Colors.deepOrangeAccent)),
                       onPressed: () {
                         if (city.text.isEmpty) {
@@ -504,8 +504,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           try {
                             displayName = currentUser.displayName;
                             email = currentUser.email;
-                          } on Exception catch (e) {
-                            print(e);
+                          } on Exception catch (_) {
                           }
                         } else {
                           displayName = "Error";

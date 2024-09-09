@@ -7,7 +7,6 @@ import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/about_app.dart';
 import 'package:wbrs/pages/admin_panel.dart';
-import 'package:wbrs/pages/auth/writing_data_user.dart';
 import 'package:wbrs/pages/home_page.dart';
 import 'package:wbrs/pages/meetings.dart';
 import 'package:wbrs/pages/shop.dart';
@@ -322,7 +321,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () {
                     nextScreenReplace(context, const ShopPage());
                   },
-                  title: const Text("Магазин",
+                  title: const Text("Дарить подарки",
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.shopping_basket,

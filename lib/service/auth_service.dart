@@ -1,16 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wbrs/widgets/widgets.dart';
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   // login
-  Future loginWithUserNameandPassword(String email, String password) async {
+  Future loginWithUserNameAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await firebaseAuth
+      UserCredential user = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
       return true;
     } on FirebaseAuthException catch (e) {
@@ -25,10 +22,10 @@ class AuthService {
   }
 
   // register
-  Future registerUserWithEmailandPassword(
+  Future registerUserWithEmailAndPassword(
       String fullName, String email, String password) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
+      await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       return true;
     } on FirebaseAuthException catch (e) {

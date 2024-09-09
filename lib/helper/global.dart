@@ -13,6 +13,7 @@ String? somebodyUid,
     GlobalCity,
     GlobalRost,
     GlobalHobbi;
+int GlobalBalance = 0;
 // ignore: non_constant_identifier_names
 bool GlobalDeti = false;
 
@@ -28,9 +29,10 @@ List Images = [];
 int selectedIndex = 1;
 
 //Filter data
-String FiltrPol = "";
-RangeValues currentValues = const RangeValues(18, 100);
+String                FiltrPol = "";
+int                   ageStart = 18, ageEnd = 100;
 TextEditingController filtrCity = TextEditingController();
+bool                  filterByGroup = false;
 
 late List user_info;
 

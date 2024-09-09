@@ -27,16 +27,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     super.initState();
     currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser != null) {
-      String email = currentUser.email;
-      String userName = currentUser.displayName;
-    }
   }
 
-  var currentUser;
+  User? currentUser;
 
-  var email;
-  var userName;
+  String? email;
+  String? userName;
   void _onItemTapped(int index) async {
     setState(() {
       selectedIndex = index;
@@ -138,7 +134,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 group: x,
               ));
         }
-
         break;
       case 3:
         nextScreen(context, const MeetingPage());

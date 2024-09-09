@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class Politica extends StatefulWidget {
   const Politica({super.key});
@@ -9,7 +8,6 @@ class Politica extends StatefulWidget {
 }
 
 class _PoliticaState extends State<Politica> {
-  final WebViewController controller = WebViewController();
 
   @override
   void initState() {

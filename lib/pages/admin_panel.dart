@@ -32,7 +32,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
           body: SingleChildScrollView(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column(
+              child: const Column(
                 children: [
 
                 ]

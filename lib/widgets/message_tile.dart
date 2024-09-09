@@ -1,8 +1,15 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:random_string/random_string.dart';
+import 'package:wbrs/pages/auth/somebody_profile.dart';
+import 'package:wbrs/pages/shop.dart';
+import 'package:wbrs/service/database_service.dart';
+import 'package:wbrs/widgets/widgets.dart';
 
 class MessageTile extends StatefulWidget {
   final DocumentSnapshot message;
@@ -11,17 +18,17 @@ class MessageTile extends StatefulWidget {
   final String name;
   final bool sentByMe;
   final bool isRead;
-
+  final Widget? avatar;
+  final bool isChat;
 
   const MessageTile(
-      {Key? key,
+      {super.key,
       required this.message,
       required this.chatId,
       required this.sender,
       required this.sentByMe,
       required this.isRead,
-      required this.name})
-      : super(key: key);
+      required this.name, this.avatar, required this.isChat});
 
   @override
   State<MessageTile> createState() => _MessageTileState();
@@ -29,50 +36,72 @@ class MessageTile extends StatefulWidget {
 
 class _MessageTileState extends State<MessageTile> {
 
-  var _tapPosition;
+  Offset? _tapPosition;
+  bool isMessage = true, isReply = false, isTs = false, isGroup = false;
+  Timestamp time = Timestamp.fromDate(DateTime.now());
+  Map msg = {};
 
   @override
   void initState() {
     super.initState();
-    _tapPosition = Offset(0.0, 0.0);
+    _tapPosition = const Offset(0.0, 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final DocumentReference _firestore = FirebaseFirestore.instance.collection(
+    msg = widget.message.data() as Map<String, dynamic>;
+    setState(() {
+      isMessage = msg.containsKey('message');
+      isReply = msg.containsKey('replyMessage');
+      isGroup = !widget.isChat;
+      isTs = msg.containsKey('ts');
+      time = isTs ? widget.message['ts'] : widget.message['time'];
+    });
+    final DocumentReference firestore = FirebaseFirestore.instance.collection(
         'chats').doc(widget.chatId);
     Size size = MediaQuery
         .of(context)
         .size;
 
-    void _storePosition(TapDownDetails details) {
+    void storePosition(TapDownDetails details) {
       _tapPosition = details.globalPosition;
     }
 
-    final TextEditingController _replyController = TextEditingController();
-    String _selectedMessageId = '';
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final TextEditingController replyController = TextEditingController();
+    String selectedMessageId = '';
+    final FirebaseAuth auth = FirebaseAuth.instance;
 
-    Future<void> _sendMessage(String message) async {
-      final user = _auth.currentUser;
+
+    Future<void> sendMessage(String message, Map replyMsg) async {
+      final user = auth.currentUser;
       if (user != null) {
-        final messageRef = _firestore.collection('messages').doc();
-        await messageRef.set({
+        final messageRef = {
           'message': message,
-          'timestamp': FieldValue.serverTimestamp(),
-          'userId': user.uid,
-          'replyToMessageId':
-          _selectedMessageId.isNotEmpty ? _selectedMessageId : null,
-        });
-        _selectedMessageId = '';
+          'sender': user.uid,
+          'avatar': user.photoURL,
+          'name': user.displayName,
+          'replyMessage': replyMsg,
+          'sendByID': user.uid,
+          'isRead': true,
+          'sendBy': user.displayName,
+        };
+        if(!isGroup){
+          messageRef.addAll({'ts': FieldValue.serverTimestamp()});
+          DatabaseService().addMessage(widget.chatId, randomNumeric(12), messageRef);
+        }else{
+          messageRef.addAll({'time': FieldValue.serverTimestamp()});
+          DatabaseService().sendMessageGroup(widget.chatId, messageRef);
+        }
+
+        selectedMessageId = '';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Сообщение отправлено.'),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
                 'Вы должны авторизоваться, чтобы отправить сообщение'),
           ),
@@ -80,64 +109,73 @@ class _MessageTileState extends State<MessageTile> {
       }
     }
 
-    Future<void> _deleteMessage(String messageId) async {
-      final user = _auth.currentUser;
+    Future<void> deleteMessage(String messageId) async {
+      final user = auth.currentUser;
       if (user != null) {
         final messageSnapshot =
-        await _firestore.collection('chats').doc(widget.message.id).get();
+        await firestore.collection('chats').doc(widget.message.id).get();
         if (messageSnapshot.exists &&
             messageSnapshot.data()!['sendByID'] == user.uid) {
-          await _firestore.collection('chats').doc(widget.message.id).update({
+          await firestore.collection('chats').doc(widget.message.id).update({
             'deleteFor':FirebaseAuth.instance.currentUser!.uid
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Сообщение удалено.'),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Вы можете удалять только свои сообщения.'),
             ),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Чтобы удалить сообщение, необходимо войти.'),
           ),
         );
       }
     }
 
-    Future<void> _replyToMessage(String messageId) async {
+    Future<void> replyToMessage(Map message) async {
       setState(() {
-        _selectedMessageId = widget.message.id;
+        selectedMessageId = widget.message.id;
       });
-      _replyController.clear();
+      replyController.clear();
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Написать ответ'),
-            content: TextField(
-              controller: _replyController,
-              decoration: InputDecoration(
-                labelText: 'Напишите свой ответ',
+            backgroundColor: Colors.grey.shade700.withOpacity(0.7),
+            title: const Text('Написать ответ'),
+            titleTextStyle: const TextStyle(color: Colors.white),
+            content: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: TextField(
+                controller: replyController,
+                minLines: 1,
+                maxLines: 5,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Напишите свой ответ',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Отмена'),
+                child: const Text('Отмена',style: TextStyle(color: Colors.white),),
               ),
               TextButton(
                 onPressed: () {
-                  _sendMessage(_replyController.text);
+                  sendMessage(replyController.text, message);
                   Navigator.pop(context);
                 },
-                child: Text('Ответить'),
+                child: const Text('Ответить',style: TextStyle(color: Colors.white),),
               ),
             ],
           );
@@ -145,11 +183,11 @@ class _MessageTileState extends State<MessageTile> {
       );
     }
 
-    Future<void> _editMessage(String messageId) async {
-      final user = _auth.currentUser;
+    Future<void> editMessage(String messageId) async {
+      final user = auth.currentUser;
       if (user != null) {
         final messageSnapshot =
-        await _firestore.collection('chats').doc(widget.message.id).get();
+        await firestore.collection('chats').doc(widget.message.id).get();
         if (messageSnapshot.exists &&
             messageSnapshot.data()!['sendByID'] == user.uid) {
           final messageText = messageSnapshot.data()!['message'];
@@ -158,21 +196,21 @@ class _MessageTileState extends State<MessageTile> {
             builder: (BuildContext context) {
               final controller = TextEditingController(text: messageText);
               return AlertDialog(
-                title: Text('Редактировать сообщение'),
+                title: const Text('Редактировать сообщение'),
                 content: TextField(
                   controller: controller,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Редактировать сообщение',
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text('Отмена'),
+                    child: const Text('Отмена'),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, controller.text),
-                    child: Text('Сохранить'),
+                    child: const Text('Сохранить'),
                   ),
                 ],
               );
@@ -180,68 +218,69 @@ class _MessageTileState extends State<MessageTile> {
           );
 
           if (newMessageText != null && newMessageText != messageText) {
-            await _firestore.collection('chats').doc(widget.message.id).update({
+            await firestore.collection('chats').doc(widget.message.id).update({
               'message': newMessageText,
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Сообщение успешно отредактировано'),
               ),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Вы можете редактировать только свои сообщения.'),
             ),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Чтобы отредактировать сообщение, необходимо войти'),
           ),
         );
       }
     }
 
-    Future<void> _copyMessage(String message) async {
+    Future<void> copyMessage(String message) async {
       await Clipboard.setData(ClipboardData(text: message));
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Сообщение скопировано в буфер обмена.'),
         ),
       );
     }
 
-    Future<void> _deleteMessageForEveryone(String messageId) async {
-      final user = _auth.currentUser;
+    Future<void> deleteMessageForEveryone(String messageId) async {
+      final user = auth.currentUser;
       if (user != null) {
         final messageSnapshot =
-        await _firestore.collection('chats').doc(widget.message.id).get();
+        await firestore.collection('chats').doc(widget.message.id).get();
         if (messageSnapshot.exists &&
             messageSnapshot.data()!['sendByID'] == user.uid) {
           final sentTime = messageSnapshot.data()!['ts'].toDate();
           final timeSinceMessageSent = DateTime.now().difference(sentTime);
-          final int timeLimit = 10; // В минутах
-          if (timeSinceMessageSent.inMinutes <= timeLimit) {
-            await _firestore.collection('chats').doc(widget.message.id).delete();
+          print(timeSinceMessageSent.inDays);
+          const int timeLimit = 2; // В минутах
+          if (timeSinceMessageSent.inDays <= timeLimit) {
+            await firestore.collection('chats').doc(widget.message.id).delete();
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Сообщение удалено для всех.'),
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text(
-                    'Удалить сообщение для всех можно только в течение 10 минут после его отправки..'),
+                    'Удалить сообщение для всех можно только в течение 2 дней после его отправки..'),
               ),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text(
                   'Вы можете удалять только свои собственные сообщения для всех.'),
             ),
@@ -249,7 +288,7 @@ class _MessageTileState extends State<MessageTile> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
                 'Вы должны быть авторизованы, чтобы удалить сообщение для всех.'),
           ),
@@ -257,7 +296,7 @@ class _MessageTileState extends State<MessageTile> {
       }
     }
 
-    _showPopupMenu() async {
+    showPopupMenu() async {
       final RenderObject? overlay = Overlay
           .of(context)
           .context
@@ -266,136 +305,235 @@ class _MessageTileState extends State<MessageTile> {
       await showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            _tapPosition & Size(40, 40), // smaller rect, the touch area
+            _tapPosition! & const Size(40, 40), // smaller rect, the touch area
             Offset.zero & overlay!.semanticBounds
                 .size // Bigger rect, the entire screen
         ),
-        items: [
-
+        items:
+            isMessage
+        ?[
           PopupMenuItem<String>(
             value: 'reply',
             onTap: () {
-              _replyToMessage(widget.message.id);
+              replyToMessage(widget.message.data() as Map<String, dynamic>);
             },
-            child: Text('Ответить'),
+            child: const Text('Ответить'),
           ),
           PopupMenuItem<String>(
             value: 'edit',
             onTap: () {
-              _editMessage(widget.message.id);
+              editMessage(widget.message.id);
             },
-            child: Text('Редактировать'),
+            child: const Text('Редактировать'),
           ),
           PopupMenuItem<String>(
             value: 'copy',
             onTap: () {
-              _copyMessage(widget.message['message']);
+              copyMessage(widget.message['message']);
             },
-            child: Text('Копировать'),
+            child: const Text('Копировать'),
           ),
           PopupMenuItem<String>(
             value: 'delete_me',
             onTap: () {
-              _deleteMessage(widget.message.id);
+              deleteMessage(widget.message.id);
             },
-            child: Text('Удалить у меня'),
+            child: const Text('Удалить у меня'),
           ),
           PopupMenuItem<String>(
             value: 'delete_everyone',
             onTap: () {
-              _deleteMessageForEveryone(widget.message.id);
+              deleteMessageForEveryone(widget.message.id);
             },
-            child: Text('Удалить для всех'),
+            child: const Text('Удалить для всех'),
           ),
 
-        ],
+        ]
+        :[
+              PopupMenuItem<String>(
+                value: 'delete_me',
+                onTap: () {
+                  deleteMessage(widget.message.id);
+                },
+                child: const Text('Удалить у меня'),
+              ),
+              PopupMenuItem<String>(
+                value: 'delete_everyone',
+                onTap: () {
+                  deleteMessageForEveryone(widget.message.id);
+                },
+                child: const Text('Удалить для всех'),
+              ),
+            ],
         elevation: 8.0,
       );
     }
 
     return GestureDetector(
-      onTapDown: _storePosition,
+      onTapDown: storePosition,
       onLongPress: () {
-        _showPopupMenu();
+        showPopupMenu();
       },
       child: Container(
         padding: EdgeInsets.only(
             top: 4,
             bottom: 4,
-            left: widget.sentByMe ? 0 : 24,
+            left: widget.sentByMe ? 0 : 15,
             right: widget.sentByMe ? 24 : 0),
         alignment:
         widget.sentByMe ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          constraints: BoxConstraints(maxWidth: size.width * 0.7),
-          margin: widget.sentByMe
-              ? const EdgeInsets.only(left: 30)
-              : const EdgeInsets.only(right: 30),
-          padding:
-          const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
-          decoration: BoxDecoration(
-              borderRadius: widget.sentByMe
-                  ? const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              )
-                  : const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-              color: widget.sentByMe ? Colors.orangeAccent : Colors.white),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.name.toUpperCase(),
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    letterSpacing: -0.5),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(widget.message['message'],
-                        textAlign: TextAlign.start,
-                        style:
-                        const TextStyle(fontSize: 16, color: Colors.black)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            widget.sentByMe
+                ? const SizedBox.shrink()
+                : GestureDetector(
+              onTap: () async {
+                final userInfo = await FirebaseFirestore.instance.collection('users').doc(widget.sender).get();
+                
+                nextScreen(context, SomebodyProfile(
+                    uid: widget.sender, 
+                    photoUrl: userInfo.get('profilePic'),
+                    name: widget.name, 
+                    userInfo: userInfo));
+              },
+                child: widget.avatar ?? const SizedBox.shrink()),
+            const SizedBox(width: 10,),
+            Container(
+              constraints: BoxConstraints(maxWidth: size.width * 0.74),
+              margin: widget.sentByMe
+                  ? const EdgeInsets.only(left: 30)
+                  : const EdgeInsets.only(right: 30),
+              padding:
+              const EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
+              decoration: BoxDecoration(
+                  borderRadius: widget.sentByMe
+                      ? const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  )
+                      : const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
-                  widget.sentByMe
-                      ? const SizedBox(
-                    width: 10,
+                  color: widget.sentByMe ? Colors.orangeAccent.withOpacity(0.6) : Colors.grey.shade700.withOpacity(0.8)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.name.toUpperCase(),
+                    textAlign: TextAlign.start,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: -0.5),
+                  ),
+                  isReply
+                  ?IntrinsicHeight(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min  ,
+                      children: [
+                        const VerticalDivider(
+                          width: 4,
+                          color: Colors.white,
+                          thickness: 2,
+                        ),
+                        const SizedBox(width: 10,),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              isGroup
+                              ?msg['replyMessage']['name']
+                              :msg['replyMessage']['sendBy'],
+                              textAlign: TextAlign.start,
+                              style:
+                              const TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.6,
+                              child: Text(
+                                msg['replyMessage']['message'],
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.start,
+                                style:
+                                const TextStyle(fontSize: 12, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   )
-                      : const SizedBox(),
-                  widget.sentByMe
-                      ? widget.isRead
-                      ? const FaIcon(
-                    FontAwesomeIcons.check,
-                    size: 15,
-                    color: Colors.greenAccent,
+                  :const SizedBox.shrink(),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child:
+                            isMessage
+                        ?Text(widget.message['message'],
+                            textAlign: TextAlign.start,
+                            style:
+                            const TextStyle(fontSize: 14, color: Colors.white))
+                        :GestureDetector(
+                              onTap: (){
+                                if(widget.sentByMe){
+                                  nextScreen(context, const ShopPage(tabIndex: 1,));
+                                }else{
+                                  nextScreen(context, const ShopPage(tabIndex: 0,));
+                                }
+                              },
+                                child: Column(
+                                  children: [
+                                    Image.asset(widget.message['image'],),
+                                    Text(widget.message['name'],
+                                        textAlign: TextAlign.start,
+                                        style: const TextStyle(fontSize: 16, color: Colors.white)),
+                                  ],
+                                )),
+                      ),
+                      widget.sentByMe
+                          ? const SizedBox.shrink(
+                      )
+                          : const SizedBox(),
+                      widget.sentByMe
+                          ? widget.isRead
+                          ? const FaIcon(
+                        FontAwesomeIcons.check,
+                        size: 15,
+                        color: Colors.greenAccent,
+                      )
+                          : const FaIcon(
+                        FontAwesomeIcons.check,
+                        size: 15,
+                        color: Colors.grey,
+                      )
+                          : const SizedBox(),
+                      const SizedBox(width: 10,),
+                      Text('${time.toDate().hour}:${time.toDate().minute < 10 ? '0${time.toDate().minute}' : time.toDate().minute}',
+                      style: const TextStyle(fontSize: 12, color: Colors.white),)
+                    ],
                   )
-                      : const FaIcon(
-                    FontAwesomeIcons.check,
-                    size: 15,
-                    color: Colors.grey,
-                  )
-                      : const SizedBox(),
+                  // widget.isRead
+                  //     ? const FaIcon(FontAwesomeIcons.check)
+                  //     : const FaIcon(FontAwesomeIcons.check),
                 ],
-              )
-              // widget.isRead
-              //     ? const FaIcon(FontAwesomeIcons.check)
-              //     : const FaIcon(FontAwesomeIcons.check),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

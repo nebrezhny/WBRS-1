@@ -1,5 +1,4 @@
-// ignore_for_file: avoid_print, avoid_function_literals_in_foreach_calls
-
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,13 +7,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/migrations/24-08.dart';
 import 'package:wbrs/pages/auth/login_page.dart';
 import 'package:wbrs/pages/home_page.dart';
 import 'package:wbrs/pages/profile_page.dart';
 import 'package:wbrs/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:wbrs/widgets/check_internet.dart';
 import 'package:wbrs/widgets/splash.dart';
@@ -25,7 +24,7 @@ import 'firebase_options.dart';
 import 'helper/global.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling a background message ${message.messageId}');
+  log('Handling a background message ${message.messageId}');
 }
 
 void main() async {
@@ -42,12 +41,21 @@ void main() async {
     badge: true,
     sound: true,
   );
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings("@mipmap/launcher_icon");
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
 
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -63,19 +71,22 @@ class _MyAppState extends State<MyApp> {
   late AndroidNotificationChannel channel;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  String? mtoken = " ";
 
+  // ignore: prefer_typing_uninitialized_variables
   var doc;
 
+  startMigrations() async {
+    //addUnVisibleField();
+  }
+
   initFunction() async {
+    startMigrations();
     await checkInternet();
     selectedIndex = 1;
     await getUserLoggedInStatus();
     if (_isSignedIn) {
       getUserInfo();
       getUserRegistrationStatus();
-      print(_isRegistrationEnd);
-      _loading = false;
     }
     if (Platform.isIOS) {
       firebaseMessaging.requestPermission();
@@ -93,19 +104,20 @@ class _MyAppState extends State<MyApp> {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
+
+    setState(() {
+      GlobalBalance = doc.get('balance');
+    });
   }
 
   checkInternet() async {
     try {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
-        print(result);
         return true;
       }
     } on SocketException catch (_) {
       nextScreen(context, const CheckInternetPage());
-      print('not connected');
       return false;
     }
   }
@@ -123,22 +135,22 @@ class _MyAppState extends State<MyApp> {
   getUserRegistrationStatus() async {
     var collection = await FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid).get();
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
 
-    _isRegistrationEnd = await  collection.get('isRegistrationEnd');
+    _isRegistrationEnd = await collection.get('isRegistrationEnd');
 
-    if (_isRegistrationEnd!=false) {
+    if (_isRegistrationEnd != false) {
       setState(() {
         _isRegistrationEnd = true;
+        _loading = false;
       });
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     TextTheme tema = GoogleFonts.robotoTextTheme(Theme.of(context).textTheme);
-    //getToken();
     return MaterialApp(
       theme: ThemeData(
           fontFamily: 'Times New Roman',
@@ -163,9 +175,11 @@ class _MyAppState extends State<MyApp> {
         }
       },
       home: _isSignedIn
-          ? _isRegistrationEnd
-              ?  const HomePage()
-              : _loading ? SplashScreen() : const FirstGroupRed()
+          ? _loading
+              ? const SplashScreen()
+              : _isRegistrationEnd
+                  ? const HomePage()
+                  : const FirstGroupRed()
           : const LoginPage(),
     );
   }

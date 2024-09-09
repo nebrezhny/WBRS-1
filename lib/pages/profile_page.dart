@@ -1,12 +1,10 @@
-// ignore_for_file: must_be_immutable, empty_catches, non_constant_identifier_names, avoid_print, prefer_interpolation_to_compose_strings, unrelated_type_equality_checks, use_build_context_synchronously
 
-import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/login_page.dart';
@@ -16,25 +14,25 @@ import 'package:wbrs/pages/visiters.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/widgets/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:wbrs/widgets/show_image.dart';
 import 'package:wbrs/widgets/widgets.dart';
 
 import '../helper/global.dart' as global;
-import '../helper/global.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class ProfilePage extends StatefulWidget {
-  String userName;
-  String email;
-  String about;
-  String age;
-  String rost;
-  String city;
-  String hobbi;
-  bool deti;
-  String pol;
-  String group;
-  ProfilePage({
-    Key? key,
+  final String email;
+  final String about;
+  final String age;
+  final String rost;
+  final String city;
+  final String hobbi;
+  final String userName;
+  final bool deti;
+  final String pol;
+  final String group;
+  const ProfilePage({
+    super.key,
     required this.email,
     required this.userName,
     required this.about,
@@ -45,7 +43,7 @@ class ProfilePage extends StatefulWidget {
     required this.rost,
     required this.city,
     required this.hobbi,
-  }) : super(key: key);
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -61,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<XFile>? imageFileList = [];
 
   void selectImages() async {
-    final List<XFile> selectedImages = await imagePicker.pickMultiImage();
+    final List<XFile> selectedImages = await imagePicker.pickMultiImage(imageQuality: 50);
     if (selectedImages.isNotEmpty) {
       imageFileList!.addAll(selectedImages);
       for (int i = 0; i < selectedImages.length; i++) {
@@ -251,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   (currentUser!.photoURL == "" ||
                                       currentUser!.photoURL == null)
                                       ? "assets/profile.png"
-                                      : currentUser!.photoURL.toString(), Group),
+                                      : currentUser!.photoURL.toString(), widget.group),
                             ],
                           ),
                           const SizedBox(
@@ -454,33 +452,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 40,
                           ),
                           const Text(
-                            'Подарки',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.normal),
-                          ),
-                          StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .collection('gifts')
-                                  .snapshots(),
-                              builder: (context, AsyncSnapshot snapshot) {
-                                if (snapshot.data != null) {
-                                  if (snapshot.data!.docs.length != 0) {
-                                    return ifGiftsSnapshotNotEmtpry(snapshot);
-                                  } else {
-                                    return ifGiftsSnaphotEmpty(snapshot);
-                                  }
-                                } else {
-                                  return ifGiftsSnaphotEmpty(snapshot);
-                                }
-                              }),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const Text(
                             'Фотографии',
                             style: TextStyle(
                                 color: Colors.white,
@@ -510,6 +481,37 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return ifImageSnaphotEmpty(snapshot);
                                 }
                               }),
+                        const Text(
+                          'Подарки',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .snapshots(),
+                            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (snapshot.data != null) {
+                                Map docAsMap = snapshot.data!.data() as Map;
+                                if(docAsMap['presentedGifts'] != null){
+                                  if (docAsMap['presentedGifts'].length > 0) {
+                                    return ifGiftsSnapshotNotEmtpry(docAsMap['presentedGifts']);
+                                  } else {
+                                    return ifGiftsSnaphotEmpty(snapshot);
+                                  }
+                                }else {
+                                  return ifGiftsSnaphotEmpty(snapshot);
+                                }
+                              } else {
+                                return ifGiftsSnaphotEmpty(snapshot);
+                              }
+                            }),
                         ])
                   : const SizedBox(),
             ),
@@ -530,9 +532,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     urls.sort(
       (a, b) {
-        return a.toString().contains('avatar')
+        return a.toString() == FirebaseAuth.instance.currentUser!.photoURL
             ? -1
-            : b.toString().contains('avatar')
+            : b.toString() == FirebaseAuth.instance.currentUser!.photoURL
                 ? 1
                 : 0;
       },
@@ -554,46 +556,33 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 300,
                   child: InkWell(
                       onTap: () {
-                        showDialog(
-                          builder: (context) => AlertDialog(
-                            iconPadding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width * 0.8),
-                            icon: IconButton(
-                              splashRadius: 20,
-                              icon: const Icon(Icons.more_horiz_rounded),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return TextButton(
-                                        child: const Text('Удалить'),
-                                        onPressed: () {
-                                          print(initList.indexOf(urls[index]));
-                                          deleteImage(snapshot,
-                                              initList.indexOf(urls[index]));
-                                        },
-                                      );
-                                    });
-                              },
-                            ),
-                            iconColor: Colors.white,
-                            backgroundColor: Colors.transparent,
-                            insetPadding: const EdgeInsets.all(2),
-                            title: Container(
-                              decoration: const BoxDecoration(),
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.network(
-                                urls[index],
-                              ),
-                            ),
-                          ),
-                          context: context,
-                        );
+                        nextScreen(context, ShowImage(
+                          urls: urls,
+                          initList: initList,
+                          index: index,
+                          snapshot: snapshot,
+                          userName: widget.userName,
+                          group: widget.group,
+                          email: widget.email,
+                          about: widget.about,
+                          age: widget.age,
+                          rost: widget.rost,
+                          city: widget.city,
+                          hobbi: widget.hobbi,
+                          deti: widget.deti,
+                          pol: widget.pol,
+                        ));
                       },
                       child: Container(
                         margin: const EdgeInsets.only(right: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(15)),
+                          image: DecorationImage(
+                              image: CachedNetworkImageProvider(urls[index]),
+                              fit: BoxFit.cover),
+                        ),
                         width: 100,
-                        child: Image.network(urls[index], fit: BoxFit.cover),
+                        child: SizedBox(),
                       )),
                 );
               },
@@ -656,8 +645,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   ifGiftsSnapshotNotEmtpry(
-    AsyncSnapshot snapshot,
+    Map gifts,
   ) {
+    List urlsList = gifts.keys.toList();
+    List countList = gifts.values.toList();
     return Column(
       children: [
         SizedBox(
@@ -674,33 +665,31 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 300,
                   child: InkWell(
                       onTap: () {
-                        showDialog(
-                          builder: (context) => AlertDialog(
-                            iconPadding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width * 0.8),
-                            backgroundColor: Colors.transparent,
-                            insetPadding: const EdgeInsets.all(2),
-                            title: Container(
-                              decoration: const BoxDecoration(),
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.network(
-                                snapshot.data.docs[index]['url'],
-                              ),
-                            ),
-                          ),
-                          context: context,
-                        );
                       },
                       child: Container(
                         margin: const EdgeInsets.only(right: 5),
-                        width: 100,
-                        child: Image.network(snapshot.data.docs[index]['url'],
-                            fit: BoxFit.cover),
+                        width: 110,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.asset(urlsList[index],
+                                fit: BoxFit.fitWidth),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: Border.all(color: Colors.white),
+                                ),
+                                  child: Text(countList[index].toString(), style: TextStyle(color: Colors.white),)),
+                            )
+                          ],
+                        ),
                       )),
                 );
               },
-              itemCount:
-                  (snapshot.data != null ? (snapshot.data!).docs.length : 0)),
+              itemCount: gifts.length),
         ),
       ],
     );
@@ -715,77 +704,5 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ],
     );
-  }
-
-  deleteImage(snapshot, index) {
-    showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            color: Colors.white,
-            height: MediaQuery.of(context).size.height * 0.17,
-            child: Column(
-              children: [
-                const DefaultTextStyle(
-                  style: TextStyle(
-                      decorationColor: Colors.white,
-                      fontStyle: FontStyle.normal,
-                      color: Colors.black,
-                      fontSize: 16),
-                  child: Text("Вы уверены, что хотите удалить это фото?"),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent),
-                        onPressed: () async {
-                          FirebaseStorage.instance
-                              .refFromURL(snapshot.data.docs[index]['url'])
-                              .delete();
-                          FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .collection('images')
-                              .doc(snapshot.data.docs[index].id)
-                              .delete();
-
-                          nextScreenReplace(
-                              context,
-                              ProfilePage(
-                                  email: widget.email,
-                                  userName: widget.userName,
-                                  about: widget.about,
-                                  age: widget.age,
-                                  pol: widget.pol,
-                                  group: widget.group,
-                                  deti: widget.deti,
-                                  rost: widget.rost,
-                                  city: widget.city,
-                                  hobbi: widget.hobbi));
-                        },
-                        child: const Icon(Icons.check)),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Icon(Icons.close)),
-                  ],
-                )
-              ],
-            ),
-          );
-        });
   }
 }

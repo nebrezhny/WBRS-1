@@ -35,6 +35,7 @@ class DatabaseService {
       "fullName": fullName,
       "email": email,
       "chats": [],
+      'balance': 27,
       "profilePic": "",
       "uid": uid,
       "age": age,
@@ -47,6 +48,7 @@ class DatabaseService {
       "city": city,
       "images": [],
       "pol": pol,
+      "группа": "",
     });
   }
 
@@ -146,38 +148,9 @@ class DatabaseService {
     groupCollection.doc(chatId).collection("messages").add(chatMessageData);
     groupCollection.doc(chatId).update({
       "recentMessage": chatMessageData['message'],
-      "recentMessageSender": chatMessageData['sender'],
+      "recentMessageSender": chatMessageData['name'],
       "recentMessageTime": chatMessageData['time'].toString(),
     });
-
-    var usersDoc = await groupCollection.doc(chatId).get();
-
-    var users = usersDoc.get('users');
-
-    for (int i = 0; i < users.length; i++) {
-      if (users[i] != FirebaseAuth.instance.currentUser!.uid) {
-        var doc = await FirebaseFirestore.instance
-            .collection('TOKENS')
-            .doc(users[i])
-            .get();
-
-        var snap = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(users[i])
-            .get();
-
-        String token = doc.get('token');
-        String name = snap.get('fullName');
-
-        NotificationsService().sendPushMessage(
-            token,
-            chatMessageData['message'],
-            name,
-            1,
-            FirebaseAuth.instance.currentUser!.photoURL,
-            chatId);
-      }
-    }
   }
 
   Future<Stream<QuerySnapshot>> getUserByUserName(String username) async {

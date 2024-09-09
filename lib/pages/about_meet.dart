@@ -1,7 +1,11 @@
 // ignore_for_file: implementation_imports, must_be_immutable, non_constant_identifier_names
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:wbrs/pages/chat_page.dart';
+import 'package:wbrs/pages/meetings.dart';
+import 'package:wbrs/widgets/widgets.dart';
 
 class AboutMeet extends StatefulWidget {
   String id = '';
@@ -9,12 +13,11 @@ class AboutMeet extends StatefulWidget {
   List users;
   bool is_user_join = false;
   AboutMeet(
-      {Key? key,
+      {super.key,
       required this.id,
       required this.users,
       required this.name,
-      required this.is_user_join})
-      : super(key: key);
+      required this.is_user_join});
 
   @override
   State<AboutMeet> createState() => _AboutMeetState();
@@ -26,7 +29,6 @@ class _AboutMeetState extends State<AboutMeet> {
     return ChatPage(
       groupId: widget.id,
       groupName: widget.name,
-      email: "some",
       users: widget.users,
       is_user_join: widget.is_user_join,
     );

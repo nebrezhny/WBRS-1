@@ -77,8 +77,11 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: Colors.transparent,
             title: const Text(
               "Ответьте на вопросы",
+              style: TextStyle(color: Colors.white),
             ),
           ),
           body: SingleChildScrollView(
@@ -155,11 +158,6 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (counter != 0) {
-                        setState(() {
-                          counter--;
-                        });
-                      }
                       setState(() {
                         colors[index] = Colors.red;
                       });

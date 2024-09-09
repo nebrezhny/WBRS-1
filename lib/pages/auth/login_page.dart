@@ -1,14 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/register_page.dart';
 import 'package:wbrs/pages/home_page.dart';
 import 'package:wbrs/service/auth_service.dart';
-import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -30,8 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _isChecked = false;
   bool _isVisible = true;
 
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String email = "";
   String password = "";
   bool _isLoading = false;
@@ -246,13 +242,16 @@ class _LoginPageState extends State<LoginPage> {
                                         login();
                                       }
                                     } on SocketException catch (_) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          content: const Text(
-                                              "Нет соединения с интернетом"),
-                                          )
+                                      if(context.mounted) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                const AlertDialog(
+                                                  content: Text(
+                                                      "Нет соединения с интернетом"),
+                                                )
                                         );
+                                      }
                                     }
                                   },
                                 ),
@@ -306,16 +305,20 @@ class _LoginPageState extends State<LoginPage> {
                                                             email:
                                                                 resetPasswordEmail
                                                                     .text);
-                                                    showSnackbar(
-                                                        context,
-                                                        Colors.orangeAccent,
-                                                        'На вашу электронную почту отправлено письмо с ссылкой для сброса пароля.');
-                                                    Navigator.pop(context);
+                                                    if(context.mounted) {
+                                                      showSnackbar(
+                                                          context,
+                                                          Colors.orangeAccent,
+                                                          'На вашу электронную почту отправлено письмо с ссылкой для сброса пароля.');
+                                                      Navigator.pop(context);
+                                                    }
                                                   } else {
-                                                    showSnackbar(
-                                                        context,
-                                                        Colors.red,
-                                                        'Введите email.');
+                                                    if(context.mounted) {
+                                                      showSnackbar(
+                                                          context,
+                                                          Colors.red,
+                                                          'Введите email.');
+                                                    }
                                                   }
                                                 },
                                                 child: const Text(
@@ -354,14 +357,16 @@ class _LoginPageState extends State<LoginPage> {
           _isLoading = false;
         });
         authService
-            .loginWithUserNameandPassword(
+            .loginWithUserNameAndPassword(
                 _emailController.text, _passwordController.text)
             .then((value) async {
           if (value == true) {
             selectedIndex = 1;
             await HelperFunctions.saveUserLoggedInStatus(true);
-            showSnackbar(context, Colors.green, 'Вы авторизовались');
-            nextScreenReplace(context, const HomePage());
+            if(context.mounted) {
+              showSnackbar(context, Colors.green, 'Вы авторизовались');
+              nextScreenReplace(context, const HomePage());
+            }
           } else {
             showSnackbar(context, Colors.red, value);
             setState(() {
@@ -392,19 +397,18 @@ class _LoginPageState extends State<LoginPage> {
 
   void _loadUserEmailPassword() async {
     try {
-      SharedPreferences _prefs = await SharedPreferences.getInstance();
-      var _email = _prefs.getString("email") ?? "";
-      var _password = _prefs.getString("password") ?? "";
-      var _remeberMe = _prefs.getBool("remember_me") ?? false;
-      if (_remeberMe) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String email = prefs.getString("email") ?? "";
+      String password = prefs.getString("password") ?? "";
+      bool remeberMe = prefs.getBool("remember_me") ?? false;
+      if (remeberMe) {
         setState(() {
           _isChecked = true;
         });
-        _emailController.text = _email ?? "";
-        _passwordController.text = _password ?? "";
+        _emailController.text = email;
+        _passwordController.text = password;
       }
-    } catch (e) {
-      print(e);
+    } catch (_) {
     }
   }
 }

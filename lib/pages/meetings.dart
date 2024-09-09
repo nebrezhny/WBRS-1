@@ -24,24 +24,19 @@ class _MeetingPageState extends State<MeetingPage> {
     super.initState();
     meets = FirebaseFirestore.instance
         .collection('meets')
-        .orderBy('recentMessageTime', descending: true)
+        .orderBy('datetime', descending: true)
         .snapshots();
   }
 
   TextEditingController city = TextEditingController();
-
   Stream<QuerySnapshot>? meets;
-  CollectionReference collectionReference =
-      FirebaseFirestore.instance.collection('meets');
-
   late int kolvo_users;
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return MaterialApp(
-      home: Stack(
+    return Stack(
         children: [
           Container(
             decoration: const BoxDecoration(boxShadow: []),
@@ -64,7 +59,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     },
                     icon: const Icon(Icons.add))
               ],
-              title: const Text("Встречи"),
+              title: const Text("Встречи",style: TextStyle(color: Colors.white),),
               backgroundColor: Colors.transparent,
             ),
             bottomNavigationBar: const MyBottomNavigationBar(),
@@ -74,18 +69,42 @@ class _MeetingPageState extends State<MeetingPage> {
               decoration: const BoxDecoration(),
               child: Column(
                 children: [
+                  Padding(padding: const EdgeInsets.symmetric(vertical: 10),
+                  child:
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          backgroundColor: Colors.grey.shade700.withOpacity(0.7),
+                            context: context, builder: (context) {
+                          return Container(
+                            padding: const EdgeInsets.all(15),
+                            child: const Column(
+                              children: [
+                                Text('Аннотация на встречи:',style: TextStyle(color: Colors.white),),
+                                Text('1. Вы один(одна) и хотите пригласить кого-то. Создавайте индивидуальную встречу, укажите в описании куда идёте, что будете делать.',style: TextStyle(color: Colors.white),),
+                                Text('2. Вас, например, двое. Один создаёт коллективную встречу, и  пишет: ждём двух девушек, и что вы предлагаете. (К примеру, пьём кофе на набережной и т.п.)',style: TextStyle(color: Colors.white),),
+                                Text('3. Вы - компания и хотите устроить что-то масштабное. Один пусть создаёт коллективную встречу, опишите кратко предложение.',style: TextStyle(color: Colors.white),),
+                                Text('4. Когда кто-нибудь вступит, придет уведомление как создателю.',style: TextStyle(color: Colors.white),),
+                              ],
+                            ),
+                          );
+                        });
+                      },
+                      child: const Text("Как создать встречу",style: TextStyle(color: Colors.white, fontSize: 18)),),
+                  ),),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 10),
                     padding: EdgeInsets.symmetric(
                         vertical: height * 0.01, horizontal: width * 0.011),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white54,
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     child: Row(
                       children: [
                         SizedBox(
-                          width: 295,
+                          width: width * 0.75,
                           child: TextField(
                             controller: city,
                             style: const TextStyle(),
@@ -94,7 +113,7 @@ class _MeetingPageState extends State<MeetingPage> {
                               border: InputBorder.none,
                               hintText: "Введите ваш город",
                               hintStyle: TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w400,
                                   fontSize: 18),
                             ),
@@ -110,7 +129,7 @@ class _MeetingPageState extends State<MeetingPage> {
                               } else {
                                 meets = FirebaseFirestore.instance
                                     .collection('meets')
-                                    .where('city', isEqualTo: city.text)
+                                    .where('city', isEqualTo: city.text.split(RegExp(r"(?! )\s{2,}")).join(' ').split(RegExp(r"\s+$")).join(''))
                                     .snapshots();
                               }
                             });
@@ -160,7 +179,6 @@ class _MeetingPageState extends State<MeetingPage> {
             ),
           ),
         ],
-      ),
     );
   }
 
@@ -180,10 +198,10 @@ class _MeetingPageState extends State<MeetingPage> {
         ? Container(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-                color: Colors.orangeAccent,
+                color: snapshot.data.docs[index]['admin'] == FirebaseAuth.instance.currentUser!.uid ? Colors.grey : Colors.orangeAccent,
                 border: Border.all(color: Colors.black),
                 borderRadius: const BorderRadius.all(Radius.circular(18))),
-            child: GestureDetector(
+            child: InkWell(
               onTap: (() async {
                 DocumentSnapshot doc = await FirebaseFirestore.instance
                     .collection('meets')
@@ -198,6 +216,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     is_user_join = true;
                   }
                 }
+                // ignore: use_build_context_synchronously
                 var doc12 = await FirebaseFirestore.instance
                     .collection('users')
                     .doc(snapshot.data.docs[index]['admin'])
@@ -228,29 +247,37 @@ class _MeetingPageState extends State<MeetingPage> {
                     color: Colors.orangeAccent),
                 width: double.infinity,
                 child: ListTile(
-                  title: Row(children: [
-                    SizedBox(
-                        width: 80,
-                        child: Text(snapshot.data.docs[index]['name'])),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(snapshot.data.docs[index]['city']),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Flexible(
-                        child: Text(snapshot.data.docs[index]['datetime'])),
-                  ]),
-                  subtitle: Row(children: [
-                    Text(
-                        snapshot.data.docs[index]['recentMessageSender'] + ':'),
+                  title: SizedBox(
+                    height: 80,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                      SizedBox(
+                          width: double.infinity,
+                          child: Text(snapshot.data.docs[index]['name'], softWrap: false,),),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(snapshot.data.docs[index]['city']),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Flexible(
+                          child: Text(snapshot.data.docs[index]['datetime'])),
+                    ]),
+                  ),
+                  subtitle:
+                  snapshot.data.docs[index]['recentMessage'] == '' ? const SizedBox(
+                    child: Text('Нет сообщений'),
+                  ) :
+                  Row(children: [
+                    Text(snapshot.data.docs[index]['recentMessageSender'] + ':', ),
                     const SizedBox(
                       width: 5,
                     ),
                     Flexible(
                         child:
-                            Text(snapshot.data.docs[index]['recentMessage'])),
+                            Text(snapshot.data.docs[index]['recentMessage'],softWrap: false, overflow: TextOverflow.ellipsis,)),
                   ]),
                 ),
               ),

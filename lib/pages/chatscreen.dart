@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/pages/auth/somebody_profile.dart';
 import 'package:wbrs/pages/shop.dart';
@@ -20,12 +19,11 @@ import 'package:random_string/random_string.dart';
 class ChatScreen extends StatefulWidget {
   final String chatWithUsername, photoUrl, id, chatId;
   const ChatScreen(
-      {Key? key,
+      {super.key,
       required this.chatWithUsername,
       required this.photoUrl,
       required this.id,
-      required this.chatId})
-      : super(key: key);
+      required this.chatId});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -52,8 +50,6 @@ class _ChatScreenState extends State<ChatScreen> {
         .then((value) {
       return value.get('группа');
     });
-
-    print(group);
   }
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -86,7 +82,6 @@ class _ChatScreenState extends State<ChatScreen> {
         "sendBy": FirebaseAuth.instance.currentUser!.displayName,
         "sendByID": FirebaseAuth.instance.currentUser!.uid,
         "ts": lastMessageTs,
-        "imgUrl": FirebaseAuth.instance.currentUser!.photoURL,
         "isRead": isUserInChat ? true : false
       };
 
@@ -126,60 +121,23 @@ class _ChatScreenState extends State<ChatScreen> {
       String token = doc.get('token');
       String name = snap.get('fullName');
 
+      Map notificationBody = {
+        'isChat': true,
+        'chatId': widget.chatId,
+        'chatWith': widget.chatWithUsername,
+        'id': widget.id,
+        'photoUrl': widget.photoUrl,
+        'message': message,
+      };
+
+      print(token);
+
       !isUserInChat
-          ? NotificationsService().sendPushMessage(token, message, name, 4,
-              FirebaseAuth.instance.currentUser!.photoURL, widget.chatId)
+          ? NotificationsService().sendPushMessage(
+          token, notificationBody, FirebaseAuth.instance.currentUser!.displayName.toString(), 4, widget.chatId)
           : null;
     }
-  }
-
-  Widget chatMessageTile(String message, bool sendByMe, bool isRead) {
-    Size size = MediaQuery.of(context).size;
-    return Row(
-      mainAxisAlignment:
-          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        Flexible(
-          child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(24),
-                  bottomRight: sendByMe
-                      ? const Radius.circular(0)
-                      : const Radius.circular(24),
-                  topRight: const Radius.circular(24),
-                  bottomLeft: sendByMe
-                      ? const Radius.circular(24)
-                      : const Radius.circular(0),
-                ),
-                color: sendByMe ? Colors.orange : Colors.blue.shade400,
-              ),
-              padding: EdgeInsets.only(
-                  top: 4,
-                  bottom: 4,
-                  left: sendByMe ? 0 : 24,
-                  right: sendByMe ? 24 : 0),
-              child: Container(
-                constraints:
-                    BoxConstraints(minWidth: 50, maxWidth: size.width / 2),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      message,
-                      maxLines: 100,
-                      softWrap: true,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-        ),
-      ],
-    );
+    messageTextEdittingController.text = "";
   }
 
   Widget chatMessages() {
@@ -204,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             style: TextStyle(color: Colors.green),
                           )),
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.74,
+                        height: MediaQuery.of(context).size.height * 0.72,
                         child: ListView.builder(
                             padding: const EdgeInsets.only(bottom: 0, top: 16),
                             itemCount: snapshot.data.docs.length,
@@ -222,7 +180,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                     .update({'isRead': true});
                               }
 
-                              if (ds["message"] == null) {
+                              Map newDs = ds.data() as Map;
+
+                              if (newDs.containsKey('')) {
                                 return MessageTile(
                                     chatId: widget.chatId,
                                     sender: ds["sendBy"],
@@ -231,34 +191,35 @@ class _ChatScreenState extends State<ChatScreen> {
                                     sentByMe: FirebaseAuth
                                             .instance.currentUser!.uid ==
                                         ds["sendByID"],
-                                    isRead: ds["isRead"]);
+                                    isRead: ds["isRead"], isChat: true,);
                               } else {
-                                var x = ds.data().toString().contains('deleteFor');
+                                var x =
+                                    ds.data().toString().contains('deleteFor');
                                 if (x) {
-                                  if(ds["deleteFor"] != FirebaseAuth.instance.currentUser!.uid) {
+                                  if (ds["deleteFor"] !=
+                                      FirebaseAuth.instance.currentUser!.uid) {
                                     return MessageTile(
                                         chatId: widget.chatId,
                                         sender: ds["sendBy"],
                                         name: ds["sendBy"],
                                         message: ds,
                                         sentByMe: FirebaseAuth
-                                            .instance.currentUser!.uid ==
+                                                .instance.currentUser!.uid ==
                                             ds["sendByID"],
-                                        isRead: ds["isRead"]);
-                                  }else{
+                                        isRead: ds["isRead"], isChat: true,);
+                                  } else {
                                     return const SizedBox.shrink();
                                   }
-                                }
-                                else{
+                                } else {
                                   return MessageTile(
                                       chatId: widget.chatId,
                                       sender: ds["sendBy"],
                                       name: ds["sendBy"],
                                       message: ds,
                                       sentByMe: FirebaseAuth
-                                          .instance.currentUser!.uid ==
+                                              .instance.currentUser!.uid ==
                                           ds["sendByID"],
-                                      isRead: ds["isRead"]);
+                                      isRead: ds["isRead"], isChat: true,);
                                 }
                               }
                             }),
@@ -339,6 +300,8 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
   }
 
+  ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -349,9 +312,9 @@ class _ChatScreenState extends State<ChatScreen> {
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
         ),
-        WillPopScope(
-          onWillPop: () {
-            return outOfChat();
+        PopScope(
+          onPopInvoked: (bool value) {
+            outOfChat();
           },
           child: Scaffold(
             backgroundColor: Colors.transparent,
@@ -361,48 +324,48 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: [
                   ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: SizedBox(
-                        height: 45,
-                        width: 45,
-                        child: FloatingActionButton(
-                            onPressed: () async {
-                              DocumentSnapshot doc = await FirebaseFirestore
-                                  .instance
-                                  .collection('users')
-                                  .doc(widget.id)
-                                  .get();
-                              Images = doc.get('images');
-                              CountImages = Images.length;
-                              nextScreen(
-                                  context,
-                                  SomebodyProfile(
-                                    uid: widget.id,
-                                    photoUrl: widget.photoUrl,
-                                    name: widget.chatWithUsername,
-                                    userInfo: await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(widget.id)
-                                        .get(),
-                                  ));
-                            },
-                            child:
-                            userImageWithCircle(widget.photoUrl, group, 58.0, 58.0),
-                            ),
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.transparent,
+                        onPressed: () async {
+                          DocumentSnapshot doc = await FirebaseFirestore
+                              .instance
+                              .collection('users')
+                              .doc(widget.id)
+                              .get();
+                          Images = doc.get('images');
+                          CountImages = Images.length;
+                          if (!mounted) return;
+                          nextScreen(
+                              context,
+                              SomebodyProfile(
+                                uid: widget.id,
+                                photoUrl: widget.photoUrl,
+                                name: widget.chatWithUsername,
+                                userInfo: await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.id)
+                                    .get(),
+                              ));
+                        },
+                        child: userImageWithCircle(
+                            widget.photoUrl, group, 50.0, 50.0),
                       )),
                   const SizedBox(
                     width: 20,
                   ),
-                  Text(widget.chatWithUsername, style: const TextStyle(color: Colors.white)),
+                  Text(widget.chatWithUsername,
+                      style: const TextStyle(color: Colors.white)),
                 ],
               ),
               backgroundColor: Colors.transparent,
             ),
             body: SingleChildScrollView(
+              controller: _scrollController,
               child: Stack(
                 alignment: Alignment.bottomCenter,
                 children: [
                   SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.905,
+                      height: MediaQuery.of(context).size.height * 0.9,
                       child: chatMessages()),
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -410,56 +373,58 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Container(
-                        //   margin: EdgeInsets.symmetric(horizontal: 10),
-                        //   height: 70,
-                        //   width: 70,
-                        //   decoration: BoxDecoration(
-                        //     border: Border.all(color: Colors.white, width: 1),
-                        //   ),
-                        //   child: Stack(
-                        //
-                        //     alignment: Alignment.topRight,
-                        //     children: [
-                        //       Image.asset('assets/fon2.jpg'),
-                        //       Align(
-                        //         child: Transform.translate(
-                        //             offset: Offset(-10, -10),
-                        //             child: IconButton(onPressed: (){}, icon: const Icon(Icons.cancel_outlined), color: Colors.white)),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
                         Container(
                           alignment: Alignment.bottomCenter,
-                          height: MediaQuery.of(context).size.height * 0.07,
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height * 0.07,
+                            maxHeight: MediaQuery.of(context).size.height * 0.35,
+                          ),
+                          width: MediaQuery.of(context).size.width,
                           child: Container(
                             color: Colors.black.withOpacity(0.8),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    child: TextField(
-                                  controller: messageTextEdittingController,
-                                  onChanged: (value) {},
-                                  style: const TextStyle(color: Colors.white),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "type a message",
-                                      hintStyle: TextStyle(
-                                          color: Colors.white.withOpacity(0.6))),
-                                )),
-                                GestureDetector(
-                                  onTap: () {
-                                    addMessage(true, 'text');
-                                  },
-                                  child: Icon(
-                                    Icons.send,
-                                    color: messageTextEdittingController.text != "" ? Colors.white : Colors.white.withOpacity(0.6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minWidth: MediaQuery.of(context).size.width,
+                                  maxWidth: MediaQuery.of(context).size.width
+                              ),
+                              child: Row(
+                                children: [
+                                  ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        minHeight: 50,
+                                        minWidth: MediaQuery.of(context).size.width-70,
+                                        maxWidth: MediaQuery.of(context).size.width-60
+                                      ),
+                                      child: TextField(
+                                    controller: messageTextEdittingController,
+                                    keyboardType: TextInputType.multiline,
+                                    minLines: 1,
+                                    maxLines: 5,
+                                    onChanged: (value) {},
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: "Введите сообщение",
+                                        hintStyle: TextStyle(
+                                            color:
+                                                Colors.white.withOpacity(0.6))),
+                                  )),
+                                  GestureDetector(
+                                    onTap: () {
+                                      addMessage(true, 'text');
+                                    },
+                                    child: Icon(
+                                      Icons.send,
+                                      color:
+                                          messageTextEdittingController.text != ""
+                                              ? Colors.white
+                                              : Colors.white.withOpacity(0.6),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -474,19 +439,16 @@ class _ChatScreenState extends State<ChatScreen> {
       ],
     );
   }
+
   uploadFile(String filePath) async {
     File file = File(filePath);
     var storage = FirebaseStorage.instance;
     String ref = '${widget.id}/${DateTime.now().toString()}.jpg';
     try {
-      await storage
-          .ref(ref)
-          .putFile(file);
-    } on FirebaseException catch (e) {}
+      await storage.ref(ref).putFile(file);
+    } on FirebaseException catch (_) {}
 
-    String downloadUrl = await storage
-        .ref(ref)
-        .getDownloadURL();
+    String downloadUrl = await storage.ref(ref).getDownloadURL();
     return downloadUrl;
   }
 }
