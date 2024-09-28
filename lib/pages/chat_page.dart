@@ -59,21 +59,21 @@ class _ChatPageState extends State<ChatPage> {
 
   isMeAdminCheck() async {
     String myId = firebaseAuth.currentUser!.uid;
-    var doc = await firebaseFirestore.collection('meets').doc(widget.groupId).get();
+    var doc =
+        await firebaseFirestore.collection('meets').doc(widget.groupId).get();
     setState(() {
       isMeAdmin = doc.get('admin') == myId;
     });
   }
 
   getMeet() async {
-    meet = await firebaseFirestore.collection('meets').doc(widget.groupId).get();
+    meet =
+        await firebaseFirestore.collection('meets').doc(widget.groupId).get();
   }
 
   checkNotification() async {
     isNotificationOff = userWOutN.contains(firebaseAuth.currentUser!.uid);
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -109,10 +109,14 @@ class _ChatPageState extends State<ChatPage> {
       String token = "";
 
       for (int i = 0; i < users.length; i++) {
-        if(userWOutN.contains(users[i])) break;
-        var doc = await firebaseFirestore.collection('TOKENS').doc(users[i]).get();
+        print(users[i]);
+        if (userWOutN.contains(users[i])) break;
+        var doc =
+            await firebaseFirestore.collection('TOKENS').doc(users[i]).get();
         token = doc.get('token');
-        NotificationsService().sendPushMessageGroup(token, notification, widget.groupName, 1, widget.groupId);
+        print(token);
+        NotificationsService().sendPushMessageGroup(
+            token, notification, widget.groupName, 1, widget.groupId);
       }
     }
 
@@ -134,23 +138,32 @@ class _ChatPageState extends State<ChatPage> {
             title: Text(widget.groupName),
             actions: [
               is_user_join
-              ?IconButton(onPressed: () {
-                List users = widget.users;
-                users.remove(firebaseAuth.currentUser!.uid);
-                firebaseFirestore
-                    .collection('meets')
-                    .doc(widget.groupId)
-                    .update({'users': users});
-                nextScreen(context, const MeetingPage());
-              },
-                  icon: const Icon(Icons.output_sharp))
-              : const SizedBox(),
-              IconButton(onPressed: (){
-                switchNotification();
-              }, icon: isNotificationOff ? const Icon(Icons.notifications_on_outlined) : const Icon(Icons.notifications_off_outlined)),
-              isMeAdmin ? IconButton(onPressed: () {
-                nextScreen(context, EditMeet(meet: meet));
-              }, icon: const Icon(Icons.edit_calendar_outlined)) : const SizedBox(),
+                  ? IconButton(
+                      onPressed: () {
+                        List users = widget.users;
+                        users.remove(firebaseAuth.currentUser!.uid);
+                        firebaseFirestore
+                            .collection('meets')
+                            .doc(widget.groupId)
+                            .update({'users': users});
+                        nextScreen(context, const MeetingPage());
+                      },
+                      icon: const Icon(Icons.output_sharp))
+                  : const SizedBox(),
+              IconButton(
+                  onPressed: () {
+                    switchNotification();
+                  },
+                  icon: isNotificationOff
+                      ? const Icon(Icons.notifications_on_outlined)
+                      : const Icon(Icons.notifications_off_outlined)),
+              isMeAdmin
+                  ? IconButton(
+                      onPressed: () {
+                        nextScreen(context, EditMeet(meet: meet));
+                      },
+                      icon: const Icon(Icons.edit_calendar_outlined))
+                  : const SizedBox(),
               is_user_join
                   ? IconButton(
                       onPressed: () async {
@@ -178,10 +191,12 @@ class _ChatPageState extends State<ChatPage> {
                               return Stack(
                                 children: [
                                   Container(
-                                    decoration: const BoxDecoration(boxShadow: []),
+                                    decoration:
+                                        const BoxDecoration(boxShadow: []),
                                     child: Image.asset(
                                       "assets/fon.jpg",
-                                      height: MediaQuery.of(context).size.height,
+                                      height:
+                                          MediaQuery.of(context).size.height,
                                       width: MediaQuery.of(context).size.width,
                                       fit: BoxFit.cover,
                                       scale: 0.6,
@@ -205,7 +220,11 @@ class _ChatPageState extends State<ChatPage> {
                                             onPressed: () {
                                               getOutFromChat();
                                             },
-                                            child: const Text('Выйти из встречи',style: TextStyle(color: Colors.black),))
+                                            child: const Text(
+                                              'Выйти из встречи',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ))
                                       ],
                                     ),
                                   ),
@@ -253,8 +272,8 @@ class _ChatPageState extends State<ChatPage> {
                               style: const TextStyle(color: Colors.white),
                               decoration: const InputDecoration(
                                 hintText: "Отправить сообщение...",
-                                hintStyle:
-                                    TextStyle(color: Colors.white, fontSize: 16),
+                                hintStyle: TextStyle(
+                                    color: Colors.white, fontSize: 16),
                               ),
                             )),
                             GestureDetector(
@@ -275,20 +294,21 @@ class _ChatPageState extends State<ChatPage> {
                                 controller: messageController,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: const InputDecoration(
-                                  hintText: "Вы не являетесь участником встречи",
+                                  hintText:
+                                      "Вы не являетесь участником встречи",
                                   hintStyle: TextStyle(
                                       color: Colors.white, fontSize: 16),
                                 ),
                               )),
                               TextButton(
                                   onPressed: () {
-                                    joinUser(
-                                        firebaseAuth.currentUser!.uid,
+                                    joinUser(firebaseAuth.currentUser!.uid,
                                         widget.groupId);
                                     setState(() {
                                       is_user_join = true;
                                     });
-                                    messageController.text = "${firebaseAuth.currentUser!.displayName} присоединился ко встрече";
+                                    messageController.text =
+                                        "${firebaseAuth.currentUser!.displayName} присоединился ко встрече";
                                     addNotification();
                                     getAndSetMessages();
                                     messageController.text = "";
@@ -310,24 +330,26 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  switchNotification()async{
+  switchNotification() async {
     String myUID = firebaseAuth.currentUser!.uid;
     setState(() {
-      if(isNotificationOff){
+      if (isNotificationOff) {
         userWOutN.remove(myUID);
-      }else{
+      } else {
         userWOutN.add(myUID);
       }
     });
     print(userWOutN);
 
-    await FirebaseFirestore.instance.collection('meets').doc(widget.groupId).update({'usersWithoutNotification': userWOutN});
+    await FirebaseFirestore.instance
+        .collection('meets')
+        .doc(widget.groupId)
+        .update({'usersWithoutNotification': userWOutN});
     checkNotification();
   }
 
   getOutFromChat() async {
-    var chat =
-    firebaseFirestore.collection('meets').doc(widget.groupId);
+    var chat = firebaseFirestore.collection('meets').doc(widget.groupId);
 
     String myId = firebaseAuth.currentUser!.uid;
 
@@ -370,9 +392,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getUsers() async {
-    DocumentReference meet = firebaseFirestore
-        .collection('meets')
-        .doc(widget.groupId);
+    DocumentReference meet =
+        firebaseFirestore.collection('meets').doc(widget.groupId);
     users_in_meet = meet.snapshots();
     DocumentSnapshot data = await meet.get();
     Map mapData = data.data() as Map;
@@ -402,9 +423,14 @@ class _ChatPageState extends State<ChatPage> {
                         snapshot.data.docs[index]['sender'],
                     isRead: true,
                     avatar: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                        child: CachedNetworkImage(imageUrl: snapshot.data.docs[index]['avatar'],
-                        width: 50, height: 50,fit: BoxFit.cover,)), isChat: false,
+                        borderRadius: BorderRadius.circular(100),
+                        child: CachedNetworkImage(
+                          imageUrl: snapshot.data.docs[index]['avatar'],
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )),
+                    isChat: false,
                   );
                 },
               )
@@ -446,11 +472,12 @@ class _ChatPageState extends State<ChatPage> {
                           width: 50,
                           height: 50,
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(200),
-                            child: userImageWithCircle(
-                                user_info[index].image_url,user_info[index].group,
-                                60.0, 60.0)
-                          )),
+                              borderRadius: BorderRadius.circular(200),
+                              child: userImageWithCircle(
+                                  user_info[index].image_url,
+                                  user_info[index].group,
+                                  60.0,
+                                  60.0))),
                     ),
                     dense: false,
                   ),
