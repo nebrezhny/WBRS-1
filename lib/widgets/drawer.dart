@@ -134,10 +134,17 @@ class _MyDrawerState extends State<MyDrawer> {
                                   color: Colors.white,
                                 )
                               : userImageWithCircle(
-                              (FirebaseAuth.instance.currentUser!.photoURL == "" ||
-                                  FirebaseAuth.instance.currentUser!.photoURL == null)
-                                  ? "assets/profile.png"
-                                  : FirebaseAuth.instance.currentUser!.photoURL.toString(), Group),
+                                  (FirebaseAuth.instance.currentUser!
+                                                  .photoURL ==
+                                              "" ||
+                                          FirebaseAuth.instance.currentUser!
+                                                  .photoURL ==
+                                              null)
+                                      ? "assets/profile.png"
+                                      : FirebaseAuth
+                                          .instance.currentUser!.photoURL
+                                          .toString(),
+                                  Group),
                           // : ClipRRect(
                           //     borderRadius: BorderRadius.circular(100.0),
                           //     child: Image.network(
@@ -371,7 +378,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     color: Colors.grey,
                   ),
                   contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 ),
                 ListTile(
                   onTap: () async {
@@ -394,6 +401,11 @@ class _MyDrawerState extends State<MyDrawer> {
                               ),
                               IconButton(
                                 onPressed: () async {
+                                  FirebaseFirestore.instance
+                                      .collection('TOKENS')
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser?.uid)
+                                      .set({'token': ''});
                                   await authService.signOut();
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(

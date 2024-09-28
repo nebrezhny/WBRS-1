@@ -130,12 +130,12 @@ class _ChatScreenState extends State<ChatScreen> {
         'message': message,
       };
 
-      print(token);
-
-      !isUserInChat
-          ? NotificationsService().sendPushMessage(
-          token, notificationBody, FirebaseAuth.instance.currentUser!.displayName.toString(), 4, widget.chatId)
-          : null;
+      NotificationsService().sendPushMessage(
+          token,
+          notificationBody,
+          FirebaseAuth.instance.currentUser!.displayName.toString(),
+          4,
+          widget.chatId);
     }
     messageTextEdittingController.text = "";
   }
@@ -184,14 +184,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
                               if (newDs.containsKey('')) {
                                 return MessageTile(
-                                    chatId: widget.chatId,
-                                    sender: ds["sendBy"],
-                                    name: ds["sendBy"],
-                                    message: ds,
-                                    sentByMe: FirebaseAuth
-                                            .instance.currentUser!.uid ==
-                                        ds["sendByID"],
-                                    isRead: ds["isRead"], isChat: true,);
+                                  chatId: widget.chatId,
+                                  sender: ds["sendBy"],
+                                  name: ds["sendBy"],
+                                  message: ds,
+                                  sentByMe:
+                                      FirebaseAuth.instance.currentUser!.uid ==
+                                          ds["sendByID"],
+                                  isRead: ds["isRead"],
+                                  isChat: true,
+                                );
                               } else {
                                 var x =
                                     ds.data().toString().contains('deleteFor');
@@ -199,19 +201,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                   if (ds["deleteFor"] !=
                                       FirebaseAuth.instance.currentUser!.uid) {
                                     return MessageTile(
-                                        chatId: widget.chatId,
-                                        sender: ds["sendBy"],
-                                        name: ds["sendBy"],
-                                        message: ds,
-                                        sentByMe: FirebaseAuth
-                                                .instance.currentUser!.uid ==
-                                            ds["sendByID"],
-                                        isRead: ds["isRead"], isChat: true,);
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                } else {
-                                  return MessageTile(
                                       chatId: widget.chatId,
                                       sender: ds["sendBy"],
                                       name: ds["sendBy"],
@@ -219,7 +208,24 @@ class _ChatScreenState extends State<ChatScreen> {
                                       sentByMe: FirebaseAuth
                                               .instance.currentUser!.uid ==
                                           ds["sendByID"],
-                                      isRead: ds["isRead"], isChat: true,);
+                                      isRead: ds["isRead"],
+                                      isChat: true,
+                                    );
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                } else {
+                                  return MessageTile(
+                                    chatId: widget.chatId,
+                                    sender: ds["sendBy"],
+                                    name: ds["sendBy"],
+                                    message: ds,
+                                    sentByMe: FirebaseAuth
+                                            .instance.currentUser!.uid ==
+                                        ds["sendByID"],
+                                    isRead: ds["isRead"],
+                                    isChat: true,
+                                  );
                                 }
                               }
                             }),
@@ -300,6 +306,18 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    outOfChat();
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    outOfChat();
+  }
+
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -376,8 +394,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         Container(
                           alignment: Alignment.bottomCenter,
                           constraints: BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height * 0.07,
-                            maxHeight: MediaQuery.of(context).size.height * 0.35,
+                            minHeight:
+                                MediaQuery.of(context).size.height * 0.07,
+                            maxHeight:
+                                MediaQuery.of(context).size.height * 0.35,
                           ),
                           width: MediaQuery.of(context).size.width,
                           child: Container(
@@ -387,30 +407,36 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                   minWidth: MediaQuery.of(context).size.width,
-                                  maxWidth: MediaQuery.of(context).size.width
-                              ),
+                                  maxWidth: MediaQuery.of(context).size.width),
                               child: Row(
                                 children: [
                                   ConstrainedBox(
                                       constraints: BoxConstraints(
-                                        minHeight: 50,
-                                        minWidth: MediaQuery.of(context).size.width-70,
-                                        maxWidth: MediaQuery.of(context).size.width-60
-                                      ),
+                                          minHeight: 50,
+                                          minWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              70,
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              60),
                                       child: TextField(
-                                    controller: messageTextEdittingController,
-                                    keyboardType: TextInputType.multiline,
-                                    minLines: 1,
-                                    maxLines: 5,
-                                    onChanged: (value) {},
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: "Введите сообщение",
-                                        hintStyle: TextStyle(
-                                            color:
-                                                Colors.white.withOpacity(0.6))),
-                                  )),
+                                        controller:
+                                            messageTextEdittingController,
+                                        keyboardType: TextInputType.multiline,
+                                        minLines: 1,
+                                        maxLines: 5,
+                                        onChanged: (value) {},
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: "Введите сообщение",
+                                            hintStyle: TextStyle(
+                                                color: Colors.white
+                                                    .withOpacity(0.6))),
+                                      )),
                                   GestureDetector(
                                     onTap: () {
                                       addMessage(true, 'text');
@@ -418,7 +444,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: Icon(
                                       Icons.send,
                                       color:
-                                          messageTextEdittingController.text != ""
+                                          messageTextEdittingController.text !=
+                                                  ""
                                               ? Colors.white
                                               : Colors.white.withOpacity(0.6),
                                     ),

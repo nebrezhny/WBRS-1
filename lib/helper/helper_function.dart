@@ -107,19 +107,21 @@ userImageWithCircle(userPhotoUrl, group, [width, height]) {
     height: height ?? 100,
     padding: const EdgeInsets.all(9),
     decoration: BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage(getUserGroupCircle(group)),
-        fit: BoxFit.cover,
-      )
-    ),
-    child:       userPhotoUrl != ''
+        image: DecorationImage(
+      image: AssetImage(getUserGroupCircle(group)),
+      fit: BoxFit.cover,
+    )),
+    child: userPhotoUrl != ''
         ? CircleAvatar(
-      backgroundImage: CachedNetworkImageProvider(userPhotoUrl),
-    )
+            backgroundImage: CachedNetworkImageProvider(
+              userPhotoUrl,
+              errorListener: (p0) {},
+            ),
+          )
         : const CircleAvatar(
-      radius: 39,
-      backgroundImage: AssetImage("assets/profile.png"),
-    ),
+            radius: 39,
+            backgroundImage: AssetImage("assets/profile.png"),
+          ),
   );
 }
 
@@ -170,8 +172,7 @@ List<Widget> getLikeGroup(myGroup) {
       myGroup == "коричнево-белая" ||
       myGroup == "коричневая") {
     spisok = ["Все белые", "Все коричневые", "Сине-белая"];
-  }else if (myGroup == "красно-белая"
-      || myGroup == "красно-синяя") {
+  } else if (myGroup == "красно-белая" || myGroup == "красно-синяя") {
     spisok = [
       "Чистая синяя",
       "Сине-коричневая",
@@ -195,12 +196,7 @@ List<Widget> getLikeGroup(myGroup) {
       "Красно-коричневая",
     ];
   } else if (myGroup == "синяя" || myGroup == "сине-коричневая") {
-    spisok = [
-      "Чисто красная",
-      "Красно-белая",
-      "Сине-красная",
-      "Красно-синяя"
-    ];
+    spisok = ["Чисто красная", "Красно-белая", "Сине-красная", "Красно-синяя"];
   } else if (myGroup == "сине-белая") {
     spisok = [
       "Все коричневые",
@@ -215,14 +211,13 @@ List<Widget> getLikeGroup(myGroup) {
   } else if (myGroup == "бело-красная" ||
       myGroup == "бело-синяя" ||
       myGroup == "бело-коричневая" ||
-      myGroup == "белая"){
-    spisok =[
+      myGroup == "белая") {
+    spisok = [
       "Все коричневые",
       "Сине-белая",
       "Красно-коричневая",
     ];
   }
-
 
   List<Widget> spisokOfWidgets = [];
 

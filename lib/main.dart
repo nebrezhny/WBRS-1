@@ -2,12 +2,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_admin/firebase_admin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wbrs/helper/helper_function.dart';
-import 'package:wbrs/migrations/24-08.dart';
 import 'package:wbrs/pages/auth/login_page.dart';
 import 'package:wbrs/pages/home_page.dart';
 import 'package:wbrs/pages/profile_page.dart';
@@ -22,6 +22,8 @@ import 'package:wbrs/pages/test/red_group.dart';
 
 import 'firebase_options.dart';
 import 'helper/global.dart';
+import 'pages/about_meet.dart';
+import 'pages/chatscreen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
@@ -45,8 +47,14 @@ void main() async {
       FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings("@mipmap/launcher_icon");
-  const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+  const DarwinInitializationSettings initializationSettingsIOS =
+      DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+  const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
   );
@@ -74,13 +82,11 @@ class _MyAppState extends State<MyApp> {
 
   // ignore: prefer_typing_uninitialized_variables
   var doc;
-
   startMigrations() async {
     //addUnVisibleField();
   }
 
   initFunction() async {
-    startMigrations();
     await checkInternet();
     selectedIndex = 1;
     await getUserLoggedInStatus();
@@ -93,10 +99,100 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  String? mtoken;
+  void getToken() async {
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mtoken = token;
+      });
+    });
+
+    print(mtoken);
+
+    saveUserToken(mtoken!);
+  }
+
+  void saveUserToken(String token) {
+    FirebaseFirestore.instance
+        .collection('TOKENS')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .set({'token': token});
+  }
+
   @override
   void initState() {
-    initFunction();
     super.initState();
+    initFunction();
+  }
+
+  initNotify() {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      Map body = message.data;
+      if (body['isChat'] == 'true') {
+        nextScreen(
+            context,
+            ChatScreen(
+              chatWithUsername: body['chatWith'],
+              photoUrl: body['photoUrl'],
+              id: body['id'],
+              chatId: body['chatId'],
+            ));
+      } else {
+        body['users'] =
+            body['users'].toString().replaceAll('[', '').replaceAll(']', '');
+        List users = body['users'].toString().split(',');
+        print(users);
+        nextScreen(
+            context,
+            AboutMeet(
+              id: body['groupId'],
+              users: users,
+              name: body['groupName'],
+              is_user_join: body['isUserJoin'].toString() == 'true',
+            ));
+      }
+    });
+    const AndroidInitializationSettings('@mipmap/launcher_icon');
+    const DarwinInitializationSettings();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print(message);
+      BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+        message.notification!.body.toString(),
+        htmlFormatBigText: true,
+        contentTitle: message.notification!.title.toString(),
+        htmlFormatContentTitle: true,
+      );
+
+      AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails('wbrs', 'wbrs',
+              importance: Importance.max,
+              styleInformation: bigTextStyleInformation,
+              priority: Priority.max,
+              playSound: true);
+
+      NotificationDetails platformChannelSpecifics =
+          NotificationDetails(android: androidNotificationDetails);
+
+      try {
+        await flutterLocalNotificationsPlugin.show(
+            0,
+            message.notification?.title,
+            message.notification?.body,
+            platformChannelSpecifics,
+            payload: message.notification?.body);
+      } on Exception catch (e) {
+        showSnackbar(context, Colors.red, e);
+      }
+    });
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update(
+      {
+        'chatWithId': '',
+      },
+    );
   }
 
   getUserInfo() async {
@@ -108,6 +204,8 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       GlobalBalance = doc.get('balance');
     });
+    getToken();
+    initNotify();
   }
 
   checkInternet() async {
