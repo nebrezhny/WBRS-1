@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wbrs/helper/global.dart';
+import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/pages/filter_pages/cities.dart';
 
 import '../widgets/widgets.dart';
 
@@ -13,12 +15,12 @@ class CreateMeetPage extends StatefulWidget {
 
 class _CreateMeetPageState extends State<CreateMeetPage> {
   CollectionReference collectionReference =
-      FirebaseFirestore.instance.collection('meets');
+      firebaseFirestore.collection('meets');
 
-  TextEditingController name_meet = TextEditingController();
+  TextEditingController nameMeet = TextEditingController();
   TextEditingController city = TextEditingController();
   TextEditingController description = TextEditingController();
-  TextEditingController date_and_time = TextEditingController();
+  TextEditingController dateAndTime = TextEditingController();
 
   String? _type = 'групповая';
 
@@ -76,8 +78,8 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                   child: Column(
                 children: [
                   TextField(
-                    style: TextStyle(color: Colors.white),
-                    controller: name_meet,
+                    style: const TextStyle(color: Colors.white),
+                    controller: nameMeet,
                     decoration: const InputDecoration(
                         hintText: 'Введите название встречи',
                         hintStyle: TextStyle(color: Colors.white),
@@ -94,27 +96,61 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                   const SizedBox(
                     height: 30,
                   ),
-                  TextField(
-                    style: TextStyle(color: Colors.white),
-                    controller: city,
-                    decoration: const InputDecoration(
-                        hintText: 'Введите название города',
-                        fillColor: Colors.white,
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 5)),
+                  Autocomplete<String>(
+                    optionsMaxHeight: MediaQuery.of(context).size.height * 0.3,
+                    optionsViewBuilder: (context, onSelected, options) {
+                      return cityDropdown(context, options, onSelected);
+                    },
+                    optionsBuilder: (textEditingValue) {
+                      if (textEditingValue.text == '') {
+                        return [];
+                      }
+                      return cities
+                          .where((city) => city
+                              .toLowerCase()
+                              .startsWith(textEditingValue.text.toLowerCase()))
+                          .toList()
+                        ..sort((a, b) => a.compareTo(b));
+                    },
+                    onSelected: (String val) {
+                      setState(() {
+                        city.text = val
+                            .split(RegExp(r"(?! )\s{2,}"))
+                            .join(' ')
+                            .split(RegExp(r"\s+$"))
+                            .join('');
+                      });
+                    },
+                    fieldViewBuilder:
+                        (context, controller, focusNode, onSubmitted) {
+                      return TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: controller,
+                        focusNode: focusNode,
+                        onChanged: (value) {
+                          city.text = value;
+                        },
+                        decoration: const InputDecoration(
+                            hintText: 'Введите название города',
+                            fillColor: Colors.white,
+                            hintStyle: TextStyle(color: Colors.white),
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 5)),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 30,
                   ),
                   TextField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     maxLength: 300,
                     controller: description,
                     decoration: const InputDecoration(
@@ -135,36 +171,47 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(selectedDate.month > 10
-                          ? 'Дата: ${selectedDate.day}.${selectedDate.month}.${selectedDate.year}'
-                          : 'Дата: ${selectedDate.day}.0${selectedDate.month}.${selectedDate.year}',
-                        style: TextStyle(color: Colors.white),),
+                      Text(
+                        selectedDate.month > 10
+                            ? 'Дата: ${selectedDate.day}.${selectedDate.month}.${selectedDate.year}'
+                            : 'Дата: ${selectedDate.day}.0${selectedDate.month}.${selectedDate.year}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orangeAccent),
                           onPressed: () {
                             _selectDate(context);
                           },
-                          child: const Text('Выбрать дату',style: TextStyle(color: Colors.white),)),
+                          child: const Text(
+                            'Выбрать дату',
+                            style: TextStyle(color: Colors.white),
+                          )),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(selectedTime.hour > 10
-                          ? selectedTime.minute > 10
-                              ? 'Время: ${selectedTime.hour}:${selectedTime.minute}'
-                              : 'Время: ${selectedTime.hour}:0${selectedTime.minute}'
-                          : selectedTime.minute > 10
-                              ? 'Время: 0${selectedTime.hour}:${selectedTime.minute}'
-                              : 'Время: 0${selectedTime.hour}:0${selectedTime.minute}',style: TextStyle(color: Colors.white),),
+                      Text(
+                        selectedTime.hour > 10
+                            ? selectedTime.minute > 10
+                                ? 'Время: ${selectedTime.hour}:${selectedTime.minute}'
+                                : 'Время: ${selectedTime.hour}:0${selectedTime.minute}'
+                            : selectedTime.minute > 10
+                                ? 'Время: 0${selectedTime.hour}:${selectedTime.minute}'
+                                : 'Время: 0${selectedTime.hour}:0${selectedTime.minute}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orangeAccent),
                           onPressed: () {
                             _selectTime(context);
                           },
-                          child: const Text('Выбрать время',style: TextStyle(color: Colors.white),)),
+                          child: const Text(
+                            'Выбрать время',
+                            style: TextStyle(color: Colors.white),
+                          )),
                     ],
                   ),
                   const SizedBox(
@@ -174,11 +221,14 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     dropdownColor: Colors.black45,
-                    items:
-                        <String>['индивидуальная', 'групповая'].map((String value) {
+                    items: <String>['индивидуальная', 'групповая']
+                        .map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value,style: TextStyle(color: Colors.white),),
+                        child: Text(
+                          value,
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       );
                     }).toList(),
                     onChanged: (String? value) {
@@ -206,20 +256,26 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
 
                         var dateTime =
                             '$day.$month.${selectedDate.year} $hour:$minute';
-                        if (name_meet.text == '') {
-                          showSnackbar(context, Colors.red, 'Введите название!');
+                        if (nameMeet.text == '') {
+                          showSnackbar(
+                              context, Colors.red, 'Введите название!');
                         }
                         if (city.text == '') {
                           showSnackbar(context, Colors.red, 'Введите город!');
                         } else {
                           collectionReference.add({
-                            'name': name_meet.text.split(RegExp(r"(?! )\s{2,}")).join(' ').split(RegExp(r"\s+$")).join(''),
+                            'timeStamp': DateTime.now(),
+                            'name': nameMeet.text
+                                .split(RegExp(r"(?! )\s{2,}"))
+                                .join(' ')
+                                .split(RegExp(r"\s+$"))
+                                .join(''),
                             'city': city.text,
                             'description': description.text,
                             'datetime': dateTime,
-                            'admin': FirebaseAuth.instance.currentUser!.uid,
+                            'admin': firebaseAuth.currentUser!.uid,
                             'type': _type != '' ? _type : 'групповая',
-                            'users': [FirebaseAuth.instance.currentUser!.uid],
+                            'users': [firebaseAuth.currentUser!.uid],
                             'recentMessage': '',
                             'recentMessageSender': '',
                           });
@@ -227,15 +283,16 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                         }
 
                         setState(() {
-                          name_meet.clear();
+                          nameMeet.clear();
                           city.clear();
                           description.clear();
-                          date_and_time.clear();
+                          dateAndTime.clear();
                         });
                       },
                       child: const Text(
                         "Сохранить",
-                        style: TextStyle(fontSize: 20, color: Colors.orangeAccent),
+                        style:
+                            TextStyle(fontSize: 20, color: Colors.orangeAccent),
                       ))
                 ],
               )),

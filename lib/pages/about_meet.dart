@@ -1,11 +1,8 @@
 // ignore_for_file: implementation_imports, must_be_immutable, non_constant_identifier_names
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:wbrs/pages/chat_page.dart';
-import 'package:wbrs/pages/meetings.dart';
-import 'package:wbrs/widgets/widgets.dart';
 
 class AboutMeet extends StatefulWidget {
   String id = '';

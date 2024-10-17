@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/pages/filter_pages/cities.dart';
 import 'package:wbrs/pages/profiles_list.dart';
 import 'package:wbrs/widgets/widgets.dart';
 
@@ -51,7 +52,7 @@ class _FilterPage2State extends State<FilterPage2> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      height: MediaQuery.of(context).size.height*0.3,
+      height: MediaQuery.of(context).size.height * 0.3,
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
@@ -66,9 +67,15 @@ class _FilterPage2State extends State<FilterPage2> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 children: [
-                  Icon(filterByGroup ? Icons.check_box_outlined : Icons.check_box_outline_blank, color: Colors.white,),
+                  Icon(
+                    filterByGroup
+                        ? Icons.check_box_outlined
+                        : Icons.check_box_outline_blank,
+                    color: Colors.white,
+                  ),
                   const SizedBox(width: 10),
-                  const Text("Фильтр по группам", style: TextStyle(color: Colors.white)),
+                  const Text("Фильтр по группам",
+                      style: TextStyle(color: Colors.white)),
                   const Spacer(),
                 ],
               ),
@@ -94,7 +101,8 @@ class _FilterPage2State extends State<FilterPage2> {
                       onTap: () {
                         setState(() {
                           FiltrPol = "м";
-                          nextScreenReplace(context, ProfilesList(group: Group));
+                          nextScreenReplace(
+                              context, ProfilesList(group: Group));
                         });
                       },
                       child: Container(
@@ -102,8 +110,16 @@ class _FilterPage2State extends State<FilterPage2> {
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: Text('M', style: TextStyle(color: FiltrPol == "м" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: Text(
+                          'M',
+                          style: TextStyle(
+                              color: FiltrPol == "м"
+                                  ? Colors.orangeAccent
+                                  : Colors.white24,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -113,7 +129,8 @@ class _FilterPage2State extends State<FilterPage2> {
                       onTap: () {
                         setState(() {
                           FiltrPol = "ж";
-                          nextScreenReplace(context, ProfilesList(group: Group));
+                          nextScreenReplace(
+                              context, ProfilesList(group: Group));
                         });
                       },
                       child: Container(
@@ -121,8 +138,16 @@ class _FilterPage2State extends State<FilterPage2> {
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: Text('Ж', style: TextStyle(color: FiltrPol == "ж" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: Text(
+                          'Ж',
+                          style: TextStyle(
+                              color: FiltrPol == "ж"
+                                  ? Colors.orangeAccent
+                                  : Colors.white24,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -132,7 +157,8 @@ class _FilterPage2State extends State<FilterPage2> {
                       onTap: () {
                         setState(() {
                           FiltrPol = "";
-                          nextScreenReplace(context, ProfilesList(group: Group));
+                          nextScreenReplace(
+                              context, ProfilesList(group: Group));
                         });
                       },
                       child: Container(
@@ -140,8 +166,16 @@ class _FilterPage2State extends State<FilterPage2> {
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: Text('Все', style: TextStyle(color: FiltrPol == "" ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold),),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: Text(
+                          'Все',
+                          style: TextStyle(
+                              color: FiltrPol == ""
+                                  ? Colors.orangeAccent
+                                  : Colors.white24,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -154,8 +188,7 @@ class _FilterPage2State extends State<FilterPage2> {
           ),
           StatefulBuilder(builder: (context, state) {
             return GestureDetector(
-              onTap: () {
-              },
+              onTap: () {},
               child: Container(
                 width: MediaQuery.of(context).size.width - 20,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -168,7 +201,8 @@ class _FilterPage2State extends State<FilterPage2> {
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text("Возраст", style: TextStyle(color: Colors.white)),
+                        const Text("Возраст",
+                            style: TextStyle(color: Colors.white)),
                         const SizedBox(
                           width: 10,
                         ),
@@ -177,65 +211,71 @@ class _FilterPage2State extends State<FilterPage2> {
                           children: [
                             Text(
                               'от ${filtrAgeStart.text} ',
-                              style: const TextStyle(fontSize: 13, color: Colors.white),
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.white),
                             ),
                             Text(
                               'до ${filtrAgeEnd.text}',
-                              style: const TextStyle(fontSize: 13, color: Colors.white),
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.white),
                             )
                           ],
                         ),
                         SizedBox(
-                          width: 150,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 30,
-                                child: TextField(
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  textAlign: TextAlign.center,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.white)),
-                                    filled: true,
-                                    fillColor: Colors.white24,
+                            width: 150,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.zero,
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: const BorderSide(
+                                              color: Colors.white)),
+                                      filled: true,
+                                      fillColor: Colors.white24,
+                                    ),
+                                    controller: filtrAgeStart,
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  controller: filtrAgeStart,
-                                  style: const TextStyle(color: Colors.white),
                                 ),
-                              ),
-                              const Text("-", style: TextStyle(color: Colors.white)),
-                              SizedBox(
-                                width: 50,
-                                height: 30,
-                                child: TextField(
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  textAlign: TextAlign.center,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.white)),
-                                    filled: true,
-                                    fillColor: Colors.white24,
+                                const Text("-",
+                                    style: TextStyle(color: Colors.white)),
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.zero,
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: const BorderSide(
+                                              color: Colors.white)),
+                                      filled: true,
+                                      fillColor: Colors.white24,
+                                    ),
+                                    controller: filtrAgeEnd,
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  controller: filtrAgeEnd,
-                                  style: const TextStyle(color: Colors.white),
                                 ),
-                              ),
-                            ],
-                          )
-                        ),
+                              ],
+                            )),
                       ],
                     ),
                   ],
@@ -264,13 +304,45 @@ class _FilterPage2State extends State<FilterPage2> {
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.6,
-                      child: TextField(
-                        controller: filtrCity,
-                        style: const TextStyle(color: Colors.white),
-                        onChanged: (value) {
+                      child: Autocomplete<String>(
+                        optionsMaxHeight:
+                            MediaQuery.of(context).size.height * 0.3,
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return cityDropdown(context, options, onSelected);
+                        },
+                        optionsBuilder: (textEditingValue) {
+                          if (textEditingValue.text == '') {
+                            return [];
+                          }
+                          return cities
+                              .where((city) => city.toLowerCase().startsWith(
+                                  textEditingValue.text.toLowerCase()))
+                              .toList()
+                            ..sort((a, b) => a.compareTo(b));
+                        },
+                        onSelected: (String val) {
                           setState(() {
-                            city = value.split(RegExp(r"(?! )\s{2,}")).join(' ').split(RegExp(r"\s+$")).join('');
+                            String value = val.trim();
+                            filtrCity.text = value;
+                            city = value;
                           });
+                        },
+                        fieldViewBuilder:
+                            (context, controller, focusNode, onSubmitted) {
+                          controller.text = city;
+                          return TextField(
+                            controller: controller,
+                            style: const TextStyle(color: Colors.white),
+                            focusNode: focusNode,
+                            onSubmitted: (String value) {
+                              onSubmitted();
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                city = value;
+                              });
+                            },
+                          );
                         },
                       ),
                     ),
@@ -279,17 +351,37 @@ class _FilterPage2State extends State<FilterPage2> {
               ],
             ),
           ),
-          TextButton(
-              onPressed: () async {
-                var x = await getUserGroup();
-                setState(() {
-                  filtrCity.text = city;
-                  ageStart = int.parse(filtrAgeStart.text);
-                  ageEnd = int.parse(filtrAgeEnd.text);
-                  nextScreenReplace(context, ProfilesList(group: x));
-                });
-              },
-              child: const Text('Применить фильтры', style: TextStyle(color: Colors.white)))
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                  onPressed: () async {
+                    var x = await getUserGroup();
+                    setState(() {
+                      filtrCity.text = city;
+                      ageStart = int.parse(filtrAgeStart.text);
+                      ageEnd = int.parse(filtrAgeEnd.text);
+                      nextScreenReplace(context, ProfilesList(group: x));
+                    });
+                  },
+                  child: const Text('Применить фильтры',
+                      style: TextStyle(color: Colors.white))),
+              TextButton(
+                  onPressed: () async {
+                    var x = await getUserGroup();
+                    filterByGroup = false;
+                    FiltrPol = '';
+                    setState(() {
+                      filtrCity.text = '';
+                      ageStart = 0;
+                      ageEnd = 100;
+                      nextScreenReplace(context, ProfilesList(group: x));
+                    });
+                  },
+                  child: const Text('Сбросить фильтры',
+                      style: TextStyle(color: Colors.white))),
+            ],
+          )
         ],
       ),
     );

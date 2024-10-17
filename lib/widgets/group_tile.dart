@@ -1,16 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:wbrs/helper/global.dart';
 
 class ChatTile extends StatefulWidget {
   final String userName;
   final String chatId;
   final String userName2;
   const ChatTile(
-      {Key? key,
+      {super.key,
       required this.chatId,
       required this.userName2,
-      required this.userName})
-      : super(key: key);
+      required this.userName});
 
   @override
   State<ChatTile> createState() => _ChatTileState();
@@ -48,7 +47,7 @@ class _ChatTileState extends State<ChatTile> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            "${widget.userName} ${FirebaseFirestore.instance.collection("chats")}",
+            "${widget.userName} ${firebaseFirestore.collection("chats")}",
             style: const TextStyle(fontSize: 13),
           ),
         ),

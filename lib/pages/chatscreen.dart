@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names
+// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously
 
 import 'dart:io';
 
@@ -36,6 +36,9 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _image;
   TextEditingController messageTextEdittingController = TextEditingController();
   String group = '';
+  bool isNotificationEnable = true;
+  List userWOutN = [];
+  Map chatInfo = {};
 
   getMyInfoFromSharedPreference() async {
     myName = HelperFunctions().getDisplayName().toString();
@@ -43,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
     myUserName = HelperFunctions().getUserName().toString();
     myEmail = HelperFunctions().getUserEmail().toString();
 
-    group = await FirebaseFirestore.instance
+    group = await firebaseFirestore
         .collection('users')
         .doc(widget.id)
         .get()
@@ -62,12 +65,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   addMessage(bool sendClicked, String type) async {
     if (messageTextEdittingController.text != "") {
-      QuerySnapshot querySnap = await FirebaseFirestore.instance
+      QuerySnapshot querySnap = await firebaseFirestore
           .collection('users')
           .where('fullName', isEqualTo: widget.chatWithUsername)
           .get();
       String chatWith = querySnap.docs[0]['chatWithId'];
-      bool isUserInChat = chatWith == FirebaseAuth.instance.currentUser!.uid;
+      bool isUserInChat = chatWith == firebaseAuth.currentUser!.uid;
 
       isUserInChat
           ? null
@@ -79,8 +82,8 @@ class _ChatScreenState extends State<ChatScreen> {
       Map<String, dynamic> messageInfoMap = {
         "type": type,
         "message": type == "text" ? message : _image,
-        "sendBy": FirebaseAuth.instance.currentUser!.displayName,
-        "sendByID": FirebaseAuth.instance.currentUser!.uid,
+        "sendBy": firebaseAuth.currentUser!.displayName,
+        "sendByID": firebaseAuth.currentUser!.uid,
         "ts": lastMessageTs,
         "isRead": isUserInChat ? true : false
       };
@@ -95,8 +98,8 @@ class _ChatScreenState extends State<ChatScreen> {
         Map<String, dynamic> lastMessageInfoMap = {
           "lastMessage": message,
           "lastMessageSendTs": lastMessageTs,
-          "lastMessageSendBy": FirebaseAuth.instance.currentUser!.displayName,
-          "lastMessageSendByID": FirebaseAuth.instance.currentUser!.uid,
+          "lastMessageSendBy": firebaseAuth.currentUser!.displayName,
+          "lastMessageSendByID": firebaseAuth.currentUser!.uid,
         };
 
         DatabaseService()
@@ -110,32 +113,28 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       });
 
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('TOKENS')
-          .doc(widget.id)
-          .get();
-      DocumentSnapshot snap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.id)
-          .get();
-      String token = doc.get('token');
-      String name = snap.get('fullName');
+      if (!userWOutN.contains(widget.id)) {
+        DocumentSnapshot doc = await firebaseFirestore
+            .collection('TOKENS')
+            .doc(firebaseAuth.currentUser!.uid)
+            .get();
+        DocumentSnapshot snap =
+            await firebaseFirestore.collection('users').doc(widget.id).get();
+        String token = doc.get('token');
+        snap.get('fullName');
 
-      Map notificationBody = {
-        'isChat': true,
-        'chatId': widget.chatId,
-        'chatWith': widget.chatWithUsername,
-        'id': widget.id,
-        'photoUrl': widget.photoUrl,
-        'message': message,
-      };
+        Map notificationBody = {
+          'isChat': true,
+          'chatId': widget.chatId,
+          'chatWith': widget.chatWithUsername,
+          'id': widget.id,
+          'photoUrl': widget.photoUrl,
+          'message': message,
+        };
 
-      NotificationsService().sendPushMessage(
-          token,
-          notificationBody,
-          FirebaseAuth.instance.currentUser!.displayName.toString(),
-          4,
-          widget.chatId);
+        NotificationsService().sendPushMessage(token, notificationBody,
+            firebaseAuth.currentUser!.displayName.toString(), 4, widget.chatId);
+      }
     }
     messageTextEdittingController.text = "";
   }
@@ -171,8 +170,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               DocumentSnapshot ds = snapshot.data.docs[index];
                               ds.id;
                               if (ds["sendByID"] !=
-                                  FirebaseAuth.instance.currentUser!.uid) {
-                                FirebaseFirestore.instance
+                                  firebaseAuth.currentUser!.uid) {
+                                firebaseFirestore
                                     .collection('chats')
                                     .doc(widget.chatId)
                                     .collection('chats')
@@ -188,9 +187,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                   sender: ds["sendBy"],
                                   name: ds["sendBy"],
                                   message: ds,
-                                  sentByMe:
-                                      FirebaseAuth.instance.currentUser!.uid ==
-                                          ds["sendByID"],
+                                  sentByMe: firebaseAuth.currentUser!.uid ==
+                                      ds["sendByID"],
                                   isRead: ds["isRead"],
                                   isChat: true,
                                 );
@@ -199,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ds.data().toString().contains('deleteFor');
                                 if (x) {
                                   if (ds["deleteFor"] !=
-                                      FirebaseAuth.instance.currentUser!.uid) {
+                                      firebaseAuth.currentUser!.uid) {
                                     return MessageTile(
                                       chatId: widget.chatId,
                                       sender: ds["sendBy"],
@@ -267,22 +265,25 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   chatWith_Update(String id) async {
-    String myId = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance
+    String myId = firebaseAuth.currentUser!.uid;
+    await firebaseFirestore
         .collection('users')
         .doc(myId)
         .update({'chatWithId': id});
-    DocumentSnapshot chat = await FirebaseFirestore.instance
-        .collection('chats')
-        .doc(widget.chatId)
-        .get();
+    DocumentSnapshot chat =
+        await firebaseFirestore.collection('chats').doc(widget.chatId).get();
 
-    var chatSnapshot =
-        FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
+    setState(() {
+      chatInfo = chat.data() as Map;
+      userWOutN = chatInfo['usersWOutNotifications'] ?? [];
+      isNotificationEnable = !userWOutN.contains(firebaseAuth.currentUser!.uid);
+    });
+
+    var chatSnapshot = firebaseFirestore.collection('chats').doc(widget.chatId);
 
     String lastMessageSendBy = chat.get('lastMessageSendBy');
 
-    if (lastMessageSendBy != FirebaseAuth.instance.currentUser!.displayName) {
+    if (lastMessageSendBy != firebaseAuth.currentUser!.displayName) {
       chatSnapshot.update({
         'unreadMessage': 0,
       });
@@ -290,8 +291,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<bool> outOfChat() async {
-    String myId = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance
+    String myId = firebaseAuth.currentUser!.uid;
+    await firebaseFirestore
         .collection('users')
         .doc(myId)
         .update({'chatWithId': ''});
@@ -318,7 +319,23 @@ class _ChatScreenState extends State<ChatScreen> {
     outOfChat();
   }
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+
+  switchNotification() async {
+    String myUID = firebaseAuth.currentUser!.uid;
+    setState(() {
+      if (!isNotificationEnable) {
+        userWOutN.remove(myUID);
+      } else {
+        userWOutN.add(myUID);
+      }
+    });
+    firebaseFirestore
+        .collection('chats')
+        .doc(widget.chatId)
+        .update({'usersWOutNotifications': userWOutN});
+    isNotificationEnable = !isNotificationEnable;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -338,6 +355,15 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               iconTheme: const IconThemeData(color: Colors.white),
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      switchNotification();
+                    },
+                    icon: isNotificationEnable
+                        ? const Icon(Icons.notifications_on_outlined)
+                        : const Icon(Icons.notifications_off_outlined))
+              ],
               title: Row(
                 children: [
                   ClipRRect(
@@ -359,7 +385,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 uid: widget.id,
                                 photoUrl: widget.photoUrl,
                                 name: widget.chatWithUsername,
-                                userInfo: await FirebaseFirestore.instance
+                                userInfo: await firebaseFirestore
                                     .collection('users')
                                     .doc(widget.id)
                                     .get(),

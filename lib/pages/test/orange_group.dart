@@ -1,6 +1,4 @@
 // ignore_for_file: unrelated_type_equality_checks, non_constant_identifier_names
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/helper/global.dart';
@@ -8,7 +6,7 @@ import 'package:wbrs/pages/profile_page.dart';
 import 'package:wbrs/widgets/widgets.dart';
 
 class OrangePage extends StatefulWidget {
-  const OrangePage({Key? key}) : super(key: key);
+  const OrangePage({super.key});
 
   @override
   State<OrangePage> createState() => _OrangePageState();
@@ -117,103 +115,108 @@ class _OrangePageState extends State<OrangePage> {
                             setState(() {
                               BlueGroup = counter;
 
-                            if (BrownGroup > max) {
+                              if (BrownGroup > max) {
                                 max = BrownGroup;
-                            }
+                              }
 
-                            if (RedGroup > max) {
+                              if (RedGroup > max) {
                                 max = RedGroup;
-                            }
+                              }
 
-                            if (WhiteGroup > max) {
+                              if (WhiteGroup > max) {
                                 max = WhiteGroup;
-                            }
+                              }
 
-                            if (BlueGroup > max) {
+                              if (BlueGroup > max) {
                                 max = BlueGroup;
-                            }
+                              }
 
-                            if (BrownGroup > max2 && BrownGroup != max) {
+                              if (BrownGroup > max2 && BrownGroup != max) {
                                 max2 = BrownGroup;
-                            }
+                              }
 
-                            if (RedGroup > max2 && RedGroup != max) {
+                              if (RedGroup > max2 && RedGroup != max) {
                                 max2 = RedGroup;
-                            }
+                              }
 
-                            if (WhiteGroup > max2 && WhiteGroup != max) {
+                              if (WhiteGroup > max2 && WhiteGroup != max) {
                                 max2 = WhiteGroup;
-                            }
+                              }
 
-                            if (BlueGroup > max2 && BlueGroup != max) {
+                              if (BlueGroup > max2 && BlueGroup != max) {
                                 max2 = BlueGroup;
-                            }
-
-
-                            if (max == BrownGroup) {
-                              if(max2>0){
-                              if (max2 == RedGroup) {
-                                  Group = "коричнево-красная";
                               }
-                              if (max2 == BlueGroup) {
-                                  Group = "коричнево-синяя";
-                              }
-                              if (max2 == WhiteGroup) {
-                                  Group = "коричнево-белая";
-                              }}else {
+
+                              if (max == BrownGroup) {
+                                if (max2 > 0) {
+                                  if (max2 == RedGroup) {
+                                    Group = "коричнево-красная";
+                                  }
+                                  if (max2 == BlueGroup) {
+                                    Group = "коричнево-синяя";
+                                  }
+                                  if (max2 == WhiteGroup) {
+                                    Group = "коричнево-белая";
+                                  }
+                                } else {
                                   Group = "коричневая";
+                                }
                               }
-                            }
 
-                            if (max == RedGroup) {
-                              if(max2>0){
-                              if (max2 == BrownGroup) {
-                                  Group = "красно-коричневая";
-                              }
-                              if (max2 == BlueGroup) {
-                                  Group = "красно-синяя";
-                              }
-                              if (max2 == WhiteGroup) {
-                                  Group = "красно-белая";
-                              }}else{
+                              if (max == RedGroup) {
+                                if (max2 > 0) {
+                                  if (max2 == BrownGroup) {
+                                    Group = "красно-коричневая";
+                                  }
+                                  if (max2 == BlueGroup) {
+                                    Group = "красно-синяя";
+                                  }
+                                  if (max2 == WhiteGroup) {
+                                    Group = "красно-белая";
+                                  }
+                                } else {
                                   Group = "красная";
+                                }
                               }
-                            }
 
-                            if (max == BlueGroup) {
-                              if(max2>0){
-                              if (max2 == RedGroup) {
-                                  Group = "сине-красная";
-                              }
-                              if (max2 == BrownGroup) {
-                                  Group = "сине-коричневая";
-                              }
-                              if (max2 == WhiteGroup) {
-                                  Group = "сине-белая";
-                              }}else{
+                              if (max == BlueGroup) {
+                                if (max2 > 0) {
+                                  if (max2 == RedGroup) {
+                                    Group = "сине-красная";
+                                  }
+                                  if (max2 == BrownGroup) {
+                                    Group = "сине-коричневая";
+                                  }
+                                  if (max2 == WhiteGroup) {
+                                    Group = "сине-белая";
+                                  }
+                                } else {
                                   Group = "синяя";
+                                }
                               }
-                            }
 
-                            if (max == WhiteGroup) {
-                              if(max2>0){
-                              if (max2 == RedGroup) {
-                                  Group = "бело-красная";
-                              }
-                              if (max2 == BlueGroup) {
-                                  Group = "бело-синяя";
-                              }
-                              if (max2 == BrownGroup) {
-                                  Group = "бело-коричневая";
-                              }}else{
+                              if (max == WhiteGroup) {
+                                if (max2 > 0) {
+                                  if (max2 == RedGroup) {
+                                    Group = "бело-красная";
+                                  }
+                                  if (max2 == BlueGroup) {
+                                    Group = "бело-синяя";
+                                  }
+                                  if (max2 == BrownGroup) {
+                                    Group = "бело-коричневая";
+                                  }
+                                } else {
                                   Group = "белая";
+                                }
                               }
-                            }
-                              FirebaseFirestore.instance
+                              firebaseFirestore
                                   .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .update({'isRegistrationEnd': true,
-                                'группа': Group});
+                                  .doc(firebaseAuth.currentUser!.uid)
+                                  .update({
+                                'isRegistrationEnd': true,
+                                'группа': Group
+                              });
                               setState(() {
                                 selectedIndex = 0;
                               });

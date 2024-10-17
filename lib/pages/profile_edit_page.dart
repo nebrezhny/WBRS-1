@@ -18,6 +18,7 @@ import 'package:wbrs/helper/global.dart' as global;
 
 import '../helper/global.dart';
 import '../widgets/bottom_nav_bar.dart';
+import 'filter_pages/cities.dart';
 
 class ProfilePageEdit extends StatefulWidget {
   String userName;
@@ -29,7 +30,7 @@ class ProfilePageEdit extends StatefulWidget {
   String hobbi;
   bool deti;
   ProfilePageEdit({
-    Key? key,
+    super.key,
     required this.email,
     required this.userName,
     required this.about,
@@ -38,7 +39,7 @@ class ProfilePageEdit extends StatefulWidget {
     required this.rost,
     required this.city,
     required this.hobbi,
-  }) : super(key: key);
+  });
 
   @override
   _ProfilePageEditState createState() => _ProfilePageEditState();
@@ -57,8 +58,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
   TextEditingController? hobbi = TextEditingController();
   TextEditingController? city = TextEditingController();
   String? deti;
-  late User? user = FirebaseAuth.instance.currentUser;
-  FirebaseFirestore db = FirebaseFirestore.instance;
+  late User? user = firebaseAuth.currentUser;
+  FirebaseFirestore db = firebaseFirestore;
 
   void pickUploadImage() async {
     final image = await ImagePicker().pickImage(
@@ -67,7 +68,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("profilepic${FirebaseAuth.instance.currentUser?.uid}.jpg");
+        .child("profilepic${firebaseAuth.currentUser?.uid}.jpg");
 
     await ref.putFile(File(image!.path));
     ref.getDownloadURL().then((value) {
@@ -82,6 +83,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     super.initState();
     about!.text = widget.about;
     hobbi!.text = widget.hobbi;
+    city!.text = widget.city;
   }
 
   AuthService authService = AuthService();
@@ -151,8 +153,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                       Stack(
                         children: [
                           (_image == null)
-                              ? (FirebaseAuth.instance.currentUser!.photoURL ==
-                                          "" ||
+                              ? (firebaseAuth.currentUser!.photoURL == "" ||
                                       FirebaseAuth
                                               .instance.currentUser!.photoURL ==
                                           null)
@@ -194,7 +195,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                 height: 50,
                                 child: IconButton(
                                   onPressed: () async {
-
                                     XFile? image = await ImagePicker()
                                         .pickImage(source: ImageSource.gallery);
 
@@ -205,17 +205,17 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     if (_image != null) {
                                       FirebaseStorage storage =
                                           FirebaseStorage.instance;
+                                      String ref =
+                                          '${firebaseAuth.currentUser!.uid}/avatar-${firebaseAuth.currentUser!.displayName}-${DateTime.now()}';
                                       try {
                                         await storage
-                                            .ref(
-                                                '${FirebaseAuth.instance.currentUser!.uid}/avatar-${FirebaseAuth.instance.currentUser!.uid}')
+                                            .ref(ref)
                                             .putFile(File(_image!.path));
                                       } on FirebaseException {}
                                       var downloadUrl = await storage
-                                          .ref(
-                                              '${FirebaseAuth.instance.currentUser!.uid}/avatar-${FirebaseAuth.instance.currentUser!.uid}')
+                                          .ref(ref)
                                           .getDownloadURL();
-                                      await FirebaseAuth.instance.currentUser!
+                                      await firebaseAuth.currentUser!
                                           .updatePhotoURL(
                                               downloadUrl.toString());
                                       print(downloadUrl);
@@ -232,7 +232,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           .doc(FirebaseAuth
                                               .instance.currentUser!.uid)
                                           .collection("images")
-                                      .add({
+                                          .add({
                                         'url': downloadUrl,
                                       }).then((value) => print("done"));
 
@@ -292,7 +292,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -341,7 +341,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -389,7 +389,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -436,7 +436,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -450,7 +450,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(
-                                    width: 290,
+                                    width:
+                                        MediaQuery.of(context).size.width / 1.5,
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       minLines: 1,
@@ -484,7 +485,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -498,7 +499,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(
-                                    width: 290,
+                                    width:
+                                        MediaQuery.of(context).size.width / 1.5,
                                     child: TextField(
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
@@ -514,7 +516,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       minLines: 1,
                                       maxLines: 5,
                                       decoration: InputDecoration(
-
                                         hintText: widget.hobbi,
                                         hintStyle: const TextStyle(
                                             color: Colors.white),
@@ -534,7 +535,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -549,25 +550,103 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                   ),
                                   SizedBox(
                                     width: 150,
-                                    child: TextField(
-                                      textAlign: TextAlign.end,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      onSubmitted: (city) {
-                                        widget.city = city.toString();
+                                    child: Autocomplete<String>(
+                                      optionsMaxHeight:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                      optionsViewBuilder:
+                                          (context, onSelected, options) {
+                                        return Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Material(
+                                            surfaceTintColor: Colors.white54,
+                                            type: MaterialType.transparency,
+                                            elevation: 4.0,
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxHeight:
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                        0.3,
+                                              ),
+                                              child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  padding: EdgeInsets.zero,
+                                                  itemCount: options.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final option = options
+                                                        .elementAt(index);
+                                                    return ListTile(
+                                                      tileColor: Colors
+                                                          .grey.shade700
+                                                          .withOpacity(0.8),
+                                                      title: Text(
+                                                        option
+                                                            .split(RegExp(
+                                                                r"(?! )\s{2,}"))
+                                                            .join(' ')
+                                                            .split(
+                                                                RegExp(r"\s+$"))
+                                                            .join(''),
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onTap: () =>
+                                                          onSelected(option),
+                                                    );
+                                                  }),
+                                            ),
+                                          ),
+                                        );
                                       },
-                                      onChanged: (city) {
-                                        widget.city = city.toString();
+                                      optionsBuilder: (textEditingValue) {
+                                        if (textEditingValue.text == '') {
+                                          return [];
+                                        }
+                                        return cities
+                                            .where((city) => city
+                                                .toLowerCase()
+                                                .startsWith(textEditingValue
+                                                    .text
+                                                    .toLowerCase()))
+                                            .toList()
+                                          ..sort((a, b) => a.compareTo(b));
                                       },
-                                      controller: city,
-                                      decoration: InputDecoration(
-                                        hintText: widget.city,
-                                        hintStyle: const TextStyle(
-                                            color: Colors.white),
-                                        alignLabelWithHint: false,
-                                        border: InputBorder.none,
-                                      ),
+                                      onSelected: (String val) {
+                                        setState(() {
+                                          city!.text = val
+                                              .split(RegExp(r"(?! )\s{2,}"))
+                                              .join(' ')
+                                              .split(RegExp(r"\s+$"))
+                                              .join('');
+                                        });
+                                      },
+                                      fieldViewBuilder: (context, controller,
+                                          focusNode, onSubmitted) {
+                                        controller.text = city!.text;
+                                        return TextField(
+                                          textAlign: TextAlign.right,
+                                          controller: controller,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                          focusNode: focusNode,
+                                          onSubmitted: (String value) {
+                                            onSubmitted();
+                                          },
+                                          onChanged: (value) {
+                                            setState(() {
+                                              city!.text = value
+                                                  .split(RegExp(r"(?! )\s{2,}"))
+                                                  .join(' ')
+                                                  .split(RegExp(r"\s+$"))
+                                                  .join('');
+                                            });
+                                          },
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
@@ -581,7 +660,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                    const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -619,8 +698,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       ),
                                       hint: const Text(
                                         "нет",
-                                        style: TextStyle(
-                                            color: Colors.white),
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                       dropdownColor: Colors.white,
                                     ),
@@ -641,9 +719,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                var chats = await db
-                                    .collection('chats')
-                                    .get();
+                                var chats = await db.collection('chats').get();
 
                                 for (int i = 0; i < chats.size; i++) {
                                   if (chats.docs[i]['user1Nickname'] ==
@@ -673,8 +749,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       int.parse(widget.age),
                                       widget.about,
                                       widget.hobbi,
-                                      widget.city);
-                                  FirebaseAuth.instance.currentUser!
+                                      city!.text);
+                                  firebaseAuth.currentUser!
                                       .updateDisplayName(widget.userName);
                                   global.GlobalAge = widget.age;
                                   global.GlobalAbout = widget.about;
@@ -690,16 +766,16 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       age: widget.age,
                                       hobbi: widget.hobbi,
                                       deti: widget.deti,
-                                      city: widget.city,
+                                      city: city!.text,
                                       rost: widget.rost,
                                       pol: GlobalPol.toString(),
                                     ));
                               },
                               style: const ButtonStyle(
-                                padding: MaterialStatePropertyAll(
+                                padding: WidgetStatePropertyAll(
                                     EdgeInsets.all(10.0)),
                                 backgroundColor:
-                                    MaterialStatePropertyAll(Colors.green),
+                                    WidgetStatePropertyAll(Colors.green),
                               ),
                               child: const Text(
                                 "Сохранить",
@@ -711,10 +787,10 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                             ),
                             ElevatedButton(
                                 style: const ButtonStyle(
-                                  padding: MaterialStatePropertyAll(
+                                  padding: WidgetStatePropertyAll(
                                       EdgeInsets.all(10.0)),
-                                  backgroundColor: MaterialStatePropertyAll(
-                                      Colors.redAccent),
+                                  backgroundColor:
+                                      WidgetStatePropertyAll(Colors.redAccent),
                                 ),
                                 onPressed: () {
                                   showModalBottomSheet(
@@ -738,38 +814,54 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                             backgroundColor: Colors
                                                                 .orangeAccent),
                                                     onPressed: () async {
-                                                      var currentUser = FirebaseAuth.instance.currentUser;
-                                                      
+                                                      var currentUser =
+                                                          firebaseAuth
+                                                              .currentUser;
+
                                                       FirebaseStorage.instance
-                                                      .ref(currentUser!.uid)
-                                                      .listAll()
-                                                      .then((value) {
+                                                          .ref(currentUser!.uid)
+                                                          .listAll()
+                                                          .then((value) {
                                                         for (var element
                                                             in value.items) {
-                                                          element
-                                                              .delete();
+                                                          element.delete();
                                                         }
                                                       });
 
                                                       List chatsId = [];
-                                                      
+
                                                       await db
-                                                      .collection('chats')
-                                                      .where(Filter.or(
-                                                        Filter('user1', isEqualTo: currentUser.uid), Filter('user2', isEqualTo: currentUser.uid)))
-                                                      .get()
-                                                      .then((value) {
+                                                          .collection('chats')
+                                                          .where(Filter.or(
+                                                              Filter('user1',
+                                                                  isEqualTo:
+                                                                      currentUser
+                                                                          .uid),
+                                                              Filter('user2',
+                                                                  isEqualTo:
+                                                                      currentUser
+                                                                          .uid)))
+                                                          .get()
+                                                          .then((value) {
                                                         setState(() {
-                                                          chatsId.add(value.docs[0].data());
+                                                          chatsId.add(value
+                                                              .docs[0]
+                                                              .data());
                                                         });
                                                       });
 
-                                                      for (int i = 0; i < chatsId.length; i++) {
+                                                      for (int i = 0;
+                                                          i < chatsId.length;
+                                                          i++) {
                                                         print(chatsId[i]);
-                                                        db.collection('removedChats').add(chatsId[i]);
+                                                        db
+                                                            .collection(
+                                                                'removedChats')
+                                                            .add(chatsId[i]);
                                                         db
                                                             .collection('chats')
-                                                            .doc(chatsId[i]['chatId'])
+                                                            .doc(chatsId[i]
+                                                                ['chatId'])
                                                             .delete();
                                                       }
 
@@ -780,11 +872,11 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                           .doc(currentUser.uid)
                                                           .delete();
 
-                                                      nextScreen(
-                                                          context, LoginPage());
+                                                      nextScreen(context,
+                                                          const LoginPage());
                                                     },
-                                                    child: Text('Да')),
-                                                SizedBox(
+                                                    child: const Text('Да')),
+                                                const SizedBox(
                                                   width: 20,
                                                 ),
                                                 ElevatedButton(
@@ -795,7 +887,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                     onPressed: () {
                                                       Navigator.pop(context);
                                                     },
-                                                    child: Text('Нет')),
+                                                    child: const Text('Нет')),
                                               ],
                                             )
                                           ]),
@@ -827,12 +919,12 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     var users = await db.collection('users').get();
 
     for (int i = 0; i < users.size; i++) {
-      if (users.docs[i].id != FirebaseAuth.instance.currentUser!.uid) {
+      if (users.docs[i].id != firebaseAuth.currentUser!.uid) {
         var collections = db
             .collection('users')
             .doc(users.docs[i].id)
             .collection('visiters')
-            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('uid', isEqualTo: firebaseAuth.currentUser!.uid)
             .snapshots();
 
         bool isEmpty = await collections.isEmpty;
@@ -841,7 +933,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
             .collection('users')
             .doc(users.docs[i].id)
             .collection('visiters')
-            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('uid', isEqualTo: firebaseAuth.currentUser!.uid)
             .get();
 
         if (!isEmpty && snapshot.docs.isNotEmpty) {
@@ -849,7 +941,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
               .collection('users')
               .doc(users.docs[i].id)
               .collection('visiters')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .doc(firebaseAuth.currentUser!.uid)
               .update({'photoUrl': photourl});
         } else {
           print(isEmpty);

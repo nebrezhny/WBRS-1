@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:wbrs/helper/global.dart';
@@ -6,8 +8,6 @@ import 'package:wbrs/pages/auth/register_page.dart';
 import 'package:wbrs/pages/home_page.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/widgets/widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,8 +36,10 @@ class _LoginPageState extends State<LoginPage> {
   AuthService authService = AuthService();
 
   checkSystem() async {
-    var  check = await FirebaseFirestore.instance.collection('users')
-        .doc('6DVznuvNT8Yp4Nifz8TeH5mra4w2').get();
+    var check = await firebaseFirestore
+        .collection('users')
+        .doc('6DVznuvNT8Yp4Nifz8TeH5mra4w2')
+        .get();
     return check.id;
   }
 
@@ -153,11 +155,17 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.white,
                                 obscureText: _isVisible,
                                 decoration: textInputDecoration.copyWith(
-                                    suffix: IconButton(onPressed: (){
-                                      setState(() {
-                                        _isVisible = !_isVisible;
-                                      });
-                                    }, icon: Icon(_isVisible ? Icons.visibility_off : Icons.visibility, color: Colors.white)),
+                                    suffix: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _isVisible = !_isVisible;
+                                          });
+                                        },
+                                        icon: Icon(
+                                            _isVisible
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                            color: Colors.white)),
                                     fillColor: Colors.white,
                                     labelStyle:
                                         const TextStyle(color: Colors.white),
@@ -242,15 +250,14 @@ class _LoginPageState extends State<LoginPage> {
                                         login();
                                       }
                                     } on SocketException catch (_) {
-                                      if(context.mounted) {
+                                      if (context.mounted) {
                                         showDialog(
                                             context: context,
                                             builder: (context) =>
                                                 const AlertDialog(
                                                   content: Text(
                                                       "Нет соединения с интернетом"),
-                                                )
-                                        );
+                                                ));
                                       }
                                     }
                                   },
@@ -300,12 +307,12 @@ class _LoginPageState extends State<LoginPage> {
                                                 onPressed: () async {
                                                   if (resetPasswordEmail.text !=
                                                       '') {
-                                                    await FirebaseAuth.instance
+                                                    await firebaseAuth
                                                         .sendPasswordResetEmail(
                                                             email:
                                                                 resetPasswordEmail
                                                                     .text);
-                                                    if(context.mounted) {
+                                                    if (context.mounted) {
                                                       showSnackbar(
                                                           context,
                                                           Colors.orangeAccent,
@@ -313,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
                                                       Navigator.pop(context);
                                                     }
                                                   } else {
-                                                    if(context.mounted) {
+                                                    if (context.mounted) {
                                                       showSnackbar(
                                                           context,
                                                           Colors.red,
@@ -363,7 +370,7 @@ class _LoginPageState extends State<LoginPage> {
           if (value == true) {
             selectedIndex = 1;
             await HelperFunctions.saveUserLoggedInStatus(true);
-            if(context.mounted) {
+            if (context.mounted) {
               showSnackbar(context, Colors.green, 'Вы авторизовались');
               nextScreenReplace(context, const HomePage());
             }
@@ -408,7 +415,6 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text = email;
         _passwordController.text = password;
       }
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 }

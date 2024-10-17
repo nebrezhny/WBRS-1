@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/login_page.dart';
 import 'package:wbrs/pages/auth/writing_data_user.dart';
@@ -224,7 +223,7 @@ class _RegisterPageState extends State<RegisterPage> {
           await HelperFunctions.saveUserLoggedInStatus(true);
           await HelperFunctions.saveUserEmailSF(email);
           await HelperFunctions.saveUserNameSF(fullName);
-          FirebaseAuth.instance.currentUser?.updateDisplayName(fullName);
+          firebaseAuth.currentUser?.updateDisplayName(fullName);
           nextScreenReplace(context, const AboutUserWriting());
         } else {
           showSnackbar(context, Colors.red, value);

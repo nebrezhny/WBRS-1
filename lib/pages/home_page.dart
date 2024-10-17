@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/about_meet.dart';
 import 'package:wbrs/pages/chatscreen.dart';
@@ -7,7 +8,6 @@ import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/widgets/chat_room_list.dart';
 import 'package:wbrs/widgets/drawer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wbrs/widgets/widgets.dart';
@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
       });
     });
     // getting the list of snapshots in our stream
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+    await DatabaseService(uid: firebaseAuth.currentUser!.uid)
         .getUserGroups()
         .then((snapshot) {
       setState(() {
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     requestPermission();
     getToken();
-    currentUser = FirebaseAuth.instance.currentUser;
+    currentUser = firebaseAuth.currentUser;
     initInfo();
     super.initState();
   }
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
             message.notification?.title,
             message.notification?.body,
             platformChannelSpecifics,
-            payload: message.data['body']['message']);
+            payload: message.notification!.body);
       } on Exception catch (e) {
         showSnackbar(context, Colors.red, e);
       }
@@ -177,9 +177,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void saveUserToken(String token) {
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection('TOKENS')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(firebaseAuth.currentUser?.uid)
         .set({'token': token});
   }
 
@@ -203,9 +203,9 @@ class _HomePageState extends State<HomePage> {
       } else {}
     } on Exception catch (e) {
       showSnackbar(context, Colors.red, e);
-      FirebaseFirestore.instance
+      firebaseFirestore
           .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .doc(firebaseAuth.currentUser!.uid)
           .update({'token': e});
     }
   }
@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
             body: SizedBox(
               height: 10000,
               child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
+                  stream: firebaseFirestore
                       .collection('chats')
                       .where(Filter.or(
                         Filter('user1', isEqualTo: currentUser!.uid),

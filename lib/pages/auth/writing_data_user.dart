@@ -1,7 +1,7 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:io';
 import 'package:wbrs/service/database_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -121,7 +121,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             height: 50,
                             child: IconButton(
                               onPressed: () async {
-                                // print(await FirebaseFirestore.instance.collection('chats').where('user2',isEqualTo: AuthName)
+                                // print(await firebaseFirestore.collection('chats').where('user2',isEqualTo: AuthName)
                                 //     .snapshots().length);
 
                                 XFile? image = await ImagePicker()
@@ -136,23 +136,23 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 try {
                                   await storage
                                       .ref(
-                                          'avatar-${FirebaseAuth.instance.currentUser!.displayName}')
+                                          'avatar-${firebaseAuth.currentUser!.displayName}')
                                       .putFile(File(_image!.path));
                                 } on FirebaseException catch (e) {
                                   e.message;
                                 }
                                 var downloadUrl = await storage
                                     .ref(
-                                        'avatar-${FirebaseAuth.instance.currentUser!.displayName}')
+                                        'avatar-${firebaseAuth.currentUser!.displayName}')
                                     .getDownloadURL();
-                                await FirebaseAuth.instance.currentUser!
+                                await firebaseAuth.currentUser!
                                     .updatePhotoURL(downloadUrl.toString());
-                                await FirebaseFirestore.instance
+                                await firebaseFirestore
                                     .collection("users")
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .doc(firebaseAuth.currentUser!.uid)
                                     .update({'profilePic': downloadUrl});
 
-                                FirebaseAuth.instance.currentUser!
+                                firebaseAuth.currentUser!
                                     .updatePhotoURL(downloadUrl);
                               },
                               icon: const Icon(
@@ -460,8 +460,8 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                   ),
                   ElevatedButton(
                       style: const ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                              Colors.deepOrangeAccent)),
+                          backgroundColor:
+                              WidgetStatePropertyAll(Colors.deepOrangeAccent)),
                       onPressed: () {
                         if (city.text.isEmpty) {
                           setState(() {
@@ -498,14 +498,13 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           });
                         }
 
-                        currentUser = FirebaseAuth.instance.currentUser;
+                        currentUser = firebaseAuth.currentUser;
 
                         if (currentUser != null) {
                           try {
                             displayName = currentUser.displayName;
                             email = currentUser.email;
-                          } on Exception catch (_) {
-                          }
+                          } on Exception catch (_) {}
                         } else {
                           displayName = "Error";
                           email = 'test4@test.ru';

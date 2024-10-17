@@ -1,9 +1,8 @@
 // ignore_for_file: equal_keys_in_map, unnecessary_string_escapes, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
-import 'package:wbrs/service/notifications.dart';
 
 class DatabaseService {
   final String? uid;
@@ -11,11 +10,11 @@ class DatabaseService {
 
   // reference for our collections
   final CollectionReference userCollection =
-      FirebaseFirestore.instance.collection("users");
+      firebaseFirestore.collection("users");
   final CollectionReference chatCollection =
-      FirebaseFirestore.instance.collection("chats");
+      firebaseFirestore.collection("chats");
   final CollectionReference groupCollection =
-      FirebaseFirestore.instance.collection("meets");
+      firebaseFirestore.collection("meets");
 
   Future savingUserDataAfterRegister(
       String fullName,
@@ -27,11 +26,10 @@ class DatabaseService {
       String hobbi,
       String about,
       String pol) async {
-    FirebaseAuth.instance.currentUser!.updateDisplayName(fullName);
-    FirebaseAuth.instance.currentUser!.updateEmail(email);
-    return await userCollection
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .set({
+    firebaseAuth.currentUser!.updateDisplayName(fullName);
+    // ignore: deprecated_member_use
+    firebaseAuth.currentUser!.updateEmail(email);
+    return await userCollection.doc(firebaseAuth.currentUser!.uid).set({
       "fullName": fullName,
       "email": email,
       "chats": [],
@@ -44,7 +42,7 @@ class DatabaseService {
       "hobbi": hobbi,
       "deti": deti,
       "temperament": "",
-      "uid": FirebaseAuth.instance.currentUser!.uid,
+      "uid": firebaseAuth.currentUser!.uid,
       "city": city,
       "images": [],
       "pol": pol,
@@ -54,9 +52,7 @@ class DatabaseService {
 
   Future updateUserData(String fullName, String email, int age, String about,
       String hobbi, String city) async {
-    return await userCollection
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({
+    return await userCollection.doc(firebaseAuth.currentUser!.uid).update({
       "fullName": fullName,
       "email": email,
       "age": age,
@@ -154,33 +150,30 @@ class DatabaseService {
   }
 
   Future<Stream<QuerySnapshot>> getUserByUserName(String username) async {
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("users")
         .where("username", isEqualTo: username)
         .snapshots();
   }
 
   createChatRoom(String chatRoomId, var chatRoomInfoMap) async {
-    final snapShot = await FirebaseFirestore.instance
-        .collection("chats")
-        .doc(chatRoomId)
-        .get();
+    final snapShot =
+        await firebaseFirestore.collection("chats").doc(chatRoomId).get();
 
     if (snapShot.exists) {
       // chatroom already exists
       return true;
     } else {
       // chatroom does not exists
-      return FirebaseFirestore.instance
+      return firebaseFirestore
           .collection("chats")
           .doc(chatRoomId)
           .set(chatRoomInfoMap);
     }
   }
 
-
   Future<QuerySnapshot> getUserInfo(String username) async {
-    return await FirebaseFirestore.instance
+    return await firebaseFirestore
         .collection("users")
         .where("username", isEqualTo: username)
         .get();
@@ -199,7 +192,7 @@ class DatabaseService {
   }
 
   Future<Stream<QuerySnapshot>> getChatRoomMessages(chatRoomId) async {
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("chats")
         .doc(chatRoomId)
         .collection("chats")
@@ -208,7 +201,7 @@ class DatabaseService {
   }
 
   Future<Stream<QuerySnapshot>> getGroupMessages(chatRoomId) async {
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("meets")
         .doc(chatRoomId)
         .collection("messages")
@@ -218,7 +211,7 @@ class DatabaseService {
 
   Future<String> GetChatRoomId(String user1, String user2) async {
     String chatId = "";
-    await FirebaseFirestore.instance
+    await firebaseFirestore
         .collection("chats")
         .where("chatId", isEqualTo: getChatRoomIdByUserID(user1, user2))
         .get()
@@ -234,15 +227,15 @@ class DatabaseService {
 
   Future<Stream<QuerySnapshot>> getChatRooms() async {
     String myUsername = HelperFunctions().getUserName().toString();
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("chats")
-    //.orderBy("lastMessage", descending: true)
+        //.orderBy("lastMessage", descending: true)
         .where("users", arrayContains: myUsername)
         .snapshots();
   }
 
   Future addMessage(String chatRoomId, String messageId, messageInfoMap) async {
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("chats")
         .doc(chatRoomId)
         .collection("chats")
@@ -251,35 +244,32 @@ class DatabaseService {
   }
 
   updateLastMessageSend(String chatRoomId, lastMessageInfoMap) {
-    return FirebaseFirestore.instance
+    return firebaseFirestore
         .collection("chats")
         .doc(chatRoomId)
         .update(lastMessageInfoMap);
   }
 
   updateUnreadMessageCount(String chatRoomId) async {
-    DocumentSnapshot count = await FirebaseFirestore.instance
-        .collection('chats')
-        .doc(chatRoomId)
-        .get();
+    DocumentSnapshot count =
+        await firebaseFirestore.collection('chats').doc(chatRoomId).get();
     int kolvo = count.get('unreadMessage') + 1;
 
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection('chats')
         .doc(chatRoomId)
         .update({"unreadMessage": kolvo});
   }
 
   Future addChat(String uid, String chatId) {
-    return FirebaseFirestore.instance.collection("users").doc(uid).update({
+    return firebaseFirestore.collection("users").doc(uid).update({
       "chats": FieldValue.arrayUnion([chatId])
     });
   }
 
   Future addChatSecondUser(String uid, String chatId) {
-    return FirebaseFirestore.instance.collection("users").doc(uid).update({
+    return firebaseFirestore.collection("users").doc(uid).update({
       "chats": FieldValue.arrayUnion([chatId])
     });
   }
-
 }

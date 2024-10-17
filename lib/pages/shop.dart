@@ -1,9 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/helper/global.dart';
-import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/chatscreen.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/widgets/bottom_nav_bar.dart';
@@ -30,16 +31,16 @@ class ShopPage extends StatefulWidget {
   State<ShopPage> createState() => _ShopPageState();
 }
 
-  class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
+class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
   TabController? _controller;
 
   ValueNotifier<bool> threeDs = ValueNotifier<bool>(false);
   ValueNotifier<bool> threeDsV2 = ValueNotifier<bool>(false);
   ValueNotifier<String?> status = ValueNotifier<String?>('');
   ValueNotifier<String?> cardType = ValueNotifier<String?>('');
-  
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  FirebaseAuth auth = FirebaseAuth.instance;
+
+  FirebaseFirestore db = firebaseFirestore;
+  FirebaseAuth auth = firebaseAuth;
 
   bool isUnvisible = false;
 
@@ -48,8 +49,8 @@ class ShopPage extends StatefulWidget {
     const Tab(text: 'Выбранные подарки'),
   ];
 
-  checkUnVisible()async{
-    db.collection('users').doc(auth.currentUser!.uid).get().then((value){
+  checkUnVisible() async {
+    db.collection('users').doc(auth.currentUser!.uid).get().then((value) {
       isUnvisible = value.data()!['isUnVisible'];
     });
     setState(() {});
@@ -59,7 +60,8 @@ class ShopPage extends StatefulWidget {
   void initState() {
     super.initState();
     checkUnVisible();
-    _controller = TabController(vsync: this, length: 2, initialIndex: widget.tabIndex ?? 0);
+    _controller = TabController(
+        vsync: this, length: 2, initialIndex: widget.tabIndex ?? 0);
   }
 
   @override
@@ -95,9 +97,16 @@ class ShopPage extends StatefulWidget {
                       RichText(
                           text: TextSpan(
                               text: 'Ваш баланс: ',
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
                               children: [
-                                TextSpan(text: '$GlobalBalance Ag', style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold))]))],
+                            TextSpan(
+                                text: '$GlobalBalance Ag',
+                                style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold))
+                          ]))
+                    ],
                     centerTitle: false,
                     bottom: TabBar(
                       unselectedLabelColor: Colors.white60,
@@ -140,25 +149,36 @@ class ShopPage extends StatefulWidget {
                 url,
                 fit: BoxFit.cover,
               ),
-              Text(name, style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              Text(name,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center),
             ],
           ),
-          sold ? Text( "Количество: $price", style: const TextStyle(fontSize: 16, color: Colors.white)) : const SizedBox.shrink(),
+          sold
+              ? Text("Количество: $price",
+                  style: const TextStyle(fontSize: 16, color: Colors.white))
+              : const SizedBox.shrink(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              !sold ?  Text("$price Ag", style: const TextStyle(fontSize: 16, color: Colors.white)) : const SizedBox.shrink(),
+              !sold
+                  ? Text("$price Ag",
+                      style: const TextStyle(fontSize: 16, color: Colors.white))
+                  : const SizedBox.shrink(),
               ElevatedButton(
                 onPressed: () async {
-                  DocumentReference coll = db
-                      .collection('users')
-                      .doc(auth.currentUser!.uid);
+                  DocumentReference coll =
+                      db.collection('users').doc(auth.currentUser!.uid);
                   DocumentSnapshot data = await coll.get();
                   Map userInfo = data.data() as Map;
-                  Map<String, dynamic> initGifts = userInfo.containsKey('gifts') ? userInfo['gifts'] : {};
+                  Map<String, dynamic> initGifts =
+                      userInfo.containsKey('gifts') ? userInfo['gifts'] : {};
 
                   if (!sold) {
-                    if(GlobalBalance < price) {
+                    if (GlobalBalance < price) {
                       showSnackbar(
                           context, Colors.redAccent, "Недостаточно серебра");
                       return;
@@ -170,14 +190,14 @@ class ShopPage extends StatefulWidget {
 
                     coll.update({'balance': GlobalBalance});
 
-                    if(initGifts.containsKey(url)) {
+                    if (initGifts.containsKey(url)) {
                       initGifts[url] += 1;
-
                     } else {
-                      initGifts.addAll({url : 1});
+                      initGifts.addAll({url: 1});
                     }
                     coll.update({'gifts': initGifts});
-                    showSnackbar(context, Colors.green, "Подарок $name добавлен");
+                    showSnackbar(
+                        context, Colors.green, "Подарок $name добавлен");
                   } else {
                     var snap = await db
                         .collection('chats')
@@ -186,10 +206,8 @@ class ShopPage extends StatefulWidget {
 
                     var chats = [];
                     for (var chat in snap.docs) {
-                      if (chat.data()['user1'] ==
-                          auth.currentUser!.uid ||
-                          chat.data()['user2'] ==
-                              auth.currentUser!.uid) {
+                      if (chat.data()['user1'] == auth.currentUser!.uid ||
+                          chat.data()['user2'] == auth.currentUser!.uid) {
                         chats.add(chat);
                       }
                     }
@@ -197,8 +215,7 @@ class ShopPage extends StatefulWidget {
                     Map<int, dynamic> chatRoomInfoMap = {};
                     int count = 0;
                     for (var chat in chats) {
-                      if (chat.data()['user1'] ==
-                          auth.currentUser!.uid) {
+                      if (chat.data()['user1'] == auth.currentUser!.uid) {
                         chatRoomInfoMap.addAll({
                           count: {
                             "chatId": chat.data()['chatId'],
@@ -223,224 +240,293 @@ class ShopPage extends StatefulWidget {
 
                     if (mounted) {
                       List<bool> isSelected =
-                      List.filled(chatRoomInfoMap.length, false);
+                          List.filled(chatRoomInfoMap.length, false);
                       showModalBottomSheet(
-                        backgroundColor: Colors.grey.shade700.withOpacity(0.7),
+                          backgroundColor:
+                              Colors.grey.shade700.withOpacity(0.7),
                           context: context,
                           builder: (context) {
                             return StatefulBuilder(
                                 builder: (context, StateSetter setState) {
-                                  return Container(
-                                      height: 170,
-                                      padding: const EdgeInsets.all(10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            height: 100,
-                                            child: GridView.builder(
-                                                itemCount: chatRoomInfoMap.length,
-                                                gridDelegate:
+                              return Container(
+                                  height: 170,
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 100,
+                                        child: GridView.builder(
+                                            itemCount: chatRoomInfoMap.length,
+                                            gridDelegate:
                                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                                     crossAxisCount: 4),
-                                                itemBuilder: (context, index) {
-                                                  return GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        isSelected[index] =
+                                            itemBuilder: (context, index) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isSelected[index] =
                                                         !isSelected[index];
-                                                        for (int i = 0;
+                                                    for (int i = 0;
                                                         i < isSelected.length;
                                                         i++) {
-                                                          if (i != index) {
-                                                            isSelected[i] = false;
-                                                          }
-                                                        }
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                      height: 120,
-                                                      width: 120,
-                                                      margin: const EdgeInsets.all(5),
-                                                      child: Column(
-                                                        children: [
-                                                          Container(
-                                                            padding:
-                                                            const EdgeInsets.all(2),
-                                                            decoration: isSelected[index]
-                                                                ? BoxDecoration(
-                                                                border: Border.all(
-                                                                  color: Colors.blue,
+                                                      if (i != index) {
+                                                        isSelected[i] = false;
+                                                      }
+                                                    }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: 120,
+                                                  width: 120,
+                                                  margin:
+                                                      const EdgeInsets.all(5),
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2),
+                                                        decoration: isSelected[
+                                                                index]
+                                                            ? BoxDecoration(
+                                                                border:
+                                                                    Border.all(
+                                                                  color: Colors
+                                                                      .blue,
                                                                   width: 2,
                                                                 ),
                                                                 borderRadius:
-                                                                const BorderRadius
-                                                                    .all(
-                                                                  Radius.circular(
-                                                                      100),
+                                                                    const BorderRadius
+                                                                        .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          100),
                                                                 ))
-                                                                : null,
-                                                            child: CircleAvatar(
-                                                              radius: 27,
-                                                              backgroundImage:
-                                                              chatRoomInfoMap[index]
-                                                              ['image'] ==
+                                                            : null,
+                                                        child: CircleAvatar(
+                                                          radius: 27,
+                                                          backgroundImage: chatRoomInfoMap[
+                                                                          index]
+                                                                      [
+                                                                      'image'] ==
                                                                   ""
-                                                                  ? const NetworkImage(
-                                                                "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-                                                              )
-                                                                  : NetworkImage(
+                                                              ? const NetworkImage(
+                                                                  "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                                                                )
+                                                              : NetworkImage(
                                                                   chatRoomInfoMap[
-                                                                  index]
-                                                                  ['image']),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            chatRoomInfoMap[index]
-                                                            ['nickname'],
-                                                            style: const TextStyle(color: Colors.white),
-                                                            overflow: TextOverflow.fade,
-                                                            softWrap: false,
-                                                          )
-                                                        ],
+                                                                          index]
+                                                                      [
+                                                                      'image']),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                }),
-                                          ),
-                                          isSelected.contains(true)
-                                              ? Center(
-                                            child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.orangeAccent,
-                                                  elevation: 10,
-                                                  textStyle: const TextStyle(
-                                                      color: Colors.blue,
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w700),
-                                                  minimumSize: const Size(200, 50),
-                                                  padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 5),
+                                                      Text(
+                                                        chatRoomInfoMap[index]
+                                                            ['nickname'],
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        softWrap: false,
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                                onPressed: () async {
-                                                  int selectedNumber = 0;
-                                                  for (int i = 0;
-                                                  i < isSelected.length;
-                                                  i++) {
-                                                    if (isSelected[i]) {
-                                                      selectedNumber = i;
+                                              );
+                                            }),
+                                      ),
+                                      isSelected.contains(true)
+                                          ? Center(
+                                              child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.orangeAccent,
+                                                    elevation: 10,
+                                                    textStyle: const TextStyle(
+                                                        color: Colors.blue,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                    minimumSize:
+                                                        const Size(200, 50),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 5),
+                                                  ),
+                                                  onPressed: () async {
+                                                    int selectedNumber = 0;
+                                                    for (int i = 0;
+                                                        i < isSelected.length;
+                                                        i++) {
+                                                      if (isSelected[i]) {
+                                                        selectedNumber = i;
+                                                      }
                                                     }
-                                                  }
-                                                  QuerySnapshot querySnap =
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection('users')
-                                                      .where('fullName',
-                                                      isEqualTo:
-                                                      chatRoomInfoMap[
-                                                      selectedNumber]
-                                                      ['nickname'])
-                                                      .get();
+                                                    QuerySnapshot querySnap =
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection('users')
+                                                            .where('fullName',
+                                                                isEqualTo: chatRoomInfoMap[
+                                                                        selectedNumber]
+                                                                    [
+                                                                    'nickname'])
+                                                            .get();
 
-                                                  String chatId = chatRoomInfoMap[
-                                                  selectedNumber]['chatId'];
-                                                  String chatWith = querySnap
-                                                      .docs[0]['chatWithId'];
-                                                  bool isUserInChat = chatWith ==
-                                                      auth
-                                                          .currentUser!.uid;
+                                                    String chatId =
+                                                        chatRoomInfoMap[
+                                                                selectedNumber]
+                                                            ['chatId'];
+                                                    String chatWith = querySnap
+                                                        .docs[0]['chatWithId'];
+                                                    bool isUserInChat =
+                                                        chatWith ==
+                                                            auth.currentUser!
+                                                                .uid;
 
-                                                  Map<String, dynamic>
-                                                  messageInfoMap = {
-                                                    "image": url,
-                                                    "name" : name,
-                                                    "sendBy": auth
-                                                        .currentUser!.displayName,
-                                                    "sendByID": FirebaseAuth
-                                                        .instance.currentUser!.uid,
-                                                    "ts": DateTime.now(),
-                                                    "isRead":
-                                                    isUserInChat ? true : false
-                                                  };
+                                                    Map<String, dynamic>
+                                                        messageInfoMap = {
+                                                      "image": url,
+                                                      "name": name,
+                                                      "sendBy": auth
+                                                          .currentUser!
+                                                          .displayName,
+                                                      "sendByID": FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .uid,
+                                                      "ts": DateTime.now(),
+                                                      "isRead": isUserInChat
+                                                          ? true
+                                                          : false
+                                                    };
 
-                                                  DatabaseService().addMessage(
-                                                      chatId,
-                                                      randomAlphaNumeric(12),
-                                                      messageInfoMap);
+                                                    DatabaseService()
+                                                        .addMessage(
+                                                            chatId,
+                                                            randomAlphaNumeric(
+                                                                12),
+                                                            messageInfoMap);
 
-                                                  messageInfoMap = {
-                                                    "image": url,
-                                                    "message" : "${auth.currentUser!.displayName} подарил вам подарок ${name}! ❤️",
-                                                    "sendBy": auth
-                                                        .currentUser!.displayName,
-                                                    "sendByID": FirebaseAuth
-                                                        .instance.currentUser!.uid,
-                                                    "ts": DateTime.now(),
-                                                    "isRead":
-                                                    isUserInChat ? true : false
-                                                  };
-                                                  DatabaseService().addMessage(
-                                                      chatId,
-                                                      randomAlphaNumeric(12),
-                                                      messageInfoMap);
+                                                    messageInfoMap = {
+                                                      "image": url,
+                                                      "message":
+                                                          "${auth.currentUser!.displayName} подарил вам подарок $name! ❤️",
+                                                      "sendBy": auth
+                                                          .currentUser!
+                                                          .displayName,
+                                                      "sendByID": FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .uid,
+                                                      "ts": DateTime.now(),
+                                                      "isRead": isUserInChat
+                                                          ? true
+                                                          : false
+                                                    };
+                                                    DatabaseService()
+                                                        .addMessage(
+                                                            chatId,
+                                                            randomAlphaNumeric(
+                                                                12),
+                                                            messageInfoMap);
 
-                                                  initGifts[url] -= 1;
-                                                  if(initGifts[url] == 0) {
-                                                    initGifts.remove(url);
-                                                  }
-                                                  coll.update({'gifts': initGifts});
-                                                  var data = await db.collection('users').doc(chatRoomInfoMap[selectedNumber]['id']).get();
+                                                    initGifts[url] -= 1;
+                                                    if (initGifts[url] == 0) {
+                                                      initGifts.remove(url);
+                                                    }
+                                                    coll.update(
+                                                        {'gifts': initGifts});
+                                                    var data = await db
+                                                        .collection('users')
+                                                        .doc(chatRoomInfoMap[
+                                                                selectedNumber]
+                                                            ['id'])
+                                                        .get();
 
-                                                  Map<String, dynamic> presentedGifts = data.data() as Map<String, dynamic>;
-                                                  if(presentedGifts.containsKey('presentedGifts')) {
-                                                    presentedGifts= presentedGifts['presentedGifts'];
-                                                  }else{
-                                                    presentedGifts = {};
-                                                  }
-                                                  int count = 1;
-                                                if(presentedGifts.containsKey(url)) {
-                                                  presentedGifts[url] += 1;
-                                                }else{
-                                                  presentedGifts.addAll({url: 1});
-                                                }
-                                                  showSnackbar(context, Colors.green, "Подарок $name подарен!");
-                                                  Navigator.pop(context);
-                                                  nextScreen(
-                                                      context,
-                                                      ChatScreen(
-                                                          chatWithUsername:
-                                                          chatRoomInfoMap[
-                                                          selectedNumber]
-                                                          ['nickname'],
-                                                          photoUrl: chatRoomInfoMap[
-                                                          selectedNumber]
-                                                          ['image'],
-                                                          id: auth
-                                                              .currentUser!.uid,
-                                                          chatId: chatId));
-                                                db.collection('users').doc(chatRoomInfoMap[
-                                                selectedNumber]['id']).update({'presentedGifts': presentedGifts});
-                                                  DocumentSnapshot doc = await FirebaseFirestore.instance
-                                                      .collection('TOKENS')
-                                                      .doc(chatRoomInfoMap[selectedNumber]['id'])
-                                                      .get();
-                                                  Map notificationBody = {
-                                                    'message': "${auth.currentUser!.displayName} подарил вам подарок $name ❤️",
-                                                  };
-                                                NotificationsService().sendPushMessage(
-                                                    doc.get('token'),
-                                                    notificationBody,
-                                                    chatRoomInfoMap[selectedNumber]['nickname'],
-                                                    1, chatId);
-                                                },
-                                                child: const Text("Подарить")),
-                                          )
-                                              : Container()
-                                        ],
-                                      ));
-                                });
+                                                    Map<String, dynamic>
+                                                        presentedGifts =
+                                                        data.data() as Map<
+                                                            String, dynamic>;
+                                                    if (presentedGifts
+                                                        .containsKey(
+                                                            'presentedGifts')) {
+                                                      presentedGifts =
+                                                          presentedGifts[
+                                                              'presentedGifts'];
+                                                    } else {
+                                                      presentedGifts = {};
+                                                    }
+                                                    if (presentedGifts
+                                                        .containsKey(url)) {
+                                                      presentedGifts[url] += 1;
+                                                    } else {
+                                                      presentedGifts
+                                                          .addAll({url: 1});
+                                                    }
+                                                    showSnackbar(
+                                                        context,
+                                                        Colors.green,
+                                                        "Подарок $name подарен!");
+                                                    Navigator.pop(context);
+                                                    nextScreen(
+                                                        context,
+                                                        ChatScreen(
+                                                            chatWithUsername:
+                                                                chatRoomInfoMap[selectedNumber]
+                                                                    [
+                                                                    'nickname'],
+                                                            photoUrl:
+                                                                chatRoomInfoMap[
+                                                                        selectedNumber]
+                                                                    ['image'],
+                                                            id: auth
+                                                                .currentUser!
+                                                                .uid,
+                                                            chatId: chatId));
+                                                    db
+                                                        .collection('users')
+                                                        .doc(chatRoomInfoMap[
+                                                                selectedNumber]
+                                                            ['id'])
+                                                        .update({
+                                                      'presentedGifts':
+                                                          presentedGifts
+                                                    });
+                                                    DocumentSnapshot doc =
+                                                        await firebaseFirestore
+                                                            .collection(
+                                                                'TOKENS')
+                                                            .doc(chatRoomInfoMap[
+                                                                    selectedNumber]
+                                                                ['id'])
+                                                            .get();
+                                                    Map notificationBody = {
+                                                      'message':
+                                                          "${auth.currentUser!.displayName} подарил вам подарок $name ❤️",
+                                                    };
+                                                    NotificationsService()
+                                                        .sendPushMessage(
+                                                            doc.get('token'),
+                                                            notificationBody,
+                                                            chatRoomInfoMap[
+                                                                    selectedNumber]
+                                                                ['nickname'],
+                                                            1,
+                                                            chatId);
+                                                  },
+                                                  child:
+                                                      const Text("Подарить")),
+                                            )
+                                          : Container()
+                                    ],
+                                  ));
+                            });
                           });
                     }
                   }
@@ -450,15 +536,25 @@ class ShopPage extends StatefulWidget {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     )),
                     padding: WidgetStatePropertyAll(EdgeInsets.all(7)),
-                    backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
-                child: sold ? const Text("Подарить", style: TextStyle(color: Colors.white, fontSize: 14),) : const Text("Забрать", style: TextStyle(color: Colors.white, fontSize: 14),),
+                    backgroundColor:
+                        WidgetStatePropertyAll(Colors.orangeAccent)),
+                child: sold
+                    ? const Text(
+                        "Подарить",
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      )
+                    : const Text(
+                        "Забрать",
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
               ),
-              const SizedBox(height: 20,),
+              const SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ],
       ),
-
     );
   }
 
@@ -475,23 +571,44 @@ class ShopPage extends StatefulWidget {
     Podarok(name: 'Букет красные розы', price: 12, img: "assets/gifts/10.png"),
     Podarok(name: 'Пойдем поедим', price: 12, img: "assets/gifts/11.png"),
     Podarok(name: 'Маленький щенок', price: 12, img: "assets/gifts/12.png"),
-    Podarok(name: 'Киса упакована в коробку', price: 12, img: "assets/gifts/13.png"),
+    Podarok(
+        name: 'Киса упакована в коробку',
+        price: 12,
+        img: "assets/gifts/13.png"),
     Podarok(name: 'Серый красивый дом', price: 12, img: "assets/gifts/14.png"),
     Podarok(name: 'Мне б такую как ты', price: 12, img: "assets/gifts/15.png"),
-    Podarok(name: 'Ты - самая прекрасная', price: 12, img: "assets/gifts/16.png"),
+    Podarok(
+        name: 'Ты - самая прекрасная', price: 12, img: "assets/gifts/16.png"),
     Podarok(name: 'Букет розовые розы', price: 12, img: "assets/gifts/17.png"),
-    Podarok(name: 'Истосковался по такой как ты', price: 12, img: "assets/gifts/18.png"),
+    Podarok(
+        name: 'Истосковался по такой как ты',
+        price: 12,
+        img: "assets/gifts/18.png"),
     Podarok(name: 'Диадема с рубинами', price: 12, img: "assets/gifts/19.png"),
     Podarok(name: 'Жду встречи', price: 12, img: "assets/gifts/20.png"),
-    Podarok(name: 'Береги себя, ты мне нужна!', price: 12, img: "assets/gifts/21.png"),
+    Podarok(
+        name: 'Береги себя, ты мне нужна!',
+        price: 12,
+        img: "assets/gifts/21.png"),
     Podarok(name: 'Яхта олигарха', price: 12, img: "assets/gifts/22.png"),
-    Podarok(name: 'Водочка с селедочкой', price: 12, img: "assets/gifts/23.png"),
+    Podarok(
+        name: 'Водочка с селедочкой', price: 12, img: "assets/gifts/23.png"),
     Podarok(name: 'Диадема в алмазах', price: 12, img: "assets/gifts/24.png"),
     Podarok(name: 'Додж челленджер', price: 12, img: "assets/gifts/25.png"),
-    Podarok(name: 'Классический красивый дом', price: 12, img: "assets/gifts/26.png"),
-    Podarok(name: 'Семейный красивый дом', price: 12, img: "assets/gifts/27.png"),
-    Podarok(name: 'Современный красивый дом', price: 12, img: "assets/gifts/28.png"),
-    Podarok(name: 'Мое почтение женщине со вкусом', price: 12, img: "assets/gifts/29.png"),
+    Podarok(
+        name: 'Классический красивый дом',
+        price: 12,
+        img: "assets/gifts/26.png"),
+    Podarok(
+        name: 'Семейный красивый дом', price: 12, img: "assets/gifts/27.png"),
+    Podarok(
+        name: 'Современный красивый дом',
+        price: 12,
+        img: "assets/gifts/28.png"),
+    Podarok(
+        name: 'Мое почтение женщине со вкусом',
+        price: 12,
+        img: "assets/gifts/29.png"),
     Podarok(name: 'Для такой зайки', price: 12, img: "assets/gifts/30.png"),
     Podarok(name: 'Инфинити', price: 12, img: "assets/gifts/31.png"),
     Podarok(name: 'Самой искрометной', price: 12, img: "assets/gifts/32.png"),
@@ -499,26 +616,37 @@ class ShopPage extends StatefulWidget {
     Podarok(name: 'Кофе корица', price: 12, img: "assets/gifts/34.png"),
     Podarok(name: 'Кофе и круасан', price: 12, img: "assets/gifts/35.png"),
     Podarok(name: 'Линкольн', price: 12, img: "assets/gifts/36.png"),
-    Podarok(name: 'Мадам, без вас убого', price: 12, img: "assets/gifts/37.png"),
+    Podarok(
+        name: 'Мадам, без вас убого', price: 12, img: "assets/gifts/37.png"),
     Podarok(name: 'Милый мишка', price: 12, img: "assets/gifts/38.png"),
     Podarok(name: 'Самой мудрой', price: 12, img: "assets/gifts/39.png"),
     Podarok(name: 'Мужчине со вкусом', price: 12, img: "assets/gifts/40.png"),
-    Podarok(name: 'Настоящему джентельмену', price: 12, img: "assets/gifts/41.png"),
-    Podarok(name: 'Серьезному джентельмену', price: 12, img: "assets/gifts/42.png"),
+    Podarok(
+        name: 'Настоящему джентельмену', price: 12, img: "assets/gifts/41.png"),
+    Podarok(
+        name: 'Серьезному джентельмену', price: 12, img: "assets/gifts/42.png"),
     Podarok(name: 'Настоящему ковбою', price: 12, img: "assets/gifts/43.png"),
-    Podarok(name: 'Настоящему полковнику', price: 12, img: "assets/gifts/44.png"),
+    Podarok(
+        name: 'Настоящему полковнику', price: 12, img: "assets/gifts/44.png"),
     Podarok(name: 'Настоящему рыцарю', price: 12, img: "assets/gifts/45.png"),
     Podarok(name: 'Ниссан Скайлайн', price: 12, img: "assets/gifts/46.png"),
     Podarok(name: 'Ты меня покорила', price: 12, img: "assets/gifts/47.png"),
-    Podarok(name: 'Претендуешь - соответствуй', price: 12, img: "assets/gifts/48.png"),
-    Podarok(name: 'Не разменивайся по пустякам', price: 12, img: "assets/gifts/49.png"),
+    Podarok(
+        name: 'Претендуешь - соответствуй',
+        price: 12,
+        img: "assets/gifts/48.png"),
+    Podarok(
+        name: 'Не разменивайся по пустякам',
+        price: 12,
+        img: "assets/gifts/49.png"),
     Podarok(name: 'Букет белые розы', price: 12, img: "assets/gifts/50.png"),
     Podarok(name: 'Букет белых роз', price: 12, img: "assets/gifts/51.png"),
     Podarok(name: 'Букет черные розы', price: 12, img: "assets/gifts/52.png"),
     Podarok(name: 'Роковой женщине', price: 12, img: "assets/gifts/53.png"),
     Podarok(name: 'Самой мудрой', price: 12, img: "assets/gifts/54.png"),
     Podarok(name: 'Самой опасной', price: 12, img: "assets/gifts/55.png"),
-    Podarok(name: 'Самой притягательной', price: 12, img: "assets/gifts/56.png"),
+    Podarok(
+        name: 'Самой притягательной', price: 12, img: "assets/gifts/56.png"),
     Podarok(name: 'Серьезному мужчине', price: 12, img: "assets/gifts/57.png"),
     Podarok(name: 'Коньяк и сигары', price: 12, img: "assets/gifts/58.png"),
     Podarok(name: 'Королю', price: 12, img: "assets/gifts/59.png"),
@@ -526,7 +654,8 @@ class ShopPage extends StatefulWidget {
     Podarok(name: 'Форд Мустанг', price: 12, img: "assets/gifts/61.png"),
     Podarok(name: 'Хаммер', price: 12, img: "assets/gifts/62.png"),
     Podarok(name: 'Чаек с вареньем', price: 12, img: "assets/gifts/63.png"),
-    Podarok(name: 'Чудесного настроения', price: 12, img: "assets/gifts/64.png"),
+    Podarok(
+        name: 'Чудесного настроения', price: 12, img: "assets/gifts/64.png"),
   ];
 
   first(context) {
@@ -541,78 +670,115 @@ class ShopPage extends StatefulWidget {
             ),
             ElevatedButton(
               onPressed: () {
-
                 showModalBottomSheet(
-                  backgroundColor: Colors.transparent,
-                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width, maxWidth: MediaQuery.of(context).size.width),
+                    backgroundColor: Colors.transparent,
+                    constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width,
+                        maxWidth: MediaQuery.of(context).size.width),
                     context: context,
-                    builder: (context){
+                    builder: (context) {
                       return Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)), color: Colors.white54),
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)),
+                            color: Colors.white54),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text("Выберите сумму для пополнения", style: TextStyle(color: Colors.white, fontSize: 18),),
+                                const Text(
+                                  "Выберите сумму для пополнения",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
+                                ),
                                 TextButton.icon(
                                   label: const SizedBox.shrink(),
-                                  onPressed: (){
-                                  Navigator.pop(context);
-                                }, icon: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 18,),),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(
+                                    CupertinoIcons.xmark,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(
                               height: 15,
                             ),
-                            for(int i = 0; i < 6; i++) buyButton(i)
+                            for (int i = 0; i < 6; i++) buyButton(i)
                           ],
                         ),
                       );
                     });
               },
               style: const ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(Colors.orangeAccent)),
-              child: const Text("Пополнить баланс (от 100 руб.)", style: TextStyle(color: Colors.white),),
+                  backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
+              child: const Text(
+                "Пополнить баланс (от 100 руб.)",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             ElevatedButton(
               onPressed: () {},
               style: const ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(Colors.orangeAccent)),
-              child: const Text("Отключить рекламу", style: TextStyle(color: Colors.white),),
+                  backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
+              child: const Text(
+                "Отключить рекламу",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 showModalBottomSheet(
                     backgroundColor: Colors.transparent,
-                    constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width, maxWidth: MediaQuery.of(context).size.width),
+                    constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width,
+                        maxWidth: MediaQuery.of(context).size.width),
                     context: context,
-                    builder: (context){
+                    builder: (context) {
                       return Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)), color: Colors.white54),
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)),
+                            color: Colors.white54),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text("Выберите сумму для пополнения", style: TextStyle(color: Colors.white, fontSize: 18),),
+                                const Text(
+                                  "Выберите сумму для пополнения",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
+                                ),
                                 TextButton.icon(
                                   label: const SizedBox.shrink(),
-                                  onPressed: (){
+                                  onPressed: () {
                                     Navigator.pop(context);
-                                  }, icon: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 18,),),
+                                  },
+                                  icon: const Icon(
+                                    CupertinoIcons.xmark,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(
                               height: 15,
                             ),
-                            for(int i = 0; i < 4; i++) buyButtonInvisible(i)
+                            for (int i = 0; i < 4; i++) buyButtonInvisible(i)
                           ],
                         ),
                       );
@@ -625,11 +791,13 @@ class ShopPage extends StatefulWidget {
                 // });
               },
               style: ButtonStyle(
-                  backgroundColor:
-                      isUnvisible
-                          ?const WidgetStatePropertyAll(Colors.green)
-                          :const WidgetStatePropertyAll(Colors.redAccent)),
-              child: const Text("Режим невидимки", style: TextStyle(color: Colors.white),),
+                  backgroundColor: isUnvisible
+                      ? const WidgetStatePropertyAll(Colors.green)
+                      : const WidgetStatePropertyAll(Colors.redAccent)),
+              child: const Text(
+                "Режим невидимки",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             const SizedBox(
               height: 15,
@@ -645,17 +813,21 @@ class ShopPage extends StatefulWidget {
               height: podarki.length * 130.0,
               width: double.infinity,
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 0.8,
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 0.8,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                  ),
                   itemCount: podarki.length,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, int index) {
-                    return kartochkaTovara(podarki[index].name, podarki[index].img,
-                        podarki[index].price, false, context);
+                    return kartochkaTovara(
+                        podarki[index].name,
+                        podarki[index].img,
+                        podarki[index].price,
+                        false,
+                        context);
                   }),
             ),
             const SizedBox(
@@ -678,33 +850,69 @@ class ShopPage extends StatefulWidget {
       ' (экономим 51серебра)',
       ' (экономим 112серебра) ',
     ];
-    List pricesInt = [24, 39, 69, 128,];
-    List lineThrough = [0, 56, 120, 240,];
+    List pricesInt = [
+      24,
+      39,
+      69,
+      128,
+    ];
+    List lineThrough = [
+      0,
+      56,
+      120,
+      240,
+    ];
     return ElevatedButton(
       onPressed: () {
-        showModalBottomSheet(context: context, builder:(context){
-          return const OplataPage();
-        });
+        showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return const OplataPage();
+            });
       },
       style: ButtonStyle(
-        minimumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width-40, 40)),
+        minimumSize: WidgetStatePropertyAll(
+            Size(MediaQuery.of(context).size.width - 40, 40)),
         foregroundColor: const WidgetStatePropertyAll(Colors.cyan),
-        backgroundColor:  WidgetStatePropertyAll(Colors.orangeAccent.shade400),),
-      child:
-          index==0
-      ?const Row(
-        children: [
-          Text("3 дня = 24Ag", style: TextStyle(color: Colors.white), textAlign: TextAlign.start,),
-        ],
-      )
-      :Row(
-        children: [
-          Text("${prices[index]}", style: const TextStyle(color: Colors.white),),
-          Text("${lineThrough[index]}Ag", style: const TextStyle(color: Colors.white,decoration: TextDecoration.lineThrough, decorationColor: Colors.white, decorationThickness: 3), ),
-          Text(" ${pricesInt[index]}Ag", style: const TextStyle(color: Colors.white, decoration: TextDecoration.underline, decorationColor: Colors.white),),
-          Text("${bonuses[index]}", style: const TextStyle(color: Colors.white),),
-        ],
+        backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent.shade400),
       ),
+      child: index == 0
+          ? const Row(
+              children: [
+                Text(
+                  "3 дня = 24Ag",
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.start,
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Text(
+                  "${prices[index]}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "${lineThrough[index]}Ag",
+                  style: const TextStyle(
+                      color: Colors.white,
+                      decoration: TextDecoration.lineThrough,
+                      decorationColor: Colors.white,
+                      decorationThickness: 3),
+                ),
+                Text(
+                  " ${pricesInt[index]}Ag",
+                  style: const TextStyle(
+                      color: Colors.white,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white),
+                ),
+                Text(
+                  "${bonuses[index]}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
     );
   }
 
@@ -728,33 +936,50 @@ class ShopPage extends StatefulWidget {
     List pricesInt = [30, 60, 98, 198, 298, 576];
     return ElevatedButton(
       onPressed: () {
-        showModalBottomSheet(context: context, builder:(context){
-          return const OplataPage();
-        });
+        showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return const OplataPage();
+            });
       },
       style: ButtonStyle(
-        minimumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width-40, 40)),
+        minimumSize: WidgetStatePropertyAll(
+            Size(MediaQuery.of(context).size.width - 40, 40)),
         foregroundColor: const WidgetStatePropertyAll(Colors.cyan),
-          backgroundColor:  WidgetStatePropertyAll(Colors.orangeAccent.shade400),),
+        backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent.shade400),
+      ),
       child: Row(
         children: [
-          Text("${prices[index]}", style: const TextStyle(color: Colors.white),),
-          Text("${pricesInt[index]}Ag", style: const TextStyle(color: Colors.white,decoration: TextDecoration.lineThrough, decorationColor: Colors.white, decorationThickness: 3), ),
-          Text("${bonuses[index]}", style: const TextStyle(color: Colors.white),),
+          Text(
+            "${prices[index]}",
+            style: const TextStyle(color: Colors.white),
+          ),
+          Text(
+            "${pricesInt[index]}Ag",
+            style: const TextStyle(
+                color: Colors.white,
+                decoration: TextDecoration.lineThrough,
+                decorationColor: Colors.white,
+                decorationThickness: 3),
+          ),
+          Text(
+            "${bonuses[index]}",
+            style: const TextStyle(color: Colors.white),
+          ),
         ],
       ),
     );
   }
 
   second(data, context) {
-
     if (data != null) {
       Map initGifts = data.data()!['gifts'] ?? {};
       List urls = initGifts.keys.toList();
       List counts = initGifts.values.toList();
       var indexInPodarki = [];
-      for(int i = 0; i < urls.length; i++){
-        indexInPodarki.add(podarki.indexWhere((element) => element.img == urls[i]));
+      for (int i = 0; i < urls.length; i++) {
+        indexInPodarki
+            .add(podarki.indexWhere((element) => element.img == urls[i]));
       }
 
       return initGifts.isEmpty
@@ -764,23 +989,23 @@ class ShopPage extends StatefulWidget {
               style: TextStyle(color: Colors.white),
             ))
           : SafeArea(
-            child: SizedBox(
-                height: (MediaQuery.of(context).size.height * 1) - 100,
-                width: double.infinity,
-                child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: 0.7,
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                    ),
-                    itemCount: initGifts.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, int index) {
-                      return kartochkaTovara(podarki[indexInPodarki[index]].name, urls[index],
-                          counts[index]!, true, context);
-                    }),)
-          );
+              child: SizedBox(
+              height: (MediaQuery.of(context).size.height * 1) - 100,
+              width: double.infinity,
+              child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 0.7,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                  ),
+                  itemCount: initGifts.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, int index) {
+                    return kartochkaTovara(podarki[indexInPodarki[index]].name,
+                        urls[index], counts[index]!, true, context);
+                  }),
+            ));
     } else {
       return const Center(
           child: Text(

@@ -2,9 +2,9 @@
 
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:wbrs/helper/global.dart';
 
 class Storage {
   final firebase_storage.FirebaseStorage storage =
@@ -16,7 +16,7 @@ class Storage {
     try {
       await storage
           .ref(
-              '${FirebaseAuth.instance.currentUser?.displayName}/$fileName+${FirebaseAuth.instance.currentUser?.email}')
+              '${firebaseAuth.currentUser?.displayName}/$fileName+${firebaseAuth.currentUser?.email}')
           .putFile(file);
     } on firebase_core.FirebaseException catch (e) {}
   }
@@ -24,9 +24,9 @@ class Storage {
   Future<String> downloadUrl(fileName) async {
     String downloadUrl = await storage
         .ref(
-            '${FirebaseAuth.instance.currentUser?.displayName}/$fileName+${FirebaseAuth.instance.currentUser?.email}')
+            '${firebaseAuth.currentUser?.displayName}/$fileName+${firebaseAuth.currentUser?.email}')
         .getDownloadURL();
-    FirebaseAuth.instance.currentUser!.updatePhotoURL(downloadUrl);
+    firebaseAuth.currentUser!.updatePhotoURL(downloadUrl);
 
     return downloadUrl;
   }

@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wbrs/helper/global.dart';
 
 class HelperFunctions {
   //keys
@@ -93,9 +92,9 @@ Route createRoute(Widget Function() createPage) {
 }
 
 getUserGroup() async {
-  var doc = await FirebaseFirestore.instance
+  var doc = await firebaseFirestore
       .collection('users')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .doc(firebaseAuth.currentUser!.uid)
       .get();
 
   return doc.get('группа');
@@ -237,4 +236,35 @@ List<Widget> getLikeGroup(myGroup) {
       )
     ];
   }
+}
+
+cityDropdown(context, options, onSelected) {
+  return Align(
+    alignment: Alignment.topCenter,
+    child: Material(
+      surfaceTintColor: Colors.white54,
+      type: MaterialType.transparency,
+      elevation: 4.0,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.3,
+        ),
+        child: ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            itemCount: options.length,
+            itemBuilder: (context, index) {
+              final option = options.elementAt(index);
+              return ListTile(
+                tileColor: Colors.grey.shade700.withOpacity(0.8),
+                title: Text(
+                  option.trim(),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                onTap: () => onSelected(option),
+              );
+            }),
+      ),
+    ),
+  );
 }

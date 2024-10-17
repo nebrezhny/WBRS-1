@@ -1,3 +1,4 @@
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -33,7 +34,7 @@ class _SearchPageState extends State<SearchPage> {
         userName = value!;
       });
     });
-    user = FirebaseAuth.instance.currentUser;
+    user = firebaseAuth.currentUser;
   }
 
   String getName(String r) {

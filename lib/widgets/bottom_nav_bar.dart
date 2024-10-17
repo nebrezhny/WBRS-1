@@ -25,8 +25,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   @override
   void initState() {
     super.initState();
-    currentUser = FirebaseAuth.instance.currentUser;
-
+    currentUser = firebaseAuth.currentUser;
   }
 
   User? currentUser;
@@ -42,18 +41,18 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       case 0:
         bool isLoading = true;
         nextScreen(context, SplashScreen());
-        DocumentSnapshot doc = await FirebaseFirestore.instance
+        DocumentSnapshot doc = await firebaseFirestore
             .collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .doc(firebaseAuth.currentUser!.uid)
             .get();
         Images = doc.get('images');
         CountImages = Images.length;
 
-        // await FirebaseFirestore.instance
+        // await firebaseFirestore
         //     .collection("users")
         //     .where("fullName",
         //         isEqualTo:
-        //             FirebaseAuth.instance.currentUser!.displayName.toString())
+        //             firebaseAuth.currentUser!.displayName.toString())
         //     .get()
         //     .then((QuerySnapshot snapshot) {
         //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
@@ -72,18 +71,17 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         if (isLoading == false) {
           var x = await getUserGroup();
 
-          var doc = await FirebaseFirestore.instance
+          var doc = await firebaseFirestore
               .collection('users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .doc(firebaseAuth.currentUser!.uid)
               .get();
 
           nextScreen(
               context,
               ProfilePage(
                 group: x,
-                email: FirebaseAuth.instance.currentUser!.email.toString(),
-                userName:
-                    FirebaseAuth.instance.currentUser!.displayName.toString(),
+                email: firebaseAuth.currentUser!.email.toString(),
+                userName: firebaseAuth.currentUser!.displayName.toString(),
                 about: doc.get('about'),
                 age: doc.get('age').toString(),
                 rost: doc.get('rost'),
@@ -104,10 +102,10 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       case 2:
         bool isLoading = true;
         nextScreen(context, SplashScreen());
-        // await FirebaseFirestore.instance
+        // await firebaseFirestore
         //     .collection("users")
         //     .where("fullName",
-        //         isEqualTo: FirebaseAuth.instance.currentUser!.displayName)
+        //         isEqualTo: firebaseAuth.currentUser!.displayName)
         //     .get()
         //     .then((QuerySnapshot snapshot) {
         //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();

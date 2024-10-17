@@ -1,6 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/somebody_profile.dart';
 import 'package:wbrs/widgets/drawer.dart';
@@ -17,24 +19,20 @@ class MyVisitersPage extends StatefulWidget {
 }
 
 class _MyVisitersPageState extends State<MyVisitersPage> {
-  String MyUid = '';
-  var currentUser = FirebaseAuth.instance.currentUser;
+  var currentUser = firebaseAuth.currentUser;
 
   @override
   Widget build(BuildContext context) {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
-
       Timestamp time = snapshot.data!.docs[index]['lastVisitTs'];
       return Card(
         color: Colors.white.withOpacity(0.25),
         child: ListTile(
           onTap: () async {
-            var doc = await FirebaseFirestore.instance
+            var doc = await firebaseFirestore
                 .collection('users')
                 .doc(snapshot.data!.docs[index]['uid'])
                 .get();
-
-            // ignore: use_build_context_synchronously
             nextScreen(
                 context,
                 SomebodyProfile(
@@ -48,10 +46,12 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             width: 50,
             child: userImageWithCircle(
                 (snapshot.data!.docs[index]['photoUrl'] == "" ||
-                    snapshot.data!.docs[index]['photoUrl'] == null)
+                        snapshot.data!.docs[index]['photoUrl'] == null)
                     ? "assets/profile.png"
                     : snapshot.data!.docs[index]['photoUrl'].toString(),
-                snapshot.data!.docs[index]['group'], 50.0, 50.0),
+                snapshot.data!.docs[index]['group'],
+                50.0,
+                50.0),
           ),
           title: Row(
             children: [
@@ -63,27 +63,35 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                 width: 10,
               ),
               int.parse(snapshot.data!.docs[index]['age'].toString()) % 10 == 0
-                  ? Text('${snapshot.data!.docs[index]['age'].toString()} лет',
-                style: const TextStyle(color: Colors.white),)
-                  : int.parse(snapshot.data!.docs[index]['age'].toString()) %
-                  10 ==
-                  1
                   ? Text(
-                '${snapshot.data!.docs[index]['age'].toString()} год',
-                style: const TextStyle(color: Colors.white),)
-                  : int.parse(snapshot.data!.docs[index]['age']
-                  .toString()) %
-                  10 !=
-                  5
-                  ? Text('${snapshot.data!.docs[index]['age']} года',
-                style: const TextStyle(color: Colors.white),)
-                  : Text('${snapshot.data!.docs[index]['age']} лет',
-                style: const TextStyle(color: Colors.white),),
+                      '${snapshot.data!.docs[index]['age'].toString()} лет',
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : int.parse(snapshot.data!.docs[index]['age'].toString()) %
+                              10 ==
+                          1
+                      ? Text(
+                          '${snapshot.data!.docs[index]['age'].toString()} год',
+                          style: const TextStyle(color: Colors.white),
+                        )
+                      : int.parse(snapshot.data!.docs[index]['age']
+                                      .toString()) %
+                                  10 !=
+                              5
+                          ? Text(
+                              '${snapshot.data!.docs[index]['age']} года',
+                              style: const TextStyle(color: Colors.white),
+                            )
+                          : Text(
+                              '${snapshot.data!.docs[index]['age']} лет',
+                              style: const TextStyle(color: Colors.white),
+                            ),
             ],
           ),
           subtitle: Text(
-              "Последнее посещение: \n${time.toDate().toString().substring(0, 16)}",
-            style: const TextStyle(color: Colors.white),),
+            "Последнее посещение: \n${time.toDate().toString().substring(0, 16)}",
+            style: const TextStyle(color: Colors.white),
+          ),
           dense: false,
         ),
       );
@@ -98,8 +106,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
           fit: BoxFit.cover,
         ),
         Scaffold(
-          appBar:
-          AppBar(
+          appBar: AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
             elevation: 0,
             centerTitle: true,
@@ -119,7 +126,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             child: StreamBuilder(
                 stream: widget.visiters,
                 builder: (context, snapshot) {
-                  var length;
+                  int length = 0;
                   if (snapshot.data != null) {
                     length = snapshot.data!.docs.length;
                   }

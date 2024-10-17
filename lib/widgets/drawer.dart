@@ -32,7 +32,7 @@ class _MyDrawerState extends State<MyDrawer> {
   var email;
   var currentUser;
 
-  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth auth = firebaseAuth;
   get uid => auth.currentUser!.uid;
   AuthService authService = AuthService();
 
@@ -43,13 +43,13 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   void initState() {
     super.initState();
-    var currentUser = FirebaseAuth.instance.currentUser;
+    var currentUser = firebaseAuth.currentUser;
 
     if (currentUser != null) {
       displayName = currentUser.displayName;
     }
 
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection("users")
         .where("fullName", isEqualTo: displayName)
         .get()
@@ -66,10 +66,10 @@ class _MyDrawerState extends State<MyDrawer> {
     });
     print(Group);
 
-    currentUser = FirebaseAuth.instance.currentUser;
+    currentUser = firebaseAuth.currentUser;
     if (currentUser != null) {
-      userName = FirebaseAuth.instance.currentUser!.displayName.toString();
-      email = FirebaseAuth.instance.currentUser!.email.toString();
+      userName = firebaseAuth.currentUser!.displayName.toString();
+      email = firebaseAuth.currentUser!.email.toString();
     }
   }
 
@@ -98,17 +98,16 @@ class _MyDrawerState extends State<MyDrawer> {
                     });
                     var x = await getUserGroup();
 
-                    var doc = await FirebaseFirestore.instance
+                    var doc = await firebaseFirestore
                         .collection('users')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .doc(firebaseAuth.currentUser!.uid)
                         .get();
 
                     nextScreen(
                         context,
                         ProfilePage(
                           group: x,
-                          email: FirebaseAuth.instance.currentUser!.email
-                              .toString(),
+                          email: firebaseAuth.currentUser!.email.toString(),
                           userName: FirebaseAuth
                               .instance.currentUser!.displayName
                               .toString(),
@@ -125,20 +124,16 @@ class _MyDrawerState extends State<MyDrawer> {
                     children: [
                       Column(
                         children: [
-                          FirebaseAuth.instance.currentUser!.photoURL == "" ||
-                                  FirebaseAuth.instance.currentUser!.photoURL ==
-                                      null
+                          firebaseAuth.currentUser!.photoURL == "" ||
+                                  firebaseAuth.currentUser!.photoURL == null
                               ? const Icon(
                                   Icons.account_circle,
                                   size: 150,
                                   color: Colors.white,
                                 )
                               : userImageWithCircle(
-                                  (FirebaseAuth.instance.currentUser!
-                                                  .photoURL ==
-                                              "" ||
-                                          FirebaseAuth.instance.currentUser!
-                                                  .photoURL ==
+                                  (firebaseAuth.currentUser!.photoURL == "" ||
+                                          firebaseAuth.currentUser!.photoURL ==
                                               null)
                                       ? "assets/profile.png"
                                       : FirebaseAuth
@@ -148,7 +143,7 @@ class _MyDrawerState extends State<MyDrawer> {
                           // : ClipRRect(
                           //     borderRadius: BorderRadius.circular(100.0),
                           //     child: Image.network(
-                          //       FirebaseAuth.instance.currentUser!.photoURL
+                          //       firebaseAuth.currentUser!.photoURL
                           //           .toString(),
                           //       fit: BoxFit.cover,
                           //       height: 100.0,
@@ -218,8 +213,8 @@ class _MyDrawerState extends State<MyDrawer> {
                       selectedIndex = 0;
                       isLoading = true;
                     });
-                    nextScreen(context, SplashScreen());
-                    DocumentSnapshot doc = await FirebaseFirestore.instance
+                    nextScreen(context, const SplashScreen());
+                    DocumentSnapshot doc = await firebaseFirestore
                         .collection('users')
                         .doc(uid)
                         .get();
@@ -230,21 +225,20 @@ class _MyDrawerState extends State<MyDrawer> {
                     });
 
                     if (isLoading) {
-                      nextScreen(context, SplashScreen());
+                      nextScreen(context, const SplashScreen());
                     } else {
                       var x = await getUserGroup();
 
-                      var doc = await FirebaseFirestore.instance
+                      var doc = await firebaseFirestore
                           .collection('users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .doc(firebaseAuth.currentUser!.uid)
                           .get();
 
                       nextScreen(
                           context,
                           ProfilePage(
                             group: x,
-                            email: FirebaseAuth.instance.currentUser!.email
-                                .toString(),
+                            email: firebaseAuth.currentUser!.email.toString(),
                             userName: FirebaseAuth
                                 .instance.currentUser!.displayName
                                 .toString(),
@@ -271,9 +265,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 ListTile(
                   onTap: () {
-                    var visiters = FirebaseFirestore.instance
+                    var visiters = firebaseFirestore
                         .collection('users')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .doc(firebaseAuth.currentUser!.uid)
                         .collection('visiters')
                         .snapshots();
                     nextScreen(
@@ -297,13 +291,13 @@ class _MyDrawerState extends State<MyDrawer> {
                     setState(() {
                       selectedIndex = 2;
                     });
-                    nextScreen(context, SplashScreen());
+                    nextScreen(context, const SplashScreen());
 
                     setState(() {
                       isLoading = false;
                     });
                     if (isLoading) {
-                      nextScreen(context, SplashScreen());
+                      nextScreen(context, const SplashScreen());
                     } else {
                       var x = await getUserGroup();
                       nextScreenReplace(
@@ -401,7 +395,7 @@ class _MyDrawerState extends State<MyDrawer> {
                               ),
                               IconButton(
                                 onPressed: () async {
-                                  FirebaseFirestore.instance
+                                  firebaseFirestore
                                       .collection('TOKENS')
                                       .doc(FirebaseAuth
                                           .instance.currentUser?.uid)

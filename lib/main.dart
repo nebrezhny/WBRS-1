@@ -1,9 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_admin/firebase_admin.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -107,15 +106,13 @@ class _MyAppState extends State<MyApp> {
       });
     });
 
-    print(mtoken);
-
     saveUserToken(mtoken!);
   }
 
   void saveUserToken(String token) {
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection('TOKENS')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(firebaseAuth.currentUser?.uid)
         .set({'token': token});
   }
 
@@ -141,7 +138,6 @@ class _MyAppState extends State<MyApp> {
         body['users'] =
             body['users'].toString().replaceAll('[', '').replaceAll(']', '');
         List users = body['users'].toString().split(',');
-        print(users);
         nextScreen(
             context,
             AboutMeet(
@@ -156,7 +152,6 @@ class _MyAppState extends State<MyApp> {
     const DarwinInitializationSettings();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print(message);
       BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
         message.notification!.body.toString(),
         htmlFormatBigText: true,
@@ -185,9 +180,9 @@ class _MyAppState extends State<MyApp> {
         showSnackbar(context, Colors.red, e);
       }
     });
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .update(
       {
         'chatWithId': '',
@@ -196,9 +191,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   getUserInfo() async {
-    doc = await FirebaseFirestore.instance
+    doc = await firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .get();
 
     setState(() {
@@ -231,9 +226,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   getUserRegistrationStatus() async {
-    var collection = await FirebaseFirestore.instance
+    var collection = await firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .get();
 
     _isRegistrationEnd = await collection.get('isRegistrationEnd');
@@ -260,8 +255,8 @@ class _MyAppState extends State<MyApp> {
         'profile': (context) {
           return ProfilePage(
             group: getUserGroup(),
-            email: FirebaseAuth.instance.currentUser!.email.toString(),
-            userName: FirebaseAuth.instance.currentUser!.displayName.toString(),
+            email: firebaseAuth.currentUser!.email.toString(),
+            userName: firebaseAuth.currentUser!.displayName.toString(),
             about: doc.get('about'),
             age: doc.get('age').toString(),
             rost: doc.get('rost'),

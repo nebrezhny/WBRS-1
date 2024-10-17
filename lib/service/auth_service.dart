@@ -1,14 +1,16 @@
+// ignore_for_file: avoid_print
+
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
   // login
   Future loginWithUserNameAndPassword(String email, String password) async {
     try {
-      UserCredential user = await firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      // ignore: unused_local_variable
+      UserCredential user = await firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -25,8 +27,8 @@ class AuthService {
   Future registerUserWithEmailAndPassword(
       String fullName, String email, String password) async {
     try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      await firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

@@ -33,9 +33,9 @@ class _ProfilesListState extends State<ProfilesList> {
 
   getGroup() {
     String group = "";
-    FirebaseFirestore.instance
+    firebaseFirestore
         .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .get()
         .then((data) {
       group = data.get('группа');
@@ -51,20 +51,18 @@ class _ProfilesListState extends State<ProfilesList> {
     setState(() {});
   }
 
-  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth auth = firebaseAuth;
 
   get user => auth.currentUser;
 
   get uid => user?.uid;
 
-  late FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
   get users => firebaseFirestore.collection("users").snapshots();
 
   //int age = int.parse(GlobalAge.toString());
 
-  var collection = FirebaseFirestore.instance.collection('users')
-      // .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+  var collection = firebaseFirestore.collection('users')
+      // .where("uid", isNotEqualTo: firebaseAuth.currentUser!.uid)
       // .orderBy('uid')
       // .orderBy('age')
       // .startAt([int.parse(GlobalAge.toString()) - 10])
@@ -99,8 +97,7 @@ class _ProfilesListState extends State<ProfilesList> {
               Builder(builder: (context) {
                 return IconButton(
                   icon: const Icon(Icons.filter_alt_rounded),
-                  onPressed: () {
-                  },
+                  onPressed: () {},
                 );
               }),
             ],
@@ -224,11 +221,11 @@ class _ProfilesListState extends State<ProfilesList> {
 
     var stream = filterByGroup
         ? filtered_col
-            .where('uid', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('uid', isNotEqualTo: firebaseAuth.currentUser!.uid)
             .orderBy('uid')
             .snapshots()
         : collection
-            .where('uid', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('uid', isNotEqualTo: firebaseAuth.currentUser!.uid)
             .orderBy('uid')
             .snapshots();
 
@@ -271,6 +268,7 @@ class _ProfilesListState extends State<ProfilesList> {
           }
         } else {
           if (filtrCity.text != '') {
+            print(filtrCity.text);
             if (snapshot.data!.docs[i]['city'] == filtrCity.text) {
               users.add(snapshot.data!.docs[i]);
             }
@@ -287,8 +285,8 @@ class _ProfilesListState extends State<ProfilesList> {
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.5,
           child: GridView.builder(
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3),
             itemCount: users.length,
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
@@ -311,7 +309,7 @@ class _ProfilesListState extends State<ProfilesList> {
                           uid: somebodyUid.toString(),
                           name: somebodyFullname.toString(),
                           photoUrl: somebodyImageUrl.toString(),
-                          userInfo: await FirebaseFirestore.instance
+                          userInfo: await firebaseFirestore
                               .collection('users')
                               .doc(users[index].get('uid'))
                               .get(),
@@ -321,10 +319,10 @@ class _ProfilesListState extends State<ProfilesList> {
                     height: MediaQuery.of(context).size.height * 0.05,
                     child: Column(children: [
                       userImageWithCircle(
-                        users[index]["profilePic"],
-                        users[index]["группа"] ?? '',
-                          MediaQuery.of(context).size.height * 0.1,MediaQuery.of(context).size.height * 0.1
-                      ),
+                          users[index]["profilePic"],
+                          users[index]["группа"] ?? '',
+                          MediaQuery.of(context).size.height * 0.1,
+                          MediaQuery.of(context).size.height * 0.1),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(

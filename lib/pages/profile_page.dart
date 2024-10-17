@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
 
@@ -6,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/helper/helper_function.dart';
 import 'package:wbrs/pages/auth/login_page.dart';
 import 'package:wbrs/pages/profile_edit_page.dart';
@@ -53,13 +55,14 @@ class _ProfilePageState extends State<ProfilePage> {
   FirebaseStorage storage = FirebaseStorage.instance;
   String imageUrl = " ";
   TextEditingController? name = TextEditingController();
-  late User? user = FirebaseAuth.instance.currentUser;
+  late User? user = firebaseAuth.currentUser;
 
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
 
   void selectImages() async {
-    final List<XFile> selectedImages = await imagePicker.pickMultiImage(imageQuality: 50);
+    final List<XFile> selectedImages =
+        await imagePicker.pickMultiImage(imageQuality: 50);
     if (selectedImages.isNotEmpty) {
       imageFileList!.addAll(selectedImages);
       for (int i = 0; i < selectedImages.length; i++) {
@@ -76,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("profilepic${FirebaseAuth.instance.currentUser?.uid}.jpg");
+        .child("profilepic${firebaseAuth.currentUser?.uid}.jpg");
 
     await ref.putFile(File(image!.path));
     ref.getDownloadURL().then((value) {
@@ -90,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String password = "";
   String passwordConfirm = "";
 
-  var currentUser = FirebaseAuth.instance.currentUser;
+  var currentUser = firebaseAuth.currentUser;
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -197,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 .updatePassword(
                                                     passwordConfirm);
 
-                                            FirebaseAuth.instance.signOut();
+                                            firebaseAuth.signOut();
                                             nextScreen(
                                                 context, const LoginPage());
                                             showSnackbar(context, Colors.green,
@@ -247,9 +250,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               userImageWithCircle(
                                   (currentUser!.photoURL == "" ||
-                                      currentUser!.photoURL == null)
+                                          currentUser!.photoURL == null)
                                       ? "assets/profile.png"
-                                      : currentUser!.photoURL.toString(), widget.group),
+                                      : currentUser!.photoURL.toString(),
+                                  widget.group),
                             ],
                           ),
                           const SizedBox(
@@ -317,7 +321,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               var visiters = FirebaseFirestore
                                                   .instance
                                                   .collection('users')
-                                                  .doc(FirebaseAuth.instance
+                                                  .doc(firebaseAuth
                                                       .currentUser!.uid)
                                                   .collection('visiters')
                                                   .snapshots();
@@ -459,9 +463,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.normal),
                           ),
                           StreamBuilder(
-                              stream: FirebaseFirestore.instance
+                              stream: firebaseFirestore
                                   .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .doc(firebaseAuth.currentUser!.uid)
                                   .collection('images')
                                   .snapshots(),
                               builder: (context, AsyncSnapshot snapshot) {
@@ -481,37 +485,39 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return ifImageSnaphotEmpty(snapshot);
                                 }
                               }),
-                        const Text(
-                          'Подарки',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.normal),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .snapshots(),
-                            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.data != null) {
-                                Map docAsMap = snapshot.data!.data() as Map;
-                                if(docAsMap['presentedGifts'] != null){
-                                  if (docAsMap['presentedGifts'].length > 0) {
-                                    return ifGiftsSnapshotNotEmtpry(docAsMap['presentedGifts']);
+                          const Text(
+                            'Подарки',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.normal),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          StreamBuilder(
+                              stream: firebaseFirestore
+                                  .collection('users')
+                                  .doc(firebaseAuth.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.data != null) {
+                                  Map docAsMap = snapshot.data!.data() as Map;
+                                  if (docAsMap['presentedGifts'] != null) {
+                                    if (docAsMap['presentedGifts'].length > 0) {
+                                      return ifGiftsSnapshotNotEmtpry(
+                                          docAsMap['presentedGifts']);
+                                    } else {
+                                      return ifGiftsSnaphotEmpty(snapshot);
+                                    }
                                   } else {
                                     return ifGiftsSnaphotEmpty(snapshot);
                                   }
-                                }else {
+                                } else {
                                   return ifGiftsSnaphotEmpty(snapshot);
                                 }
-                              } else {
-                                return ifGiftsSnaphotEmpty(snapshot);
-                              }
-                            }),
+                              }),
                         ])
                   : const SizedBox(),
             ),
@@ -532,9 +538,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     urls.sort(
       (a, b) {
-        return a.toString() == FirebaseAuth.instance.currentUser!.photoURL
+        return a.toString() == firebaseAuth.currentUser!.photoURL
             ? -1
-            : b.toString() == FirebaseAuth.instance.currentUser!.photoURL
+            : b.toString() == firebaseAuth.currentUser!.photoURL
                 ? 1
                 : 0;
       },
@@ -556,27 +562,30 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 300,
                   child: InkWell(
                       onTap: () {
-                        nextScreen(context, ShowImage(
-                          urls: urls,
-                          initList: initList,
-                          index: index,
-                          snapshot: snapshot,
-                          userName: widget.userName,
-                          group: widget.group,
-                          email: widget.email,
-                          about: widget.about,
-                          age: widget.age,
-                          rost: widget.rost,
-                          city: widget.city,
-                          hobbi: widget.hobbi,
-                          deti: widget.deti,
-                          pol: widget.pol,
-                        ));
+                        nextScreen(
+                            context,
+                            ShowImage(
+                              urls: urls,
+                              initList: initList,
+                              index: index,
+                              snapshot: snapshot,
+                              userName: widget.userName,
+                              group: widget.group,
+                              email: widget.email,
+                              about: widget.about,
+                              age: widget.age,
+                              rost: widget.rost,
+                              city: widget.city,
+                              hobbi: widget.hobbi,
+                              deti: widget.deti,
+                              pol: widget.pol,
+                            ));
                       },
                       child: Container(
                         margin: const EdgeInsets.only(right: 5),
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(15)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(15)),
                           image: DecorationImage(
                               image: CachedNetworkImageProvider(urls[index]),
                               fit: BoxFit.cover),
@@ -631,15 +640,15 @@ class _ProfilePageState extends State<ProfilePage> {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     await storage
-        .ref('$name+$time+${FirebaseAuth.instance.currentUser!.uid}')
+        .ref('$name+$time+${firebaseAuth.currentUser!.uid}')
         .putFile(File(image.path));
     var downloadUrl = await storage
-        .ref('$name+$time+${FirebaseAuth.instance.currentUser!.uid}')
+        .ref('$name+$time+${firebaseAuth.currentUser!.uid}')
         .getDownloadURL();
 
-    await FirebaseFirestore.instance
+    await firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .collection('images')
         .add({"url": downloadUrl});
   }
@@ -664,25 +673,27 @@ class _ProfilePageState extends State<ProfilePage> {
                           bottomLeft: Radius.circular(15))),
                   height: 300,
                   child: InkWell(
-                      onTap: () {
-                      },
+                      onTap: () {},
                       child: Container(
                         margin: const EdgeInsets.only(right: 5),
                         width: 110,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            Image.asset(urlsList[index],
-                                fit: BoxFit.fitWidth),
+                            Image.asset(urlsList[index], fit: BoxFit.fitWidth),
                             Align(
                               alignment: Alignment.bottomRight,
                               child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: Colors.white),
-                                ),
-                                  child: Text(countList[index].toString(), style: TextStyle(color: Colors.white),)),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(color: Colors.white),
+                                  ),
+                                  child: Text(
+                                    countList[index].toString(),
+                                    style: TextStyle(color: Colors.white),
+                                  )),
                             )
                           ],
                         ),

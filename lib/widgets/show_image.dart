@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:wbrs/helper/global.dart';
 import 'package:wbrs/pages/profile_page.dart';
 import 'package:wbrs/widgets/widgets.dart';
 
@@ -13,7 +10,7 @@ class ShowImage extends StatefulWidget {
   final int index;
   final List initList;
   final List urls;
-  final snapshot;
+  final AsyncSnapshot snapshot;
   final String userName;
   final String email;
   final String about;
@@ -24,7 +21,22 @@ class ShowImage extends StatefulWidget {
   final bool deti;
   final String pol;
   final String group;
-  const ShowImage({super.key, required this.urls, required this.index, required this.initList, this.snapshot, required this.userName, required this.email, required this.about, required this.age, required this.rost, required this.city, required this.hobbi, required this.deti, required this.pol, required this.group});
+  const ShowImage(
+      {super.key,
+      required this.urls,
+      required this.index,
+      required this.initList,
+      required this.snapshot,
+      required this.userName,
+      required this.email,
+      required this.about,
+      required this.age,
+      required this.rost,
+      required this.city,
+      required this.hobbi,
+      required this.deti,
+      required this.pol,
+      required this.group});
 
   @override
   State<ShowImage> createState() => _ShowImageState();
@@ -41,17 +53,25 @@ class _ShowImageState extends State<ShowImage> {
         actions: [
           Row(
             children: [
-              IconButton(onPressed: (){
-                FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({'profilePic': widget.urls[widget.index]});
-                FirebaseAuth.instance.currentUser!.updatePhotoURL(widget.urls[widget.index]);
-              }, icon: const Icon(CupertinoIcons.profile_circled)),
-              IconButton(onPressed: (){
-                deleteImage(widget.snapshot, widget.index);
-
-              }, icon: const Icon(Icons.delete)),
               IconButton(
                   onPressed: () {
-                    nextScreenReplace(context,
+                    firebaseFirestore
+                        .collection('users')
+                        .doc(firebaseAuth.currentUser!.uid)
+                        .update({'profilePic': widget.urls[widget.index]});
+                    firebaseAuth.currentUser!
+                        .updatePhotoURL(widget.urls[widget.index]);
+                  },
+                  icon: const Icon(CupertinoIcons.profile_circled)),
+              IconButton(
+                  onPressed: () {
+                    deleteImage(widget.snapshot, widget.index);
+                  },
+                  icon: const Icon(Icons.delete)),
+              IconButton(
+                  onPressed: () {
+                    nextScreenReplace(
+                        context,
                         ProfilePage(
                           userName: widget.userName,
                           email: widget.email,
@@ -73,41 +93,45 @@ class _ShowImageState extends State<ShowImage> {
       body: Dismissible(
           key: UniqueKey(),
           onDismissed: (direction) {
-            if(direction == DismissDirection.endToStart){
+            if (direction == DismissDirection.endToStart) {
               moveToNext();
-            }else{
+            } else {
               moveToPrevious();
             }
           },
           child: InteractiveViewer(
-              minScale: 0.5, maxScale: 2,
-              panEnabled: false,
-              scaleEnabled: true,
-              boundaryMargin: const EdgeInsets.all(100),
-              child: CachedNetworkImage(
-                imageUrl: widget.urls[widget.index],
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.fitWidth),
-                  ),
+            minScale: 0.5,
+            maxScale: 2,
+            panEnabled: false,
+            scaleEnabled: true,
+            boundaryMargin: const EdgeInsets.all(100),
+            child: CachedNetworkImage(
+              imageUrl: widget.urls[widget.index],
+              imageBuilder: (context, imageProvider) => Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  image: DecorationImage(
+                      image: imageProvider, fit: BoxFit.fitWidth),
                 ),
-                fit: BoxFit.cover,
-                placeholder: (context, url) => SizedBox(
-                    height: MediaQuery.of(context).size.height * .3,
-                    child: const Center(child: CircularProgressIndicator())),
-                errorWidget: (context, url, error) => SizedBox(
-                    height: MediaQuery.of(context).size.height * .3,
-                    child: const Center(child: Icon(Icons.error))),
-              ),)),
+              ),
+              fit: BoxFit.cover,
+              placeholder: (context, url) => SizedBox(
+                  height: MediaQuery.of(context).size.height * .3,
+                  child: const Center(child: CircularProgressIndicator())),
+              errorWidget: (context, url, error) => SizedBox(
+                  height: MediaQuery.of(context).size.height * .3,
+                  child: const Center(child: Icon(Icons.error))),
+            ),
+          )),
     );
   }
+
   moveToNext() {
-    if(widget.index == widget.urls.length-1) return;
-    nextScreenReplace(context,
+    if (widget.index == widget.urls.length - 1) return;
+    nextScreenReplace(
+        context,
         ShowImage(
-            index: widget.index+1,
+            index: widget.index + 1,
             initList: widget.initList,
             urls: widget.urls,
             snapshot: widget.snapshot,
@@ -120,15 +144,15 @@ class _ShowImageState extends State<ShowImage> {
             hobbi: widget.hobbi,
             deti: widget.deti,
             pol: widget.pol,
-            group: widget.group
-        ));
+            group: widget.group));
   }
 
   moveToPrevious() {
-    if(widget.index == 0) return;
-    nextScreenReplace(context,
+    if (widget.index == 0) return;
+    nextScreenReplace(
+        context,
         ShowImage(
-            index: widget.index-1,
+            index: widget.index - 1,
             initList: widget.initList,
             urls: widget.urls,
             snapshot: widget.snapshot,
@@ -141,8 +165,7 @@ class _ShowImageState extends State<ShowImage> {
             hobbi: widget.hobbi,
             deti: widget.deti,
             pol: widget.pol,
-            group: widget.group
-        ));
+            group: widget.group));
   }
 
   deleteImage(snapshot, index) {
@@ -177,15 +200,15 @@ class _ShowImageState extends State<ShowImage> {
                           FirebaseStorage.instance
                               .refFromURL(snapshot.data!.docs[index]['url'])
                               .delete();
-                          FirebaseFirestore.instance
+                          firebaseFirestore
                               .collection('users')
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .doc(firebaseAuth.currentUser!.uid)
                               .collection('images')
                               .doc(snapshot.data!.docs[index].id)
                               .delete();
-                          if(index == 0){
+                          if (index == 0) {
                             moveToNext();
-                          }else{
+                          } else {
                             moveToPrevious();
                           }
                         },

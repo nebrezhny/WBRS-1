@@ -11,8 +11,8 @@
 // class _MessagingScreenState extends State<MessagingScreen> {
 //   final TextEditingController _replyController = TextEditingController();
 //   String _selectedMessageId = '';
-//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-//   final FirebaseAuth _auth = FirebaseAuth.instance;
+//   final FirebaseFirestore _firestore = firebaseFirestore;
+//   final FirebaseAuth _auth = firebaseAuth;
 //
 //   Future<void> _sendMessage(String message) async {
 //     final user = _auth.currentUser;

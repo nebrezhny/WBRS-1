@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, unnecessary_string_escapes, non_constant_identifier_names
+// ignore_for_file: must_be_immutable, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,8 +31,8 @@ class SomebodyProfile extends StatefulWidget {
 }
 
 class _SomebodyProfileState extends State<SomebodyProfile> {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection("users");
+  FirebaseFirestore db = firebaseFirestore;
+  CollectionReference users = firebaseFirestore.collection("users");
   bool isLoading = true;
   getChatRoomIdByUsernames(String a, String b) {
     if (a.isNotEmpty && b.isNotEmpty) {
@@ -50,7 +50,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
     setState(() {
       isLoading = false;
     });
-    String myUid = FirebaseAuth.instance.currentUser!.uid;
+    String myUid = firebaseAuth.currentUser!.uid;
 
     var doc = await db
         .collection('users')
@@ -59,23 +59,21 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         .doc(myUid)
         .get();
 
-    var MyUserInfo = await db
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    var MyUserInfo =
+        await db.collection('users').doc(firebaseAuth.currentUser!.uid).get();
 
-    if(!MyUserInfo.data()!['isUnVisible']){
+    if (!MyUserInfo.data()!['isUnVisible']) {
       if (!doc.exists) {
-        FirebaseFirestore.instance
+        firebaseFirestore
             .collection('users')
             .doc(uid)
             .collection('visiters')
             .doc(myUid)
             .set({
           "uid": myUid,
-          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+          "photoUrl": firebaseAuth.currentUser!.photoURL,
           "lastVisitTs": DateTime.now(),
-          "fullName": FirebaseAuth.instance.currentUser!.displayName,
+          "fullName": firebaseAuth.currentUser!.displayName,
           "age": MyUserInfo.get('age'),
           "group": MyUserInfo.get('группа'),
           "city": MyUserInfo.get('city')
@@ -87,9 +85,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
             .collection('visiters')
             .doc(myUid)
             .update({
-          "photoUrl": FirebaseAuth.instance.currentUser!.photoURL,
+          "photoUrl": firebaseAuth.currentUser!.photoURL,
           "lastVisitTs": DateTime.now(),
-          "fullName": FirebaseAuth.instance.currentUser!.displayName,
+          "fullName": firebaseAuth.currentUser!.displayName,
           "age": MyUserInfo.get('age'),
           "city": MyUserInfo.get('city')
         });
@@ -100,25 +98,20 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
   List images = [];
 
   getImages() async {
-    var res = await db
-        .collection('users')
-        .doc(widget.uid)
-        .collection('images')
-        .get();
+    var res =
+        await db.collection('users').doc(widget.uid).collection('images').get();
     images = res.docs.map((e) => e.get('url')).toList();
     setState(() {
       images.sort(
-            (a, b) {
+        (a, b) {
           return a.toString().contains('avatar')
               ? -1
               : b.toString().contains('avatar')
-              ? 1
-              : 0;
+                  ? 1
+                  : 0;
         },
       );
     });
-
-    print(images);
   }
 
   @override
@@ -192,12 +185,11 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                if(widget.userInfo
-                                    .get('profilePic')!='') {
+                                if (widget.userInfo.get('profilePic') != '') {
                                   int index = 0;
                                   for (var element in images) {
-                                    if (element == widget.userInfo
-                                        .get('profilePic')) {
+                                    if (element ==
+                                        widget.userInfo.get('profilePic')) {
                                       index = images.indexOf(element);
                                     }
                                   }
@@ -206,13 +198,15 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                               },
                               child: userImageWithCircle(
                                   (widget.userInfo.get('profilePic') != "")
-                                      ?widget.userInfo.get('profilePic')
-                                      :"", widget.userInfo.get('группа'), 100.0, 100.0),
+                                      ? widget.userInfo.get('profilePic')
+                                      : "",
+                                  widget.userInfo.get('группа'),
+                                  100.0,
+                                  100.0),
                             ),
                             Center(
                               child: TextButton(
                                 onPressed: () async {
-                                  String chatID = '';
                                   Map<String, dynamic> chatRoomInfoMap = {
                                     "user1": FirebaseAuth
                                         .instance.currentUser!.uid
@@ -229,50 +223,45 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     "lastMessageSendTs": DateTime.now(),
                                     "unreadMessage": 0,
                                     "chatId": getChatRoomIdByUsernames(
-                                        FirebaseAuth.instance.currentUser!
-                                            .displayName
+                                        FirebaseAuth
+                                            .instance.currentUser!.displayName
                                             .toString(),
                                         widget.name)
                                   };
-                                  await FirebaseFirestore.instance
+                                  await firebaseFirestore
                                       .collection("chats")
                                       .where("user1",
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
                                       .where("user2", isEqualTo: widget.uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
                                     } else {
                                       HaveOrNot = true;
-                                      chatID = snapshot.docs[0].id;
                                     }
                                   });
-                                  await FirebaseFirestore.instance
+                                  await firebaseFirestore
                                       .collection("chats")
                                       .where("user2",
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
                                       .where("user1", isEqualTo: widget.uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
                                     } else {
                                       HaveOrNot = true;
-                                      chatID = snapshot.docs[0].id;
                                     }
                                   });
-                                  await FirebaseFirestore.instance
+                                  await firebaseFirestore
                                       .collection("chats")
                                       .where("chatId",
-                                      isEqualTo:
-                                      getChatRoomIdByUsernames(
-                                          FirebaseAuth
-                                              .instance
-                                              .currentUser!
-                                              .displayName
-                                              .toString(),
-                                          widget.name))
+                                          isEqualTo: getChatRoomIdByUsernames(
+                                              firebaseAuth
+                                                  .currentUser!.displayName
+                                                  .toString(),
+                                              widget.name))
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -282,7 +271,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     if (HaveOrNot == false) {
                                       DatabaseService().createChatRoom(
                                           getChatRoomIdByUsernames(
-                                              FirebaseAuth.instance
+                                              firebaseAuth
                                                   .currentUser!.displayName
                                                   .toString(),
                                               widget.name),
@@ -291,20 +280,22 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           FirebaseAuth
                                               .instance.currentUser!.uid,
                                           getChatRoomIdByUsernames(
-                                              FirebaseAuth.instance
+                                              firebaseAuth
                                                   .currentUser!.displayName
                                                   .toString(),
                                               widget.name));
                                       DatabaseService().addChatSecondUser(
                                           widget.uid,
                                           getChatRoomIdByUsernames(
-                                              FirebaseAuth.instance
+                                              firebaseAuth
                                                   .currentUser!.displayName
                                                   .toString(),
                                               widget.name));
-                                      nextScreenReplace(context, const ShopPage());
+                                      nextScreenReplace(
+                                          context, const ShopPage());
                                     } else {
-                                      nextScreenReplace(context, const ShopPage());
+                                      nextScreenReplace(
+                                          context, const ShopPage());
                                     }
                                   });
                                   setState(() {
@@ -320,7 +311,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     ),
                                     Text(
                                       'Подарить подарок',
-                                      style: TextStyle(color: Colors.orangeAccent),
+                                      style:
+                                          TextStyle(color: Colors.orangeAccent),
                                     )
                                   ],
                                 ),
@@ -348,19 +340,29 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                       Radius.circular(15))),
                                           width: 140,
                                           child: InkWell(
-                                            radius: 15,
+                                              radius: 15,
                                               onTap: () {
                                                 openImage(index, images);
                                               },
                                               child: Container(
-                                                decoration:const BoxDecoration(
-                                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(15)),
                                                 ),
                                                 margin: const EdgeInsets.only(
                                                     right: 5),
-                                                child: CachedNetworkImage(
-                                                    imageUrl: images[index],
-                                                    fit: BoxFit.cover),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: CachedNetworkImage(
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const SizedBox
+                                                              .shrink(),
+                                                      imageUrl: images[index],
+                                                      fit: BoxFit.cover),
+                                                ),
                                               )),
                                         );
                                       },
@@ -397,12 +399,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                         "lastMessageSendTs": DateTime.now(),
                                         "unreadMessage": 0,
                                         "chatId": getChatRoomIdByUsernames(
-                                            FirebaseAuth.instance.currentUser!
-                                                .displayName
+                                            firebaseAuth
+                                                .currentUser!.displayName
                                                 .toString(),
                                             widget.name)
                                       };
-                                      await FirebaseFirestore.instance
+                                      await firebaseFirestore
                                           .collection("chats")
                                           .where("user1",
                                               isEqualTo: FirebaseAuth
@@ -416,7 +418,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           chatID = snapshot.docs[0].id;
                                         }
                                       });
-                                      await FirebaseFirestore.instance
+                                      await firebaseFirestore
                                           .collection("chats")
                                           .where("user2",
                                               isEqualTo: FirebaseAuth
@@ -430,7 +432,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                           chatID = snapshot.docs[0].id;
                                         }
                                       });
-                                      await FirebaseFirestore.instance
+                                      await firebaseFirestore
                                           .collection("chats")
                                           .where("chatId",
                                               isEqualTo:
@@ -450,7 +452,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                         if (HaveOrNot == false) {
                                           DatabaseService().createChatRoom(
                                               getChatRoomIdByUsernames(
-                                                  FirebaseAuth.instance
+                                                  firebaseAuth
                                                       .currentUser!.displayName
                                                       .toString(),
                                                   widget.name),
@@ -459,14 +461,14 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                               FirebaseAuth
                                                   .instance.currentUser!.uid,
                                               getChatRoomIdByUsernames(
-                                                  FirebaseAuth.instance
+                                                  firebaseAuth
                                                       .currentUser!.displayName
                                                       .toString(),
                                                   widget.name));
                                           DatabaseService().addChatSecondUser(
                                               widget.uid,
                                               getChatRoomIdByUsernames(
-                                                  FirebaseAuth.instance
+                                                  firebaseAuth
                                                       .currentUser!.displayName
                                                       .toString(),
                                                   widget.name));
@@ -510,7 +512,6 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
-
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
@@ -690,11 +691,12 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
 
     //);
   }
+
   openImage(index, urls) {
     showDialog(
       builder: (context) => AlertDialog(
-        iconPadding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.8),
+        iconPadding:
+            EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.8),
         iconColor: Colors.white,
         contentPadding: const EdgeInsets.all(0),
         backgroundColor: Colors.transparent,
@@ -702,27 +704,40 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
         content: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            image: DecorationImage(image: CachedNetworkImageProvider(
-              urls[index],
-            ), fit: BoxFit.fitWidth),
+            image: DecorationImage(
+                image: CachedNetworkImageProvider(
+                  urls[index],
+                ),
+                fit: BoxFit.fitWidth),
           ),
-          height: MediaQuery.of(context).size.height/1.5,
+          height: MediaQuery.of(context).size.height / 1.5,
           width: MediaQuery.of(context).size.width,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(onPressed: () {
-                if(index!=0){
-                  Navigator.pop(context);
-                  openImage(index-1, urls);
-                }
-              }, icon: Icon(Icons.arrow_back_ios, color: index==0?Colors.grey:Colors.white,)),
-              IconButton(onPressed: () {
-                if(index!=urls.length-1){
-                  Navigator.pop(context);
-                  openImage(index+1, urls);
-                }
-              }, icon: Icon(Icons.arrow_forward_ios, color: index==urls.length-1?Colors.grey:Colors.white,)),
+              IconButton(
+                  onPressed: () {
+                    if (index != 0) {
+                      Navigator.pop(context);
+                      openImage(index - 1, urls);
+                    }
+                  },
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    color: index == 0 ? Colors.grey : Colors.white,
+                  )),
+              IconButton(
+                  onPressed: () {
+                    if (index != urls.length - 1) {
+                      Navigator.pop(context);
+                      openImage(index + 1, urls);
+                    }
+                  },
+                  icon: Icon(
+                    Icons.arrow_forward_ios,
+                    color:
+                        index == urls.length - 1 ? Colors.grey : Colors.white,
+                  )),
             ],
           ),
         ),
