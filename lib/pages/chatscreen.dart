@@ -114,10 +114,8 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       if (!userWOutN.contains(widget.id)) {
-        DocumentSnapshot doc = await firebaseFirestore
-            .collection('TOKENS')
-            .doc(firebaseAuth.currentUser!.uid)
-            .get();
+        DocumentSnapshot doc =
+            await firebaseFirestore.collection('TOKENS').doc(widget.id).get();
         DocumentSnapshot snap =
             await firebaseFirestore.collection('users').doc(widget.id).get();
         String token = doc.get('token');
