@@ -5,24 +5,23 @@ import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wbrs/helper/helper_function.dart';
-import 'package:wbrs/pages/auth/login_page.dart';
-import 'package:wbrs/pages/home_page.dart';
-import 'package:wbrs/pages/profile_page.dart';
+import 'package:wbrs/app/helper/helper_function.dart';
+import 'package:wbrs/app/pages/auth/login_page.dart';
+import 'package:wbrs/app/pages/home_page.dart';
+import 'package:wbrs/app/pages/profile_page.dart';
 import 'package:wbrs/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:wbrs/widgets/check_internet.dart';
-import 'package:wbrs/widgets/splash.dart';
-import 'package:wbrs/widgets/widgets.dart';
-import 'package:wbrs/pages/test/red_group.dart';
+import 'package:wbrs/app/widgets/check_internet.dart';
+import 'package:wbrs/app/widgets/splash.dart';
+import 'package:wbrs/app/widgets/widgets.dart';
+import 'package:wbrs/app/pages/test/red_group.dart';
 
 import 'firebase_options.dart';
-import 'helper/global.dart';
-import 'pages/about_meet.dart';
-import 'pages/chatscreen.dart';
+import 'app/helper/global.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
@@ -68,7 +67,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isSignedIn = false;
   bool _isRegistrationEnd = false;
   bool _loading = true;
@@ -85,8 +84,61 @@ class _MyAppState extends State<MyApp> {
     //addUnVisibleField();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      updateUserStatus(false);
+    } else {
+      updateUserStatus(true);
+    }
+  }
+
+  createUsers() {
+    List groups = [
+      'сине-белая',
+      'коричнево-красная',
+      'красно-синяя',
+      'бело-синяя',
+      'сине-коричневая'
+    ];
+    for (int i = 1; i < 10; i++) {
+      firebaseFirestore.collection('users').add({
+        'about': 'TEST',
+        'age': randomBetween(18, 35),
+        'balance': 0,
+        'chatWithId': '',
+        'chats': [],
+        'city': 'TEST',
+        'deti': false,
+        'email': 'testing$i@t.ru',
+        'fullName': 'TEST',
+        'hobbi': 'TEST',
+        'images': [],
+        'isRegistrationEnd': true,
+        'isUnVisible': true,
+        'lastOnlineTs': DateTime.now(),
+        'online': false,
+        'pol': 'ж',
+        'presentedGifts': [],
+        'profilePic': '',
+        'rost': randomBetween(150, 190).toString(),
+        'группа': groups[randomBetween(0, 4)],
+        'testing': true,
+        'uid': 'testing$i'
+      });
+    }
+  }
+
   initFunction() async {
+    //createUsers();
     await checkInternet();
+    updateUserStatus(true);
     selectedIndex = 1;
     await getUserLoggedInStatus();
     if (_isSignedIn) {
@@ -120,34 +172,10 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initFunction();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   initNotify() {
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      Map body = message.data;
-      if (body['isChat'] == 'true') {
-        nextScreen(
-            context,
-            ChatScreen(
-              chatWithUsername: body['chatWith'],
-              photoUrl: body['photoUrl'],
-              id: body['id'],
-              chatId: body['chatId'],
-            ));
-      } else {
-        body['users'] =
-            body['users'].toString().replaceAll('[', '').replaceAll(']', '');
-        List users = body['users'].toString().split(',');
-        nextScreen(
-            context,
-            AboutMeet(
-              id: body['groupId'],
-              users: users,
-              name: body['groupName'],
-              is_user_join: body['isUserJoin'].toString() == 'true',
-            ));
-      }
-    });
     const AndroidInitializationSettings('@mipmap/launcher_icon');
     const DarwinInitializationSettings();
 
@@ -190,6 +218,19 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  updateUserStatus(value) async {
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'online': value});
+    if (!value) {
+      await firebaseFirestore
+          .collection('users')
+          .doc(firebaseAuth.currentUser!.uid)
+          .update({'lastOnlineTS': DateTime.now()});
+    }
+  }
+
   getUserInfo() async {
     doc = await firebaseFirestore
         .collection('users')
@@ -210,7 +251,7 @@ class _MyAppState extends State<MyApp> {
         return true;
       }
     } on SocketException catch (_) {
-      nextScreen(context, const CheckInternetPage());
+      nextScreenReplace(context, const CheckInternetPage());
       return false;
     }
   }

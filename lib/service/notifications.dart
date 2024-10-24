@@ -20,21 +20,16 @@ class NotificationsService {
           body: jsonEncode(<String, dynamic>{
             'message': <String, dynamic>{
               'token': token,
-              //'key = AAAAq6Hb1PY:APA91bG_txnLhVvQqrEqaLYXgxWEzUW4CWuZWG_SyyNcWZWzsCRJCwVBn7xhCxbIP8Zm62Q-vfZOLuBe7S-i9iSNuDpdphZIuwelc5sW7SIT-BubVF2L9S18k3C7m3skv4FDsXDpzGxU',
               'data': <String, dynamic>{
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'status': 'done',
-                'chatId': chatRoomId,
-                'chatWith': body['chatWith'],
-                'photoUrl': body['photoUrl'],
-                'id': body['id'],
+                'icon': "@mipmap/launcher_icon",
+                'sound': "default",
+                'payload': jsonEncode(body),
               },
               "notification": <String, dynamic>{
                 "title": title,
                 "body": body['message'],
-                //"android_channel_id": "wbrs",
-                //'badge': unreadMsgCount,
-                //'sound': "default",
               },
             }
           }));
@@ -64,23 +59,16 @@ class NotificationsService {
           body: jsonEncode(<String, dynamic>{
             'message': <String, dynamic>{
               'token': token,
-              //'key = AAAAq6Hb1PY:APA91bG_txnLhVvQqrEqaLYXgxWEzUW4CWuZWG_SyyNcWZWzsCRJCwVBn7xhCxbIP8Zm62Q-vfZOLuBe7S-i9iSNuDpdphZIuwelc5sW7SIT-BubVF2L9S18k3C7m3skv4FDsXDpzGxU',
-              // 'data': <String, dynamic>{
-              //   'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              //   'status': 'done',
-              //   'body': body,
-              //   'title': title,
-              //   'groupId': groupRoomId,
-              //   'groupName': body['groupName'],
-              //   'users': body['users'],
-              //   'isUserJoin': body['isUserJoin'],
-              // },
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'status': 'done',
+                'icon': "@mipmap/launcher_icon",
+                'sound': "default",
+                'payload': jsonEncode(body),
+              },
               "notification": <String, dynamic>{
                 "title": title,
                 "body": body['message'],
-                //"android_channel_id": "wbrs",
-                //'badge': unreadMsgCount,
-                //'sound': "default",
               },
             }
           }));
