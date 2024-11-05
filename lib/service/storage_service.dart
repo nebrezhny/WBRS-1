@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
-import 'package:wbrs/helper/global.dart';
+import 'package:wbrs/app/helper/global.dart';
 
 class Storage {
   final firebase_storage.FirebaseStorage storage =

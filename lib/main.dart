@@ -3,6 +3,8 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:random_string/random_string.dart';
@@ -11,6 +13,8 @@ import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/login_page.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/profile_page.dart';
+import 'package:wbrs/features/auth/bloc/bloc.dart';
+import 'package:wbrs/features/auth/bloc/state.dart';
 import 'package:wbrs/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +24,7 @@ import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:wbrs/app/pages/test/red_group.dart';
 
+import 'features/auth/screen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
 
@@ -137,7 +142,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   initFunction() async {
     //createUsers();
-    await checkInternet();
+    //await checkInternet();
     updateUserStatus(true);
     selectedIndex = 1;
     await getUserLoggedInStatus();
@@ -306,15 +311,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             deti: doc.get('deti'),
             pol: doc.get('pol'),
           );
+        },
+        'login': (context) {
+          return const AuthScreen();
         }
       },
-      home: _isSignedIn
-          ? _loading
-              ? const SplashScreen()
-              : _isRegistrationEnd
-                  ? const HomePage()
-                  : const FirstGroupRed()
-          : const LoginPage(),
+      home: MultiBlocProvider(providers: [
+        BlocProvider(create: (_) => AuthBloc(FirebaseAuth.instance))
+      ], child: const AuthScreen()),
     );
+    // home:
+    // _isSignedIn
+    //     ? _loading
+    //         ? const SplashScreen()
+    //         : _isRegistrationEnd
+    //             ? const HomePage()
+    //             : const FirstGroupRed()
+    //     : const LoginPage(),
   }
 }

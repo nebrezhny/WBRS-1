@@ -1,8 +1,8 @@
 // ignore_for_file: equal_keys_in_map, unnecessary_string_escapes, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wbrs/helper/global.dart';
-import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/app/helper/global.dart';
+import 'package:wbrs/app/helper/helper_function.dart';
 
 class DatabaseService {
   final String? uid;

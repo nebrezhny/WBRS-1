@@ -1,8 +1,3 @@
-/// {@template user}
-/// User model
-///
-/// [User.empty] represents an unauthenticated user.
-/// {@endtemplate}
 class User {
   /// {@macro user}
   const User({
