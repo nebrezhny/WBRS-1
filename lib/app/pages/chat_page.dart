@@ -1,5 +1,3 @@
-// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
@@ -61,12 +59,10 @@ class _ChatPageState extends State<ChatPage> {
   isMeAdminCheck() async {
     String myId = firebaseAuth.currentUser!.uid;
     meetInfo = meet.data() as Map;
-    setState(() {
-      isMeAdmin = meetInfo['admin'] == myId;
-      if (meetInfo.containsKey('kicked')) {
-        isMeKicked = meetInfo['kicked'].contains(myId);
-      }
-    });
+    isMeAdmin = meetInfo['admin'] == myId;
+    if (meetInfo.containsKey('kicked')) {
+      isMeKicked = meetInfo['kicked'].contains(myId);
+    }
   }
 
   getMeet() async {
@@ -77,7 +73,6 @@ class _ChatPageState extends State<ChatPage> {
 
   checkNotification() async {
     isNotificationOff = userWOutN.contains(firebaseAuth.currentUser!.uid);
-    setState(() {});
   }
 
   @override
@@ -94,7 +89,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -191,10 +185,13 @@ class _ChatPageState extends State<ChatPage> {
                                 doc);
                             user_info.add(some_user_info);
                           } on Exception catch (e) {
-                            showSnackbar(context, Colors.red, e);
+                            if(context.mounted) {
+                              showSnackbar(context, Colors.red, e);
+                            }
                           }
                         }
-                        showModalBottomSheet(
+                        if (context.mounted) {
+                          showModalBottomSheet(
                             context: context,
                             builder: (context) {
                               return StatefulBuilder(
@@ -245,6 +242,7 @@ class _ChatPageState extends State<ChatPage> {
                                 );
                               });
                             });
+                        }
                       },
                       icon: const Icon(Icons.people))
                   : const SizedBox()
@@ -497,16 +495,14 @@ class _ChatPageState extends State<ChatPage> {
                                   .doc(widget.groupId)
                                   .get()
                                   .then((doc) => doc.data());
-                              setState(() {
-                                List kicked = doc?['kicked'] ?? [];
-                                kicked.add(users[index]);
-                                users.removeAt(index);
-                                user_info.removeAt(index);
-                                firebaseFirestore
-                                    .collection('meets')
-                                    .doc(widget.groupId)
-                                    .update({'users': users, 'kicked': kicked});
-                              });
+                              List kicked = doc?['kicked'] ?? [];
+                              kicked.add(users[index]);
+                              users.removeAt(index);
+                              user_info.removeAt(index);
+                              firebaseFirestore
+                                  .collection('meets')
+                                  .doc(widget.groupId)
+                                  .update({'users': users, 'kicked': kicked});
                             },
                             icon: const Icon(Icons.delete))
                         : null,

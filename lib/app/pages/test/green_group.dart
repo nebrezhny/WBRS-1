@@ -6,7 +6,7 @@ import 'package:wbrs/app/pages/test/white_group.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class GreenPage extends StatefulWidget {
-  const GreenPage({Key? key}) : super(key: key);
+  const GreenPage({super.key});
 
   @override
   State<GreenPage> createState() => _GreenPageState();

@@ -35,6 +35,12 @@ class _MeetingPageState extends State<MeetingPage> {
   late int kolvo_users;
 
   @override
+  void dispose() {
+    super.dispose();
+    city.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -81,7 +87,7 @@ class _MeetingPageState extends State<MeetingPage> {
                       onPressed: () {
                         showModalBottomSheet(
                             backgroundColor:
-                                Colors.grey.shade700.withOpacity(0.7),
+                                grey,
                             context: context,
                             builder: (context) {
                               return Container(
@@ -221,7 +227,6 @@ class _MeetingPageState extends State<MeetingPage> {
                         return snapshot.hasData
                             ? Expanded(
                                 child: ListView.builder(
-                                    itemExtent: 110,
                                     scrollDirection: Axis.vertical,
                                     itemCount: snapshot.data.docs.length,
                                     itemBuilder: (BuildContext context, index) {
@@ -296,7 +301,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     .doc(snapshot.data.docs[index]['admin'])
                     .get();
                 if (snapshot.data.docs[index]['type'] == 'групповая') {
-                  nextScreenReplace(
+                  nextScreen(
                       context,
                       AboutMeet(
                         id: snapshot.data.docs[index].id,
@@ -305,7 +310,7 @@ class _MeetingPageState extends State<MeetingPage> {
                         is_user_join: is_user_join,
                       ));
                 } else {
-                  nextScreenReplace(
+                  nextScreen(
                       context,
                       AboutIndividualMeet(
                         snapshot: snapshot,

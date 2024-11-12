@@ -1,5 +1,7 @@
+// ignore_for_file: file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wbrs/helper/global.dart';
+import 'package:wbrs/app/helper/global.dart';
 
 addUnVisibleField() async {
   CollectionReference coll = firebaseFirestore.collection('users');

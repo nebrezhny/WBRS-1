@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wbrs/app/pages/clones/clones_list.dart';
-import 'package:wbrs/app/widgets/widgets.dart';
 
 class AdminPanelPage extends StatefulWidget {
   const AdminPanelPage({super.key});
@@ -36,12 +34,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Column(children: [
-                    TextButton(
-                        onPressed: () {
-                          nextScreenReplace(context, ClonesList());
-                        },
-                        child: const Text('Редактирование клонов'))
+                  child: const Column(children: [
                   ]))),
         ),
       ],

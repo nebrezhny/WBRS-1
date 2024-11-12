@@ -126,8 +126,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
+    images.clear();
   }
 
   @override
@@ -723,7 +723,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             image: DecorationImage(
-                image: CachedNetworkImageProvider(
+                image: NetworkImage(
                   urls[index],
                 ),
                 fit: BoxFit.fitWidth),

@@ -24,12 +24,6 @@ class _RegisterPageState extends State<RegisterPage> {
   AuthService authService = AuthService();
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -44,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
-            color: Colors.white.withOpacity(0.7),
+            color: grey,
             colorBlendMode: BlendMode.modulate,
             scale: 0.6,
           ),

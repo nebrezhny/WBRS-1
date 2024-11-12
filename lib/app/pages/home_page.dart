@@ -1,9 +1,10 @@
+// ignore_for_file: use_build_context_synchronously, unnecessary_string_escapes
+
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/about_meet.dart';
 import 'package:wbrs/app/pages/chatscreen.dart';
 import 'package:wbrs/service/auth_service.dart';
@@ -16,107 +17,42 @@ import 'package:wbrs/app/widgets/widgets.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String userName = "";
-  String email = "";
   AuthService authService = AuthService();
-  Stream? chats;
-  String id = "";
-  String photoUrl = "";
-  String group = "";
 
-  var currentUser;
-
-  bool isSearching = false;
-  Stream? usersStream, chatRoomsStream;
-  late String myName, myProfilePic, myUserName, myEmail;
-  TextEditingController searchUsernameEditingController =
-      TextEditingController();
+  Stream? chatRoomsStream;
 
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  getMyInfoFromSharedPreference() async {
-    myName = HelperFunctions().getDisplayName().toString();
-    myProfilePic = HelperFunctions().getUserProfileUrl().toString();
-    myUserName = HelperFunctions().getUserName().toString();
-    myEmail = HelperFunctions().getUserEmail().toString();
-  }
-
   getChatRooms() async {
     chatRoomsStream = await DatabaseService().getChatRooms();
-  }
-
-  getChatRoomIdByUsernames(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
-    } else {
-      return "$a\_$b";
-    }
-  }
-
-  onSearchBtnClick() async {
-    isSearching = true;
-    setState(() {});
-    usersStream = await DatabaseService()
-        .getUserByUserName(searchUsernameEditingController.text);
-
-    setState(() {});
-  }
-
-  onScreenLoaded() async {
-    await getMyInfoFromSharedPreference();
-    getChatRooms();
-  }
-
-  // string manipulation
-  String getId(String res) {
-    return res.substring(0, res.indexOf("_"));
-  }
-
-  String getName(String res) {
-    return res.substring(res.indexOf("_") + 1);
-  }
-
-  gettingUserData() async {
-    await HelperFunctions.getUserEmailFromSF().then((value) {
-      setState(() {
-        email = value!;
-      });
-    });
-    await HelperFunctions.getUserNameFromSF().then((val) {
-      setState(() {
-        userName = val!;
-      });
-    });
-    // getting the list of snapshots in our stream
-    await DatabaseService(uid: firebaseAuth.currentUser!.uid)
-        .getUserGroups()
-        .then((snapshot) {
-      setState(() {
-        chats = snapshot;
-      });
-    });
   }
 
   @override
   void initState() {
     requestPermission();
     getToken();
-    currentUser = firebaseAuth.currentUser;
     initInfo();
+    firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'online': true});
+    firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'lastOnlineTS': DateTime.now()});
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -190,9 +126,7 @@ class _HomePageState extends State<HomePage> {
 
   void requestPermission() async {
     try {
-      FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-      NotificationSettings settings = await messaging.requestPermission(
+      NotificationSettings settings = await firebaseMessaging.requestPermission(
         alert: true,
         announcement: false,
         badge: true,
@@ -217,10 +151,8 @@ class _HomePageState extends State<HomePage> {
 
   String? mtoken;
   void getToken() async {
-    await FirebaseMessaging.instance.getToken().then((token) {
-      setState(() {
-        mtoken = token;
-      });
+    await firebaseMessaging.getToken().then((token) {
+      mtoken = token;
     });
 
     saveUserToken(mtoken!);
@@ -259,8 +191,10 @@ class _HomePageState extends State<HomePage> {
                   stream: firebaseFirestore
                       .collection('chats')
                       .where(Filter.or(
-                        Filter('user1', isEqualTo: currentUser!.uid),
-                        Filter('user2', isEqualTo: currentUser!.uid),
+                        Filter('user1',
+                            isEqualTo: firebaseAuth.currentUser!.uid),
+                        Filter('user2',
+                            isEqualTo: firebaseAuth.currentUser!.uid),
                       ))
                       .snapshots(),
                   builder: (BuildContext context,
@@ -276,22 +210,23 @@ class _HomePageState extends State<HomePage> {
                           textAlign: TextAlign.center,
                         );
                       } else {
-                        List sorted_list = snapshot.data!.docs;
-                        sorted_list.sort((a, b) {
+                        List sortedList = snapshot.data!.docs;
+                        sortedList.sort((a, b) {
                           return b
                               .get('lastMessageSendTs')
                               .compareTo(a.get('lastMessageSendTs'));
                         });
-                        if (currentUser != null) {
+                        if (firebaseAuth.currentUser != null) {
                           return ListView.builder(
-                              itemExtent: 100,
-                              itemCount: sorted_list.length,
+                              itemCount: sortedList.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 5.0),
-                                  child: ChatRoomList(
-                                      snapshot: sorted_list[index]),
+                                      const EdgeInsets.symmetric(vertical: 7.0, horizontal: 15),
+                                  child:
+                                      SizedBox(
+                                          height: 100,
+                                          child: ChatRoomList(snapshot: sortedList[index])),
                                 );
                               });
                         } else {

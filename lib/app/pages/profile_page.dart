@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
 
@@ -52,10 +52,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  FirebaseStorage storage = FirebaseStorage.instance;
   String imageUrl = " ";
   TextEditingController? name = TextEditingController();
-  late User? user = firebaseAuth.currentUser;
 
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
@@ -99,6 +97,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    name!.dispose();
+    imageFileList!.clear();
+    imageFileList = null;
   }
 
   @override
@@ -592,7 +598,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               fit: BoxFit.cover),
                         ),
                         width: 100,
-                        child: SizedBox(),
+                        child: const SizedBox(),
                       )),
                 );
               },
@@ -605,7 +611,7 @@ class _ProfilePageState extends State<ProfilePage> {
               imageFileList!.clear();
             },
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+                backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
             child: const Text(
               "Добавить фотографии",
               style: TextStyle(color: Colors.white, fontSize: 16),
@@ -626,7 +632,7 @@ class _ProfilePageState extends State<ProfilePage> {
             selectImages();
           },
           style: const ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
           child: const Text(
             "Добавить фотографии",
             style: TextStyle(color: Colors.black),
@@ -685,7 +691,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Align(
                               alignment: Alignment.bottomRight,
                               child: Container(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(25),
@@ -693,7 +699,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   child: Text(
                                     countList[index].toString(),
-                                    style: TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   )),
                             )
                           ],

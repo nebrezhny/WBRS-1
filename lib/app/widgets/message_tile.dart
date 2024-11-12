@@ -50,6 +50,11 @@ class _MessageTileState extends State<MessageTile> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     msg = widget.message.data() as Map<String, dynamic>;
     setState(() {
@@ -146,7 +151,7 @@ class _MessageTileState extends State<MessageTile> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Colors.grey.shade700.withOpacity(0.7),
+            backgroundColor: grey,
             title: const Text('Написать ответ'),
             titleTextStyle: const TextStyle(color: Colors.white),
             content: SizedBox(
@@ -425,8 +430,8 @@ class _MessageTileState extends State<MessageTile> {
                           bottomRight: Radius.circular(20),
                         ),
                   color: widget.sentByMe
-                      ? Colors.orangeAccent.withOpacity(0.6)
-                      : Colors.grey.shade700.withOpacity(0.8)),
+                      ? orange90
+                      : grey),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

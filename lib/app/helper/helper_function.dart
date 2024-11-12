@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wbrs/app/helper/global.dart';
@@ -38,16 +37,6 @@ class HelperFunctions {
     return sf.getBool(userLoggedInKey);
   }
 
-  static Future<String?> getUserEmailFromSF() async {
-    SharedPreferences sf = await SharedPreferences.getInstance();
-    return sf.getString(userEmailKey);
-  }
-
-  static Future<String?> getUserNameFromSF() async {
-    SharedPreferences sf = await SharedPreferences.getInstance();
-    return sf.getString(userNameKey);
-  }
-
   Future<String?> getUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userNameKey);
@@ -56,11 +45,6 @@ class HelperFunctions {
   Future<String?> getUserEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userEmailKey);
-  }
-
-  Future<String?> getUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(userIdKey);
   }
 
   Future<String?> getDisplayName() async {
@@ -72,24 +56,6 @@ class HelperFunctions {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userProfilePicKey);
   }
-}
-
-Route createRoute(Widget Function() createPage) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => createPage(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }
 
 getUserGroup() async {
@@ -115,10 +81,6 @@ userImageWithCircle(userPhotoUrl, group, [width, height]) {
       group: group,
     );
   }
-}
-
-String getUserGroupCircle(group) {
-  return "assets/circles/$group.png";
 }
 
 List<Widget> getLikeGroup(myGroup) {
@@ -214,7 +176,7 @@ cityDropdown(context, options, onSelected) {
             itemBuilder: (context, index) {
               final option = options.elementAt(index);
               return ListTile(
-                tileColor: Colors.grey.shade700.withOpacity(0.8),
+                tileColor: grey,
                 title: Text(
                   option.trim(),
                   style: const TextStyle(color: Colors.white),

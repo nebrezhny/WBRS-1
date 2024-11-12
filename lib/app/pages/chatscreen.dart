@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:io';
 
@@ -158,7 +158,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.72,
                         child: ListView.builder(
-                            itemExtent: 70,
                             padding: const EdgeInsets.only(bottom: 0, top: 16),
                             itemCount: snapshot.data.docs.length,
                             reverse: true,
@@ -443,7 +442,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           width: MediaQuery.of(context).size.width,
                           child: Container(
-                            color: Colors.black.withOpacity(0.8),
+                            color: darkGrey,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             child: ConstrainedBox(
@@ -476,8 +475,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             border: InputBorder.none,
                                             hintText: "Введите сообщение",
                                             hintStyle: TextStyle(
-                                                color: Colors.white
-                                                    .withOpacity(0.6))),
+                                                color: white70)),
                                       )),
                                   GestureDetector(
                                     onTap: () {
@@ -489,7 +487,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           messageTextEdittingController.text !=
                                                   ""
                                               ? Colors.white
-                                              : Colors.white.withOpacity(0.6),
+                                              : white70,
                                     ),
                                   ),
                                 ],

@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
-import 'package:wbrs/helper/global.dart';
-import 'package:wbrs/helper/helper_function.dart';
+import 'package:wbrs/app/helper/global.dart';
+import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {

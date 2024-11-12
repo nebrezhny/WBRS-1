@@ -1,28 +1,27 @@
 // ignore_for_file: prefer_const_constructors_in_immutables
 
-import 'package:cached_annotation/cached_annotation.dart';
+import 'dart:async';
+
+import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/somebody_profile.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
-import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../widgets/bottom_nav_bar.dart';
+import '../widgets/circle_user_image.dart';
 import 'filter_pages/filter_page.dart';
 
-// ignore: must_be_immutable
 class ProfilesList extends StatefulWidget {
-  final int startPosition;
+  int startPosition;
   final String group;
 
-  const ProfilesList(
-      {super.key, required this.group, required this.startPosition});
+  ProfilesList({super.key, required this.group, required this.startPosition});
 
   @override
   State<ProfilesList> createState() => _ProfilesListState();
@@ -30,67 +29,37 @@ class ProfilesList extends StatefulWidget {
 
 class _ProfilesListState extends State<ProfilesList> {
   AuthService authService = AuthService();
-
-  String myUserName = "";
-  bool checkGroup = false;
-
-  getGroup() {
-    String group = "";
-    firebaseFirestore
-        .collection("users")
-        .doc(firebaseAuth.currentUser!.uid)
-        .get()
-        .then((data) {
-      group = data.get('группа');
-    });
-    return group;
-  }
-
-  getMyInfoFromSharedPreference() async {
-    //myName = await SharedPreferenceHelper().getDisplayName();
-    //myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
-    myUserName = HelperFunctions().getUserName().toString();
-    //myEmail = await SharedPreferenceHelper().getUserEmail();
-    setState(() {});
-  }
-
-  getUsers() async {
-    QuerySnapshot doc = await firebaseFirestore
-        .collection('users')
-        .where('uid', isNotEqualTo: uid)
-        //.orderBy('lastOnlineTs')
-        .get();
-    for (int i = 0; i < doc.docs.length; i++) {
-      users.add(doc.docs[i].data() as Map);
-    }
-    setState(() {});
-  }
-
-  FirebaseAuth auth = firebaseAuth;
-
-  get user => auth.currentUser;
-
-  get uid => user?.uid;
-
   List<Map> users = [];
+  bool isLoading = true;
 
-  //int age = int.parse(GlobalAge.toString());
+  Stream getStream() {
+    Query query = firebaseFirestore
+        .collection('users')
+        .where('uid', isNotEqualTo: firebaseAuth.currentUser!.uid)
+        .where('age', isGreaterThanOrEqualTo: ageStart)
+        .where('age', isLessThanOrEqualTo: ageEnd);
+    if(filterCity.text != '') {
+      query = query.where('city', isEqualTo: filterCity.text);
+    }
 
-  var collection = firebaseFirestore.collection('users');
+    if(FiltrPol != '') {
+      query = query.where('pol', isEqualTo: FiltrPol);
+    }
 
-  String? pol;
+    query = query.orderBy('lastOnlineTS', descending: true);
+    Stream<QuerySnapshot> stream = query.snapshots();
+    return stream;
+  }
+
+  Stream usersStream = const Stream.empty();
 
   @override
   void initState() {
-    super.initState();
+    usersStream = getStream();
     Group = widget.group;
-    getUsers();
-  }
+    super.initState();
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
+    isLoading = false;
   }
 
   @override
@@ -99,24 +68,17 @@ class _ProfilesListState extends State<ProfilesList> {
       children: [
         Image.asset(
           "assets/fon.jpg",
+          filterQuality: FilterQuality.low,
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
         ),
         Scaffold(
-          resizeToAvoidBottomInset: true,
+          resizeToAvoidBottomInset: false,
           bottomNavigationBar: const MyBottomNavigationBar(),
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
-            actions: [
-              Builder(builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.filter_alt_rounded),
-                  onPressed: () {},
-                );
-              }),
-            ],
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
@@ -128,206 +90,51 @@ class _ProfilesListState extends State<ProfilesList> {
             ),
           ),
           drawer: const MyDrawer(),
-          body: SingleChildScrollView(
-            child: checkGroup ? usersList() : usersList(),
-          ),
+          body: isLoading ? const Center(child: CircularProgressIndicator()) : _buildStreamContent(),
         )
       ],
     );
   }
 
-  Widget usersList() {
-    var filtered_col;
-    switch (Group) {
-      case "коричнево-красная" ||
-            "коричнево-синяя" ||
-            "коричневая" ||
-            "коричнево-белая":
-        filtered_col = collection.where("группа", whereIn: [
-          "коричнево-красная",
-          "коричнево-синяя",
-          "коричневая",
-          "коричнево-белая",
-          "бело-коричневая",
-          "бело-красная",
-          "бело-синяя",
-          "белая",
-          "сине-белая"
-        ]);
-        break;
-
-      case "красно-синяя" || "красно-белая" || "красная":
-        filtered_col = collection.where("группа", whereIn: [
-          "синяя",
-          "сине-коричневая",
-        ]);
-        break;
-
-      case "красно-коричневая":
-        filtered_col = collection.where("группа", whereIn: [
-          "коричнево-белая",
-          "сине-белая",
-          "бело-коричневая",
-          "бело-красная",
-          "бело-синяя",
-          "белая",
-        ]);
-        break;
-
-      case "коричнево-белая":
-        filtered_col = collection.where("группа", whereIn: [
-          "коричнево-красная",
-          "коричнево-синяя",
-          "коричневая",
-          "коричнево-белая",
-          "бело-коричневая",
-          "бело-красная",
-          "бело-синяя",
-          "белая",
-          "сине-белая",
-          "красно-коричневая",
-        ]);
-        break;
-
-      case "синяя" || "сине-коричневая":
-        filtered_col = collection.where("группа", whereIn: [
-          "красная",
-          "красно-белая",
-          "сине-красная",
-          "красно-синяя",
-        ]);
-        break;
-
-      case "сине-белая":
-        filtered_col = collection.where("группа", whereIn: [
-          "коричнево-красная",
-          "коричнево-синяя",
-          "коричневая",
-          "коричнево-белая",
-          "бело-коричневая",
-          "бело-красная",
-          "бело-синяя",
-          "белая",
-          "красно-коричневая",
-        ]);
-        break;
-
-      case "сине-красная":
-        filtered_col = collection.where("группа", whereIn: [
-          "синяя",
-          "сине-коричневая",
-        ]);
-        break;
-
-      case "бело-красная" || "бело-синяя" || "белая" || "бело-коричневая":
-        filtered_col = collection.where("группа", whereIn: [
-          "коричнево-красная",
-          "коричнево-синяя",
-          "коричневая",
-          "коричнево-белая",
-          "сине-белая",
-          "красно-коричневая",
-        ]);
-        break;
-
-      default:
-        filtered_col = collection;
-        break;
-    }
-
-    if (users.isEmpty) {
-      return const Center(child: Text("Пользователи не найдены"));
-    } else {
-      return createTable();
-    }
-  }
-
-  Widget createTable() {
-    List filteredUsers = [];
-    print(widget.startPosition);
-    print(users.length);
-    int endPosition = widget.startPosition + 15 > users.length
-        ? users.length - widget.startPosition
-        : widget.startPosition + 15;
-    if (users.isNotEmpty) {
-      for (int i = widget.startPosition; i < endPosition; i++) {
-        if (users[i]['age'] >= ageStart && users[i]['age'] <= ageEnd) {
-          if (FiltrPol != '') {
-            if (users[i]['pol'].toString().toLowerCase() == FiltrPol) {
-              if (filtrCity.text != '') {
-                if (users[i]['city'] == filtrCity.text) {
-                  filteredUsers.add(users[i]);
-                }
-              } else {
-                filteredUsers.add(users[i]);
-              }
-            }
+  Widget _buildStreamContent() {
+    return StreamBuilder(
+        stream: usersStream,
+        initialData: const [],
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           } else {
-            if (filtrCity.text != '') {
-              if (users[i]['city'] == filtrCity.text) {
-                filteredUsers.add(users[i]);
-              }
-            } else {
-              filteredUsers.add(users[i]);
+            if (snapshot.data == null) {
+              return const Center(child: Text("Пользователи не найдены"));
+            }else{
+              return createTable(snapshot.data!.docs);
             }
           }
-        }
-      }
-    }
+        });
+  }
+
+  Widget createTable(List snapshot) {
+    int count = widget.startPosition + 15 > snapshot.length
+        ? snapshot.length - widget.startPosition
+        : 15;
 
     return Column(
       children: [
         const FilterPage2(),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.44,
+          height: MediaQuery.of(context).size.height * 0.42,
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3),
-            itemCount: filteredUsers.length,
+            itemCount: count,
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: GestureDetector(
-                  onTap: () {
-                    DatabaseService()
-                        .getUserByUserName(filteredUsers[index]['fullName']);
-
-                    setState(() {
-                      somebodyUid = filteredUsers[index]['uid'];
-                      somebodyFullname = filteredUsers[index]['fullName'];
-                      somebodyImageUrl = filteredUsers[index]['profilePic'];
-                    });
-                    nextScreen(
-                        context,
-                        SomebodyProfile(
-                          uid: somebodyUid.toString(),
-                          name: somebodyFullname.toString(),
-                          photoUrl: somebodyImageUrl.toString(),
-                          userInfo: filteredUsers[index],
-                        ));
-                  },
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    child: Column(children: [
-                      userImageWithCircle(
-                          filteredUsers[index]["profilePic"],
-                          filteredUsers[index]["группа"] ?? '',
-                          MediaQuery.of(context).size.height * 0.1,
-                          MediaQuery.of(context).size.height * 0.1),
-                      Container(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(
-                            "${filteredUsers[index]["fullName"]}, ${filteredUsers[index]["age"]},\n ${filteredUsers[index]["city"]}",
-                            style: const TextStyle(color: Colors.white),
-                            softWrap: true,
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
-                          )),
-                    ]),
-                  ),
-                ),
+              return SizedBox(
+                width: MediaQuery.of(context).size.width * 0.3,
+                height: MediaQuery.of(context).size.height * 0.3,
+                key: ValueKey(snapshot[index + widget.startPosition].data()),
+                child: userCard(snapshot[index + widget.startPosition].data(), context),
               );
             },
           ),
@@ -336,6 +143,7 @@ class _ProfilesListState extends State<ProfilesList> {
             height: MediaQuery.of(context).size.height * 0.05,
             width: MediaQuery.of(context).size.width,
             child: ListView.separated(
+              padding: const EdgeInsets.all(7),
               separatorBuilder: (context, index) {
                 return const SizedBox(
                   width: 5,
@@ -343,18 +151,18 @@ class _ProfilesListState extends State<ProfilesList> {
               },
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: (users.length / 15).round(),
+              itemCount: (snapshot.length / 15).round(),
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    nextScreenReplace(
-                        context,
-                        ProfilesList(
-                            group: widget.group, startPosition: index * 15));
+                    setState(() {
+                      widget.startPosition = index * 15;
+                    });
                   },
                   child: CircleAvatar(
+                    backgroundColor: index==widget.startPosition/15? Colors.orangeAccent: Colors.orangeAccent.shade100 ,
                     radius: 15,
-                    child: Text(index.toString()),
+                    child: Text((index+1).toString()),
                   ),
                 );
               },
@@ -362,4 +170,48 @@ class _ProfilesListState extends State<ProfilesList> {
       ],
     );
   }
+}
+
+Widget userCard(Map user, context){
+  return GestureDetector(
+    onTap: () {
+      nextScreen(
+          context,
+          SomebodyProfile(
+            uid: user['uid'],
+            name: user['fullName'],
+            photoUrl: user['profilePic'],
+            userInfo: user,
+          ));
+    },
+    child: _buildUserCardContent(user, context),
+  );
+}
+
+Widget _buildUserCardContent(Map user, BuildContext context) {
+  return SizedBox(
+    height: MediaQuery.of(context).size.height * 0.05,
+    child: Column(
+      children: [
+        UserImage(
+          userPhotoUrl: user['profilePic'],
+          uid: user['uid'],
+          group: user["группа"],
+          width: 70.ceilToDouble(),
+          height: 70.ceilToDouble(),
+        ),
+        Container(
+          key: Key(user['uid']),
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(
+            "${user["fullName"]}, ${user["age"]},\n ${user["city"]}",
+            style: const TextStyle(color: Colors.white),
+            softWrap: true,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+  );
 }

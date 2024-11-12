@@ -22,17 +22,11 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
   var currentUser = firebaseAuth.currentUser;
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       Timestamp time = snapshot.data!.docs[index]['lastVisitTs'];
       return Card(
-        color: Colors.white.withOpacity(0.25),
+        color: grey,
         child: ListTile(
           onTap: () async {
             var doc = await firebaseFirestore
@@ -51,10 +45,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
           leading: SizedBox(
             width: 50,
             child: userImageWithCircle(
-                (snapshot.data!.docs[index]['photoUrl'] == "" ||
-                        snapshot.data!.docs[index]['photoUrl'] == null)
-                    ? "assets/profile.png"
-                    : snapshot.data!.docs[index]['photoUrl'].toString(),
+                snapshot.data!.docs[index]['photoUrl'],
                 snapshot.data!.docs[index]['group'],
                 50.0,
                 50.0),

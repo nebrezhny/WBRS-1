@@ -40,7 +40,6 @@ class _ChatRoomListState extends State<ChatRoomList> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -142,21 +141,21 @@ class _ChatRoomListState extends State<ChatRoomList> {
                         ? userImageWithCircle(
                             widget.snapshot.get("user2_image"),
                             snapshot.data?.get('группа'),
-                            60.0,
-                            60.0)
+                            50.0,
+                            50.0)
                         : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 60.0, 60.0)
+                            '', snapshot.data?.get('группа'), 50.0, 50.0)
                     : widget.snapshot.get("user1_image") != ""
                         ? userImageWithCircle(
                             widget.snapshot.get("user1_image"),
                             snapshot.data?.get('группа'),
-                            60.0,
-                            60.0)
+                            50.0,
+                            50.0)
                         : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 60.0, 60.0),
+                            '', snapshot.data?.get('группа'), 50.0, 50.0),
               ),
-              tileColor: Colors.white24,
-              contentPadding: const EdgeInsets.all(10.0),
+              tileColor: grey,
+              contentPadding: const EdgeInsets.all(15.0),
             );
           }
         });

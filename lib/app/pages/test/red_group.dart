@@ -7,7 +7,7 @@ import 'package:wbrs/app/pages/test/green_group.dart';
 import '../../widgets/widgets.dart';
 
 class FirstGroupRed extends StatefulWidget {
-  const FirstGroupRed({Key? key}) : super(key: key);
+  const FirstGroupRed({super.key});
 
   @override
   State<FirstGroupRed> createState() => _FirstGroupRedState();
@@ -65,14 +65,12 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          child: Image.asset(
-            "assets/fon.jpg",
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            fit: BoxFit.cover,
-            scale: 0.6,
-          ),
+        Image.asset(
+          "assets/fon.jpg",
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          fit: BoxFit.cover,
+          scale: 0.6,
         ),
         Scaffold(
           backgroundColor: Colors.transparent,

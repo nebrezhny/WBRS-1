@@ -1,8 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/meetings.dart';
@@ -15,7 +13,7 @@ import '../helper/global.dart';
 import '../helper/helper_function.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
-  const MyBottomNavigationBar({Key? key}) : super(key: key);
+  const MyBottomNavigationBar({super.key});
 
   @override
   State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
@@ -25,19 +23,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   @override
   void initState() {
     super.initState();
-    currentUser = firebaseAuth.currentUser;
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  User? currentUser;
-
-  String? email;
-  String? userName;
   void _onItemTapped(int index) async {
     setState(() {
       selectedIndex = index;
@@ -46,30 +33,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     switch (index) {
       case 0:
         bool isLoading = true;
-        nextScreen(context, SplashScreen());
-        DocumentSnapshot doc = await firebaseFirestore
-            .collection('users')
-            .doc(firebaseAuth.currentUser!.uid)
-            .get();
-        Images = doc.get('images');
-        CountImages = Images.length;
-
-        // await firebaseFirestore
-        //     .collection("users")
-        //     .where("fullName",
-        //         isEqualTo:
-        //             firebaseAuth.currentUser!.displayName.toString())
-        //     .get()
-        //     .then((QuerySnapshot snapshot) {
-        //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-        //   GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-        //   GlobalCity = snapshot.docs[0]["city"].toString();
-        //   GlobalHobbi = snapshot.docs[0]["hobbi"];
-        //   GlobalRost = snapshot.docs[0]["rost"];
-        //   GlobalDeti = snapshot.docs[0]["deti"];
-        //   Group = snapshot.docs[0]["группа"];
-        //   GlobalPol = snapshot.docs[0]["пол"];
-        // });
+        nextScreen(context, const SplashScreen());
         setState(() {
           isLoading = false;
         });
@@ -97,7 +61,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 pol: doc.get('pol'),
               ));
         } else {
-          nextScreen(context, SplashScreen());
+          nextScreen(context, const SplashScreen());
         }
         // ignore: use_build_context_synchronously
 
@@ -107,28 +71,13 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         break;
       case 2:
         bool isLoading = true;
-        nextScreen(context, SplashScreen());
-        // await firebaseFirestore
-        //     .collection("users")
-        //     .where("fullName",
-        //         isEqualTo: firebaseAuth.currentUser!.displayName)
-        //     .get()
-        //     .then((QuerySnapshot snapshot) {
-        //   GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-        //   GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-        //   GlobalCity = snapshot.docs[0]["city"].toString();
-        //   GlobalHobbi = snapshot.docs[0]["hobbi"];
-        //   GlobalRost = snapshot.docs[0]["rost"];
-        //   GlobalDeti = snapshot.docs[0]["deti"];
-        //   Group = snapshot.docs[0]["группа"];
-        //   GlobalPol = snapshot.docs[0]["пол"];
-        // });
+        nextScreen(context, const SplashScreen());
         setState(() {
           isLoading = false;
         });
 
         if (isLoading) {
-          nextScreen(context, SplashScreen());
+          nextScreen(context, const SplashScreen());
           // ignore: dead_code
         } else {
           var x = await getUserGroup();
@@ -144,6 +93,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         nextScreen(context, const MeetingPage());
         break;
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

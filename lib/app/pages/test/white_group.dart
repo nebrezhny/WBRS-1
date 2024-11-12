@@ -6,7 +6,7 @@ import 'package:wbrs/app/pages/test/orange_group.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class WhitePage extends StatefulWidget {
-  const WhitePage({Key? key}) : super(key: key);
+  const WhitePage({super.key});
 
   @override
   State<WhitePage> createState() => _WhitePageState();

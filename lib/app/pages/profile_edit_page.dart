@@ -86,6 +86,14 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     city!.text = widget.city;
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    about!.dispose();
+    hobbi!.dispose();
+    city!.dispose();
+  }
+
   AuthService authService = AuthService();
 
   @override
@@ -289,7 +297,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -338,7 +346,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -386,7 +394,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -433,7 +441,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -482,7 +490,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -532,7 +540,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -578,9 +586,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                     final option = options
                                                         .elementAt(index);
                                                     return ListTile(
-                                                      tileColor: Colors
-                                                          .grey.shade700
-                                                          .withOpacity(0.8),
+                                                      tileColor: grey,
                                                       title: Text(
                                                         option
                                                             .split(RegExp(
@@ -657,7 +663,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: white70,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),

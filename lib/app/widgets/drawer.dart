@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/about_app.dart';
-import 'package:wbrs/app/pages/admin_panel.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/meetings.dart';
 import 'package:wbrs/app/pages/shop.dart';
@@ -21,7 +20,7 @@ import '../pages/profiles_list.dart';
 import '../../service/auth_service.dart';
 
 class MyDrawer extends StatefulWidget {
-  const MyDrawer({Key? key}) : super(key: key);
+  const MyDrawer({super.key});
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
@@ -70,6 +69,11 @@ class _MyDrawerState extends State<MyDrawer> {
       userName = firebaseAuth.currentUser!.displayName.toString();
       email = firebaseAuth.currentUser!.email.toString();
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -139,15 +143,6 @@ class _MyDrawerState extends State<MyDrawer> {
                                           .instance.currentUser!.photoURL
                                           .toString(),
                                   Group),
-                          // : ClipRRect(
-                          //     borderRadius: BorderRadius.circular(100.0),
-                          //     child: Image.network(
-                          //       firebaseAuth.currentUser!.photoURL
-                          //           .toString(),
-                          //       fit: BoxFit.cover,
-                          //       height: 100.0,
-                          //       width: 100.0,
-                          //     )),
                           const SizedBox(
                             height: 15,
                           ),
@@ -180,7 +175,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   onTap: () {
                     //nextScreenReplace(context, const AboutUserWriting());
-                    nextScreenReplace(context, const FirstGroupRed());
+                    nextScreen(context, const FirstGroupRed());
                   },
                 ),
                 ListTile(
@@ -189,9 +184,6 @@ class _MyDrawerState extends State<MyDrawer> {
                       selectedIndex = 1;
                     });
                     nextScreenReplace(context, const HomePage());
-                    //   setState(() {
-                    //     _selectedIndex=index;
-                    //   });
                   },
                   selectedColor: Theme.of(context).primaryColor,
                   contentPadding:
@@ -362,19 +354,6 @@ class _MyDrawerState extends State<MyDrawer> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 ),
                 ListTile(
-                  onTap: () {
-                    nextScreenReplace(context, const AdminPanelPage());
-                  },
-                  title: const Text("Админ панель",
-                      style: TextStyle(color: Colors.white)),
-                  leading: const Icon(
-                    Icons.admin_panel_settings_outlined,
-                    color: Colors.grey,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                ),
-                ListTile(
                   onTap: () async {
                     showDialog(
                         barrierDismissible: false,
@@ -400,6 +379,10 @@ class _MyDrawerState extends State<MyDrawer> {
                                       .doc(FirebaseAuth
                                           .instance.currentUser?.uid)
                                       .set({'token': ''});
+                                  firebaseFirestore
+                                      .collection('users')
+                                      .doc(firebaseAuth.currentUser!.uid)
+                                      .update({'online': false});
                                   await authService.signOut();
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(

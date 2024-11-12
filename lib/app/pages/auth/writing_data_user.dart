@@ -1,6 +1,7 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_typing_uninitialized_variables
 
 import 'dart:io';
+import 'package:wbrs/app/pages/filter_pages/cities.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +48,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
         setState(() {});
       }
     });
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
   }
 
   @override
@@ -256,24 +251,90 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                       children: [
                         const Text("Город"),
                         SizedBox(
-                          width: 190,
-                          height: 40,
-                          child: TextField(
-                            textAlign: TextAlign.right,
-                            style: const TextStyle(
-                              color: Colors.black,
-                            ),
-                            onSubmitted: (name) {},
-                            controller: city,
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                                errorText: City ? "Заполните поле" : null,
-                                errorMaxLines: 2,
-                                border: InputBorder.none,
-                                contentPadding:
-                                    const EdgeInsets.only(right: 30),
-                                hintText: "Москва",
-                                hintStyle: const TextStyle(color: Colors.grey)),
+                          width: 150,
+                          child: Autocomplete<String>(
+                            optionsMaxHeight:
+                                MediaQuery.of(context).size.height * 0.3,
+                            optionsViewBuilder: (context, onSelected, options) {
+                              return Align(
+                                alignment: Alignment.topCenter,
+                                child: Material(
+                                  surfaceTintColor: Colors.white54,
+                                  type: MaterialType.transparency,
+                                  elevation: 4.0,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                    ),
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
+                                        itemCount: options.length,
+                                        itemBuilder: (context, index) {
+                                          final option =
+                                              options.elementAt(index);
+                                          return ListTile(
+                                            tileColor: grey,
+                                            title: Text(
+                                              option
+                                                  .split(RegExp(r"(?! )\s{2,}"))
+                                                  .join(' ')
+                                                  .split(RegExp(r"\s+$"))
+                                                  .join(''),
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            onTap: () => onSelected(option),
+                                          );
+                                        }),
+                                  ),
+                                ),
+                              );
+                            },
+                            optionsBuilder: (textEditingValue) {
+                              if (textEditingValue.text == '') {
+                                return [];
+                              }
+                              return cities
+                                  .where((city) => city
+                                      .toLowerCase()
+                                      .startsWith(
+                                          textEditingValue.text.toLowerCase()))
+                                  .toList()
+                                ..sort((a, b) => a.compareTo(b));
+                            },
+                            onSelected: (String val) {
+                              setState(() {
+                                city.text = val
+                                    .split(RegExp(r"(?! )\s{2,}"))
+                                    .join(' ')
+                                    .split(RegExp(r"\s+$"))
+                                    .join('');
+                              });
+                            },
+                            fieldViewBuilder:
+                                (context, controller, focusNode, onSubmitted) {
+                              controller.text = city.text;
+                              return TextField(
+                                textAlign: TextAlign.right,
+                                controller: controller,
+                                focusNode: focusNode,
+                                onSubmitted: (String value) {
+                                  onSubmitted();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    city.text = value
+                                        .split(RegExp(r"(?! )\s{2,}"))
+                                        .join(' ')
+                                        .split(RegExp(r"\s+$"))
+                                        .join('');
+                                  });
+                                },
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -327,7 +388,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                         const Text("Пол"),
                         DropdownButton(
                           //
-                          items: <String>['М', 'Ж'].map((String value) {
+                          items: <String>['м', 'ж'].map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value),

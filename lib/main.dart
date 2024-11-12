@@ -3,10 +3,12 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/login_page.dart';
 import 'package:wbrs/app/pages/home_page.dart';
@@ -22,17 +24,35 @@ import 'package:wbrs/app/pages/test/red_group.dart';
 
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
+updateUserStatus(value) async {
+  await firebaseFirestore
+      .collection('users')
+      .doc(firebaseAuth.currentUser!.uid)
+      .update({'online': value});
+  if (!value) {
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'lastOnlineTS': DateTime.now()});
+  }
+}
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
 }
 
 void main() async {
+  late final FirebaseApp app;
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
+  app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FlutterError.onError = (details) {
+    FirebaseCrashlytics.instance.recordError(details.exceptionAsString(), details.stack, fatal: true);
+  };
+  FirebaseAuth.instanceFor(app: app);
   await SharedPreferences.getInstance();
   await FirebaseMessaging.instance.getInitialMessage();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -42,11 +62,11 @@ void main() async {
     sound: true,
   );
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings("@mipmap/launcher_icon");
+  AndroidInitializationSettings("@mipmap/launcher_icon");
   const DarwinInitializationSettings initializationSettingsIOS =
-      DarwinInitializationSettings(
+  DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
@@ -56,7 +76,6 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
   );
-
   runApp(const MyApp());
 }
 
@@ -80,99 +99,39 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   // ignore: prefer_typing_uninitialized_variables
   var doc;
-  startMigrations() async {
-    //addUnVisibleField();
-  }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    //WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) {
-      updateUserStatus(false);
-    } else {
-      updateUserStatus(true);
-    }
-  }
-
-  createUsers() {
-    List groups = [
-      'сине-белая',
-      'коричнево-красная',
-      'красно-синяя',
-      'бело-синяя',
-      'сине-коричневая'
-    ];
-    for (int i = 1; i < 10; i++) {
-      firebaseFirestore.collection('users').add({
-        'about': 'TEST',
-        'age': randomBetween(18, 35),
-        'balance': 0,
-        'chatWithId': '',
-        'chats': [],
-        'city': 'TEST',
-        'deti': false,
-        'email': 'testing$i@t.ru',
-        'fullName': 'TEST',
-        'hobbi': 'TEST',
-        'images': [],
-        'isRegistrationEnd': true,
-        'isUnVisible': true,
-        'lastOnlineTs': DateTime.now(),
-        'online': false,
-        'pol': 'ж',
-        'presentedGifts': [],
-        'profilePic': '',
-        'rost': randomBetween(150, 190).toString(),
-        'группа': groups[randomBetween(0, 4)],
-        'testing': true,
-        'uid': 'testing$i'
-      });
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state != AppLifecycleState.resumed) {
+  //     updateUserStatus(false);
+  //   } else {
+  //     updateUserStatus(true);
+  //   }
+  // }
 
   initFunction() async {
-    //createUsers();
     await checkInternet();
-    updateUserStatus(true);
     selectedIndex = 1;
     await getUserLoggedInStatus();
     if (_isSignedIn) {
+      updateUserStatus(true);
       getUserInfo();
       getUserRegistrationStatus();
     }
-    if (Platform.isIOS) {
-      firebaseMessaging.requestPermission();
-    }
-  }
-
-  String? mtoken;
-  void getToken() async {
-    await FirebaseMessaging.instance.getToken().then((token) {
-      setState(() {
-        mtoken = token;
-      });
-    });
-
-    saveUserToken(mtoken!);
-  }
-
-  void saveUserToken(String token) {
-    firebaseFirestore
-        .collection('TOKENS')
-        .doc(firebaseAuth.currentUser?.uid)
-        .set({'token': token});
+    firebaseMessaging.requestPermission();
   }
 
   @override
   void initState() {
     super.initState();
     initFunction();
-    WidgetsBinding.instance.addObserver(this);
+    //WidgetsBinding.instance.addObserver(this);
   }
 
   initNotify() {
@@ -218,29 +177,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  updateUserStatus(value) async {
-    await firebaseFirestore
-        .collection('users')
-        .doc(firebaseAuth.currentUser!.uid)
-        .update({'online': value});
-    if (!value) {
-      await firebaseFirestore
-          .collection('users')
-          .doc(firebaseAuth.currentUser!.uid)
-          .update({'lastOnlineTS': DateTime.now()});
-    }
-  }
-
   getUserInfo() async {
     doc = await firebaseFirestore
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .get();
 
-    setState(() {
-      GlobalBalance = doc.get('balance');
-    });
-    getToken();
+    GlobalBalance = doc.get('balance');
+    Group = doc.get('группа');
     initNotify();
   }
 
@@ -284,37 +228,49 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme tema = GoogleFonts.robotoTextTheme(Theme.of(context).textTheme);
-    return MaterialApp(
-      theme: ThemeData(
-          fontFamily: 'Times New Roman',
-          primaryColor: Constants().primaryColor,
-          scaffoldBackgroundColor: Colors.white,
-          textTheme: tema),
-      debugShowCheckedModeBanner: false,
-      routes: {
-        'profile': (context) {
-          return ProfilePage(
-            group: getUserGroup(),
-            email: firebaseAuth.currentUser!.email.toString(),
-            userName: firebaseAuth.currentUser!.displayName.toString(),
-            about: doc.get('about'),
-            age: doc.get('age').toString(),
-            rost: doc.get('rost'),
-            hobbi: doc.get('hobbi'),
-            city: doc.get('city'),
-            deti: doc.get('deti'),
-            pol: doc.get('pol'),
-          );
-        }
-      },
-      home: _isSignedIn
-          ? _loading
-              ? const SplashScreen()
-              : _isRegistrationEnd
-                  ? const HomePage()
-                  : const FirstGroupRed()
-          : const LoginPage(),
+    TextTheme tema = GoogleFonts.latoTextTheme(Theme.of(context).textTheme);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return OrientationBuilder(
+          builder: (context, orientation) {
+            return Sizer(
+              builder: (context, orientation, deviceType) {
+                return MaterialApp(
+                  theme: ThemeData(
+                      fontFamily: 'Roboto',
+                      primaryColor: Constants().primaryColor,
+                      scaffoldBackgroundColor: Colors.white,
+                      textTheme: tema),
+                  debugShowCheckedModeBanner: false,
+                  routes: {
+                    'profile': (context) {
+                      return ProfilePage(
+                        group: getUserGroup(),
+                        email: firebaseAuth.currentUser!.email.toString(),
+                        userName: firebaseAuth.currentUser!.displayName.toString(),
+                        about: doc.get('about'),
+                        age: doc.get('age').toString(),
+                        rost: doc.get('rost'),
+                        hobbi: doc.get('hobbi'),
+                        city: doc.get('city'),
+                        deti: doc.get('deti'),
+                        pol: doc.get('pol'),
+                      );
+                    }
+                  },
+                  home: _isSignedIn
+                      ? _loading
+                          ? const SplashScreen()
+                          : _isRegistrationEnd
+                              ? const HomePage()
+                              : const FirstGroupRed()
+                      : const LoginPage(),
+                );
+              }
+            );
+          }
+        );
+      }
     );
   }
 }

@@ -61,7 +61,10 @@ class _EditMeetState extends State<EditMeet> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    nameMeet.dispose();
+    city.dispose();
+    description.dispose();
+    dateAndTime.dispose();
     super.dispose();
   }
 
@@ -287,7 +290,7 @@ class _EditMeetState extends State<EditMeet> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15)),
                                   backgroundColor:
-                                      Colors.grey.shade700.withOpacity(0.7),
+                                      grey,
                                   title: const Text(
                                     'Удалить встречу?',
                                     style: TextStyle(color: Colors.white),

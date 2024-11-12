@@ -243,7 +243,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                           List.filled(chatRoomInfoMap.length, false);
                       showModalBottomSheet(
                           backgroundColor:
-                              Colors.grey.shade700.withOpacity(0.7),
+                              grey,
                           context: context,
                           builder: (context) {
                             return StatefulBuilder(

@@ -1,4 +1,4 @@
-// ignore_for_file: empty_catches
+// ignore_for_file: empty_catches, avoid_print
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;

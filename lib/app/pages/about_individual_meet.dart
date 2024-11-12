@@ -13,21 +13,17 @@ import '../../service/database_service.dart';
 import '../../service/notifications.dart';
 import 'edit_meet.dart';
 
-class AboutIndividualMeet extends StatefulWidget {
+class AboutIndividualMeet extends StatelessWidget {
   final AsyncSnapshot snapshot;
   final int index;
   final DocumentSnapshot doc;
-  const AboutIndividualMeet(
-      {super.key,
-      required this.snapshot,
-      required this.index,
-      required this.doc});
+  AboutIndividualMeet({
+    super.key,
+    required this.snapshot,
+    required this.index,
+    required this.doc// Pass myUid as a required parameter
+  });
 
-  @override
-  State<AboutIndividualMeet> createState() => _AboutIndividualMeetState();
-}
-
-class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
   String myUid = firebaseAuth.currentUser!.uid;
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -43,27 +39,21 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    bool isMeAdmin = widget.doc.id == myUid;
+    bool isMeAdmin = doc.id == myUid;
     addNotification() async {
       Map notification = {
         'isChat': false,
-        'chatId': widget.doc.id,
+        'chatId': doc.id,
         'message':
             '${firebaseAuth.currentUser!.displayName} принял приглашение в группу',
       };
       String token = "";
-      var meet = widget.snapshot.data.docs[widget.index];
+      var meet = snapshot.data.docs[index];
 
-      var doc =
+      var data =
           await firebaseFirestore.collection('TOKENS').doc(meet['admin']).get();
-      token = doc.get('token');
+      token = data.get('token');
       NotificationsService()
           .sendPushMessageGroup(token, notification, meet['name'], 1, meet.id);
     }
@@ -89,14 +79,14 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                         nextScreenReplace(
                             context,
                             EditMeet(
-                                meet: widget.snapshot.data.docs[widget.index]));
+                                meet: snapshot.data.docs[index]));
                       },
                       icon: const Icon(Icons.edit_calendar_outlined))
                   : const SizedBox()
             ],
             backgroundColor: Colors.transparent,
             title: Text(
-              widget.snapshot.data.docs[widget.index]['name'],
+              snapshot.data.docs[index]['name'],
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -116,29 +106,29 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                       nextScreen(
                           context,
                           SomebodyProfile(
-                              uid: widget.doc.get('uid'),
-                              photoUrl: widget.doc.get('profilePic'),
-                              name: widget.doc.get('fullName'),
-                              userInfo: widget.doc.data() as Map));
+                              uid: doc.get('uid'),
+                              photoUrl: doc.get('profilePic'),
+                              name: doc.get('fullName'),
+                              userInfo: doc.data() as Map));
                     },
-                    title: Text(widget.doc.get('fullName')),
+                    title: Text(doc.get('fullName')),
                     leading: ClipRRect(
                         borderRadius: BorderRadius.circular(100),
-                        child: userImageWithCircle(widget.doc.get('profilePic'),
-                            widget.doc.get('группа'), 58.0, 58.0)),
+                        child: userImageWithCircle(doc.get('profilePic'),
+                            doc.get('группа'), 58.0, 58.0)),
                     subtitle: Row(
                       children: [
-                        widget.doc.get('age') % 10 == 0
-                            ? Text('${widget.doc.get('age')} лет')
-                            : widget.doc.get('age') % 10 == 1
-                                ? Text('${widget.doc.get('age')} год')
-                                : widget.doc.get('age') % 10 != 5
-                                    ? Text('${widget.doc.get('age')} года')
-                                    : Text('${widget.doc.get('age')} лет'),
+                        doc.get('age') % 10 == 0
+                            ? Text('${doc.get('age')} лет')
+                            : doc.get('age') % 10 == 1
+                                ? Text('${doc.get('age')} год')
+                                : doc.get('age') % 10 != 5
+                                    ? Text('${doc.get('age')} года')
+                                    : Text('${doc.get('age')} лет'),
                         const SizedBox(
                           width: 20,
                         ),
-                        Text("Город ${widget.doc.get('city')}")
+                        Text("Город ${doc.get('city')}")
                       ],
                     ),
                   ),
@@ -156,21 +146,21 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                   height: 10,
                 ),
                 Text(
-                  "Описание: ${widget.snapshot.data.docs[widget.index]['description']}",
+                  "Описание: ${snapshot.data.docs[index]['description']}",
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Дата и время: ${widget.snapshot.data.docs[widget.index]['datetime']}',
+                  'Дата и время: ${snapshot.data.docs[index]['datetime']}',
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Город: ${widget.snapshot.data.docs[widget.index]['city']}',
+                  'Город: ${snapshot.data.docs[index]['city']}',
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
@@ -178,7 +168,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                 ),
                 isMeAdmin
                     ? const SizedBox.shrink()
-                    : widget.snapshot.data.docs[widget.index]['users']
+                    : snapshot.data.docs[index]['users']
                             .contains(firebaseAuth.currentUser!.uid)
                         ? const Center(
                             child: Text(
@@ -191,8 +181,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                 onPressed: () async {
                                   DocumentReference meet = firebaseFirestore
                                       .collection('meets')
-                                      .doc(widget
-                                          .snapshot.data.docs[widget.index].id);
+                                      .doc(snapshot.data.docs[index].id);
                                   List users = await meet
                                       .get()
                                       .then((value) => value['users']);
@@ -250,7 +239,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                       "user1": FirebaseAuth
                                           .instance.currentUser!.uid
                                           .toString(),
-                                      "user2": widget.doc.id,
+                                      "user2": doc.id,
                                       "user1Nickname": FirebaseAuth
                                           .instance.currentUser!.displayName,
                                       "user2Nickname": name,

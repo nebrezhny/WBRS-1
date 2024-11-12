@@ -35,14 +35,6 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController resetPasswordEmail = TextEditingController();
   AuthService authService = AuthService();
 
-  checkSystem() async {
-    var check = await firebaseFirestore
-        .collection('users')
-        .doc('6DVznuvNT8Yp4Nifz8TeH5mra4w2')
-        .get();
-    return check.id;
-  }
-
   @override
   void initState() {
     _loadUserEmailPassword();
@@ -51,7 +43,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -70,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
-            color: Colors.white.withOpacity(0.7),
+            color: grey,
             colorBlendMode: BlendMode.modulate,
           ),
         ),

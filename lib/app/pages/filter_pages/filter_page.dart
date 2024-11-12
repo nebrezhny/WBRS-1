@@ -8,7 +8,7 @@ import 'package:wbrs/app/pages/profiles_list.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class FilterPage extends StatefulWidget {
-  const FilterPage({Key? key}) : super(key: key);
+  const FilterPage({super.key});
 
   @override
   State<FilterPage> createState() => _FilterPageState();
@@ -37,7 +37,7 @@ class FilterPage2 extends StatefulWidget {
 
 class _FilterPage2State extends State<FilterPage2> {
   String pol = "";
-  String city = filtrCity.text;
+  String city = filterCity.text;
   TextEditingController filtrAgeStart = TextEditingController();
   TextEditingController filtrAgeEnd = TextEditingController();
 
@@ -50,7 +50,8 @@ class _FilterPage2State extends State<FilterPage2> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    filtrAgeStart.dispose();
+    filtrAgeEnd.dispose();
     super.dispose();
   }
 
@@ -329,7 +330,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         onSelected: (String val) {
                           setState(() {
                             String value = val.trim();
-                            filtrCity.text = value;
+                            filterCity.text = value;
                             city = value;
                           });
                         },
@@ -364,7 +365,7 @@ class _FilterPage2State extends State<FilterPage2> {
                   onPressed: () async {
                     var x = await getUserGroup();
                     setState(() {
-                      filtrCity.text = city;
+                      filterCity.text = city;
                       ageStart = int.parse(filtrAgeStart.text);
                       ageEnd = int.parse(filtrAgeEnd.text);
                       nextScreenReplace(
@@ -379,7 +380,7 @@ class _FilterPage2State extends State<FilterPage2> {
                     filterByGroup = false;
                     FiltrPol = '';
                     setState(() {
-                      filtrCity.text = '';
+                      filterCity.text = '';
                       ageStart = 0;
                       ageEnd = 100;
                       nextScreenReplace(
