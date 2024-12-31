@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -22,6 +24,8 @@ import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:wbrs/app/pages/test/red_group.dart';
 
+import 'app/pages/about_meet.dart';
+import 'app/pages/chatscreen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
 updateUserStatus(value) async {
@@ -39,6 +43,69 @@ updateUserStatus(value) async {
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
+}
+
+listenNotify(context)async{
+  const AndroidInitializationSettings('@mipmap/launcher_icon');
+  const DarwinInitializationSettings();
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+    BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+      message.notification!.body.toString(),
+      htmlFormatBigText: true,
+      contentTitle: message.notification!.title.toString(),
+      htmlFormatContentTitle: true,
+    );
+
+    AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails('wbrs', 'wbrs',
+        importance: Importance.max,
+        styleInformation: bigTextStyleInformation,
+        priority: Priority.max,
+        playSound: true);
+
+    NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidNotificationDetails);
+
+    try {
+      await flutterLocalNotificationsPlugin.show(
+          0,
+          message.notification?.title,
+          message.notification?.body,
+          platformChannelSpecifics,
+          payload: message.notification!.body);
+    } on Exception catch (e) {
+      showSnackbar(context, Colors.red, e);
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    Map body = jsonDecode(message.data['payload']);
+    if (body['isChat'] == true) {
+      nextScreenReplace(
+          context,
+          ChatScreen(
+            chatWithUsername: body['chatWith'],
+            photoUrl: body['photoUrl'],
+            id: body['id'],
+            chatId: body['chatId'],
+          ));
+    } else {
+      body['users'] =
+          body['users'].toString().replaceAll('[', '').replaceAll(']', '');
+      List users = body['users'].toString().split(',');
+      nextScreenReplace(
+          context,
+          AboutMeet(
+            id: body['groupId'],
+            users: users,
+            name: body['groupName'],
+            is_user_join: body['isUserJoin'].toString() == 'true',
+          ));
+    }
+  });
 }
 
 void main() async {
@@ -106,14 +173,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state != AppLifecycleState.resumed) {
-  //     updateUserStatus(false);
-  //   } else {
-  //     updateUserStatus(true);
-  //   }
-  // }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      updateUserStatus(false);
+    } else {
+      updateUserStatus(true);
+    }
+  }
 
   initFunction() async {
     await checkInternet();
@@ -131,7 +198,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     initFunction();
-    //WidgetsBinding.instance.addObserver(this);
+    listenNotify(context);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   initNotify() {
@@ -201,6 +269,24 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   getUserLoggedInStatus() async {
+    if(firebaseAuth.currentUser != null) {
+      DocumentSnapshot data = await firebaseFirestore
+          .collection('users')
+          .doc(firebaseAuth.currentUser!.uid)
+          .get();
+
+      if (data.exists) {
+        if(data.get('status') == 'blocked') {
+          showSnackbar(context, Colors.red, 'Ваш аккаунт заблокирован');
+          await firebaseAuth.signOut();
+          nextScreenReplace(context, const LoginPage());
+        }
+      } else {
+        await firebaseAuth.currentUser!.delete();
+        showSnackbar(context, Colors.red, 'Ваш аккаунт удален');
+        nextScreenReplace(context, const LoginPage());
+      }
+    }
     await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {
         setState(() {

@@ -102,32 +102,51 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return CurvedNavigationBar(
-      items: const [
-        Icon(
-          Icons.person,
-          size: 30,
-        ),
-        Icon(
-          Icons.message_outlined,
-          size: 30,
-        ),
-        Icon(
-          Icons.people,
-          size: 30,
-        ),
-        Icon(
-          Icons.access_alarm_sharp,
-          size: 30,
-        ),
-      ],
-      index: selectedIndex,
-      backgroundColor: Colors.transparent,
-      animationDuration: const Duration(milliseconds: 300),
-      color: Colors.orangeAccent.shade400,
-      buttonBackgroundColor: Colors.orangeAccent.shade100,
-      onTap: _onItemTapped,
-      height: 60,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.08,
+      child: Column(
+        children: [
+          CurvedNavigationBar(
+            items: const [
+              Icon(
+                Icons.person,
+                size: 30,
+              ),
+              Icon(
+                Icons.message_outlined,
+                size: 30,
+              ),
+              Icon(
+                Icons.people,
+                size: 30,
+              ),
+              Icon(
+                Icons.access_alarm_sharp,
+                size: 30,
+              ),
+            ],
+            index: selectedIndex,
+            backgroundColor: Colors.transparent,
+            animationDuration: const Duration(milliseconds: 300),
+            color: Colors.orangeAccent.shade400,
+            buttonBackgroundColor: Colors.orangeAccent.shade100,
+            onTap: _onItemTapped,
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          GestureDetector(
+            onTap: (){
+              showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
+            },
+            child: Container(
+              padding: EdgeInsets.zero,
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.03,
+              color: Colors.orangeAccent.shade400,
+              child: const Text('Поддержать ❤ проект ', textAlign: TextAlign.center,style: TextStyle(fontSize: 16, letterSpacing: 0.3),),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

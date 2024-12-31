@@ -21,11 +21,13 @@ class NotificationsService {
             'message': <String, dynamic>{
               'token': token,
               'data': <String, dynamic>{
+                'android_channel_id':'wbrs',
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'status': 'done',
                 'icon': "@mipmap/launcher_icon",
                 'sound': "default",
                 'payload': jsonEncode(body),
+                'unreadMsgCount': unreadMsgCount,
               },
               "notification": <String, dynamic>{
                 "title": title,
@@ -60,10 +62,13 @@ class NotificationsService {
             'message': <String, dynamic>{
               'token': token,
               'data': <String, dynamic>{
+                'android_channel_id':'wbrs',
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'status': 'done',
                 'icon': "@mipmap/launcher_icon",
                 'sound': "default",
+                "priority": "high",
+                "time_to_live": '86400',
                 'payload': jsonEncode(body),
               },
               "notification": <String, dynamic>{

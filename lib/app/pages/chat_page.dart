@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/somebody_profile.dart';
@@ -19,7 +18,7 @@ class UserInfo {
   String image_url;
   String group;
   String uid;
-  DocumentSnapshot userInfo;
+  Map userInfo;
 
   UserInfo(this.name, this.age, this.city, this.image_url, this.group, this.uid,
       this.userInfo);
@@ -55,8 +54,9 @@ class _ChatPageState extends State<ChatPage> {
   late DocumentSnapshot meet;
   bool isNotificationOff = false;
   Map meetInfo = {};
+  bool awaitUsers = false;
 
-  isMeAdminCheck() async {
+  void isMeAdminCheck() async {
     String myId = firebaseAuth.currentUser!.uid;
     meetInfo = meet.data() as Map;
     isMeAdmin = meetInfo['admin'] == myId;
@@ -65,13 +65,13 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  getMeet() async {
+  void getMeet() async {
     meet =
         await firebaseFirestore.collection('meets').doc(widget.groupId).get();
     isMeAdminCheck();
   }
 
-  checkNotification() async {
+  void checkNotification() {
     isNotificationOff = userWOutN.contains(firebaseAuth.currentUser!.uid);
   }
 
@@ -81,44 +81,207 @@ class _ChatPageState extends State<ChatPage> {
     getMeet();
     getUsers();
     is_user_join = widget.is_user_join;
-
     getAndSetMessages();
-
     getToken();
   }
 
   @override
   void dispose() {
+    messageController.dispose();
+    user_info.clear();
+    userWOutN.clear();
     super.dispose();
   }
 
-  getToken() async {
+  void getToken() async {
     firebaseMessaging.getNotificationSettings();
   }
 
   @override
   Widget build(BuildContext context) {
-    addNotification() async {
-      List users = widget.users;
-      //users.removeWhere((element) => element == firebaseAuth.currentUser!.uid);
-      Map notification = {
-        'isChat': false,
-        'groupId': widget.groupId,
-        'groupName': widget.groupName,
-        'users': widget.users,
-        'isUserJoin': widget.is_user_join,
-        'message': messageController.text,
-      };
-      String token = "";
 
-      for (int i = 0; i < users.length; i++) {
-        if (userWOutN.contains(users[i])) return;
-        var doc =
-            await firebaseFirestore.collection('TOKENS').doc(users[i]).get();
-        token = doc.get('token');
-        NotificationsService().sendPushMessageGroup(
-            token, notification, widget.groupName, 1, widget.groupId);
-      }
+    Widget listUsers() {
+      List users = user_info;
+
+      return StreamBuilder(
+        stream: users_in_meet,
+        builder: (context, snapshot) {
+          return ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  textColor: Colors.white,
+                  onTap: () async {
+                    UserInfo user = user_info[index];
+                    nextScreen(
+                        context,
+                        SomebodyProfile(
+                            uid: user.uid,
+                            photoUrl: user.image_url,
+                            name: user.name,
+                            userInfo: user.userInfo));
+                  },
+                  trailing: isMeAdmin &&
+                      users[index].uid != firebaseAuth.currentUser!.uid
+                      ? IconButton(
+                      onPressed: () async {
+                        showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                backgroundColor: darkGrey,
+                                elevation: 0.0,
+                                titleTextStyle:
+                                const TextStyle(color: Colors.white),
+                                contentTextStyle:
+                                const TextStyle(color: Colors.white),
+                                content: const Text(
+                                    "Вы уверены, что хотите исключить этого пользователя?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text(
+                                      "Нет",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      Map doc = await firebaseFirestore
+                                          .collection('meets')
+                                          .doc(widget.groupId)
+                                          .get()
+                                          .then((doc) => doc.data() as Map);
+                                      List kicked = doc['kicked'] ?? [];
+                                      String uid = users[index].uid;
+                                      kicked.add(uid);
+                                      user_info.removeWhere((element) => element.uid == uid);
+                                      users.removeWhere((element) => element.uid == uid);
+                                      List newUsers = doc['users'];
+                                      newUsers.removeWhere((element) => element == uid);
+                                      firebaseFirestore
+                                          .collection('meets')
+                                          .doc(widget.groupId)
+                                          .update({'users': newUsers, 'kicked': kicked});
+
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                    },
+                                    child: const Text(
+                                      "Да",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.redAccent,
+                      ))
+                      : null,
+                  title: Text(user_info[index].name),
+                  subtitle: Row(
+                    children: [
+                      int.parse(user_info[index].age) % 10 == 0
+                          ? Text('${user_info[index].age} лет')
+                          : int.parse(user_info[index].age) % 10 == 1
+                          ? Text('${user_info[index].age} год')
+                          : int.parse(user_info[index].age) % 10 != 5
+                          ? Text('${user_info[index].age} года')
+                          : Text('${user_info[index].age} лет'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          "Город ${user_info[index].city}",
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ],
+                  ),
+                  leading: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(200),
+                            child: userImageWithCircle(
+                                user_info[index].image_url,
+                                user_info[index].group,
+                                60.0,
+                                60.0))),
+                  ),
+                  dense: false,
+                );
+              });
+        }
+      );
+    }
+
+    showUsers(){
+      showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return StatefulBuilder(
+                builder: (ctx, StateSetter setState) {
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration:
+                        const BoxDecoration(boxShadow: []),
+                        child: Image.asset(
+                          "assets/fon.jpg",
+                          height: MediaQuery.of(context)
+                              .size
+                              .height,
+                          width:
+                          MediaQuery.of(context).size.width,
+                          fit: BoxFit.cover,
+                          scale: 0.6,
+                        ),
+                      ),
+                      Scaffold(
+                        backgroundColor: Colors.transparent,
+                        appBar: AppBar(
+                          backgroundColor: Colors.orangeAccent,
+                          title: const Text(
+                              'Список пользователей'),
+                        ),
+                        body: Column(
+                          children: [
+                            Container(
+                              height: 330,
+                              padding:
+                              const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 15),
+                              child: listUsers(),
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  getOutFromChat();
+                                },
+                                child: const Text(
+                                  'Выйти из встречи',
+                                  style: TextStyle(
+                                      color: Colors.black),
+                                ))
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          });
     }
 
     return Stack(
@@ -133,7 +296,9 @@ class _ChatPageState extends State<ChatPage> {
             scale: 0.6,
           ),
         ),
-        Scaffold(
+        awaitUsers
+            ? const Center(child: CircularProgressIndicator())
+        :Scaffold(
           appBar: AppBar(
             toolbarTextStyle: const TextStyle(color: Colors.black),
             title: Text(widget.groupName),
@@ -147,17 +312,20 @@ class _ChatPageState extends State<ChatPage> {
                             .collection('meets')
                             .doc(widget.groupId)
                             .update({'users': users});
-                        nextScreenReplace(context, const MeetingPage());
+                        Navigator.of(context).pop();
                       },
                       icon: const Icon(Icons.output_sharp))
                   : const SizedBox(),
-              IconButton(
-                  onPressed: () {
+              GestureDetector(
+                  onTap: () {
                     switchNotification();
                   },
-                  icon: isNotificationOff
-                      ? const Icon(Icons.notifications_on_outlined)
-                      : const Icon(Icons.notifications_off_outlined)),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.notifications),
+                      Text(!isNotificationOff ? 'Вкл' : 'Выкл')
+                    ],
+                  )),
               isMeAdmin
                   ? IconButton(
                       onPressed: () {
@@ -168,193 +336,143 @@ class _ChatPageState extends State<ChatPage> {
               is_user_join
                   ? IconButton(
                       onPressed: () async {
-                        for (int i = 0; i < widget.users.length; i++) {
-                          DocumentSnapshot doc = await FirebaseFirestore
-                              .instance
-                              .collection('users')
-                              .doc(widget.users[i])
-                              .get();
-                          try {
-                            UserInfo some_user_info = UserInfo(
-                                doc.get('fullName'),
-                                doc.get('age').toString(),
-                                doc.get('city'),
-                                doc.get('profilePic'),
-                                doc.get('группа'),
-                                doc.get('uid'),
-                                doc);
-                            user_info.add(some_user_info);
-                          } on Exception catch (e) {
-                            if(context.mounted) {
-                              showSnackbar(context, Colors.red, e);
+                        if (user_info.isEmpty) {
+                          for (int i = 0; i < widget.users.length; i++) {
+                            DocumentSnapshot doc = await firebaseFirestore
+                                .collection('users')
+                                .doc(widget.users[i])
+                                .get();
+                            if (doc.exists) {
+                              try {
+                                UserInfo someUserInfo = UserInfo(
+                                    doc.get('fullName'),
+                                    doc.get('age').toString(),
+                                    doc.get('city'),
+                                    doc.get('profilePic'),
+                                    doc.get('группа'),
+                                    doc.get('uid'),
+                                    doc.data() as Map);
+                                user_info.add(someUserInfo);
+                              } on Exception catch (e) {
+                                if (context.mounted) {
+                                  showSnackbar(context, Colors.red, e);
+                                }
+                              }
                             }
                           }
                         }
                         if (context.mounted) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return StatefulBuilder(
-                                  builder: (ctx, StateSetter setState) {
-                                return Stack(
-                                  children: [
-                                    Container(
-                                      decoration:
-                                          const BoxDecoration(boxShadow: []),
-                                      child: Image.asset(
-                                        "assets/fon.jpg",
-                                        height:
-                                            MediaQuery.of(context).size.height,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        fit: BoxFit.cover,
-                                        scale: 0.6,
-                                      ),
-                                    ),
-                                    Scaffold(
-                                      backgroundColor: Colors.transparent,
-                                      appBar: AppBar(
-                                        backgroundColor: Colors.orangeAccent,
-                                        title:
-                                            const Text('Список пользователей'),
-                                      ),
-                                      body: Column(
-                                        children: [
-                                          Container(
-                                            height: 330,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 30, vertical: 15),
-                                            child: listUsers(ctx, setState),
-                                          ),
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                getOutFromChat();
-                                              },
-                                              child: const Text(
-                                                'Выйти из встречи',
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ))
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              });
-                            });
+                          if(!awaitUsers){
+                            showUsers();
+                          }
                         }
+
                       },
                       icon: const Icon(Icons.people))
                   : const SizedBox()
             ],
             backgroundColor: Colors.orangeAccent,
           ),
-          body: PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) async {
-              nextScreenReplace(context, const MeetingPage());
-            },
-            child: Stack(
-              children: [
-                Container(
-                  decoration: const BoxDecoration(boxShadow: []),
-                  child: Image.asset(
-                    "assets/fon.jpg",
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.cover,
-                    scale: 0.6,
-                  ),
-                ),
-                chatMessages(),
-                const Padding(padding: EdgeInsets.only(bottom: 50.0)),
+          body: Stack(
+            children: [
+              Image.asset(
+                "assets/fon.jpg",
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+                scale: 0.6,
+              ),
+              chatMessages(),
+              const Padding(padding: EdgeInsets.only(bottom: 50.0)),
 
-                Container(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.grey[700],
-                    child: is_user_join
-                        ? Row(children: [
-                            Expanded(
-                                child: TextFormField(
-                              controller: messageController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: const InputDecoration(
-                                hintText: "Отправить сообщение...",
-                                hintStyle: TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
-                            )),
-                            GestureDetector(
-                              onTap: () {
-                                addNotification();
+              Container(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey[700],
+                  child: is_user_join
+                      ? Row(children: [
+                          Expanded(
+                              child: TextFormField(
+                            controller: messageController,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: "Отправить сообщение...",
+                              hintStyle: TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                            ),
+                          )),
+                          GestureDetector(
+                            onTap: () async {
+                              if (messageController.text.isNotEmpty) {
+                                await getUsers();
                                 sendMessage();
-                              },
-                              child: const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
-                            )
-                          ])
-                        : isMeKicked
-                            ? Expanded(
-                                child: TextFormField(
-                                controller: messageController,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  hintText: "Вы были исключены из встречи",
-                                  hintStyle: TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                ),
-                              ))
-                            : Row(
-                                children: [
-                                  Expanded(
-                                      child: TextFormField(
-                                    controller: messageController,
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      hintText:
-                                          "Вы не являетесь участником встречи",
-                                      hintStyle: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  )),
-                                  TextButton(
-                                      onPressed: () {
-                                        joinUser(firebaseAuth.currentUser!.uid,
-                                            widget.groupId);
-                                        setState(() {
-                                          is_user_join = true;
-                                        });
-                                        messageController.text =
-                                            "${firebaseAuth.currentUser!.displayName} присоединился ко встрече";
-                                        addNotification();
-                                        getAndSetMessages();
-                                        messageController.text = "";
-                                      },
-                                      child: const Text(
-                                        'Присоедениться',
-                                        style:
-                                            TextStyle(color: Colors.blueAccent),
-                                      ))
-                                ],
-                              ),
-                  ),
-                )
-                // chat messages here
-              ],
-            ),
+                              }
+                            },
+                            child: const Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
+                          )
+                        ])
+                      : isMeKicked
+                          ?
+                      messagePanel("Вы были исключены из встречи")
+                          : Row(
+                              children: [
+                                Expanded(
+                                    child: TextFormField(
+                                  controller: messageController,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: const InputDecoration(
+                                    hintText:
+                                        "Вы не являетесь участником встречи",
+                                    hintStyle: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                )),
+                                TextButton(
+                                    onPressed: () {
+                                      joinUser(firebaseAuth.currentUser!.uid,
+                                          widget.groupId);
+                                      setState(() {
+                                        is_user_join = true;
+                                      });
+                                      messageController.text =
+                                          "${firebaseAuth.currentUser!.displayName} присоединился ко встрече";
+                                      addNotification();
+                                      getAndSetMessages();
+                                      messageController.text = "";
+                                    },
+                                    child: const Text(
+                                      'Присоедениться',
+                                      style:
+                                          TextStyle(color: Colors.blueAccent),
+                                    ))
+                              ],
+                            ),
+                ),
+              )
+              // chat messages here
+            ],
           ),
         ),
       ],
     );
   }
 
-  switchNotification() async {
+  Widget messagePanel(String msg){
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 40,
+      color: Colors.grey[700],
+      child: Text(msg, style: const TextStyle(color: Colors.white),),
+    );
+  }
+
+  void switchNotification() async {
     String myUID = firebaseAuth.currentUser!.uid;
     setState(() {
       if (isNotificationOff) {
@@ -362,6 +480,7 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         userWOutN.add(myUID);
       }
+      isNotificationOff = !isNotificationOff;
     });
 
     await firebaseFirestore
@@ -373,7 +492,7 @@ class _ChatPageState extends State<ChatPage> {
         "Уведомления ${isNotificationOff ? "выключены" : "включены"}");
   }
 
-  getOutFromChat() async {
+  void getOutFromChat() async {
     var chat = firebaseFirestore.collection('meets').doc(widget.groupId);
 
     String myId = firebaseAuth.currentUser!.uid;
@@ -400,7 +519,7 @@ class _ChatPageState extends State<ChatPage> {
     nextScreenReplace(context, const MeetingPage());
   }
 
-  getAndSetMessages() async {
+  void getAndSetMessages() async {
     if (is_user_join) {
       chats = await DatabaseService().getGroupMessages(widget.groupId);
     } else {
@@ -410,51 +529,76 @@ class _ChatPageState extends State<ChatPage> {
           .collection('removed_meets')
           .doc(widget.groupId)
           .collection('messages')
-          .orderBy('time')
+          .orderBy('time', descending: true)
           .snapshots();
     }
     setState(() {});
   }
 
-  getUsers() async {
+  Future getUsers() async {
+    awaitUsers = true;
     DocumentReference meet =
         firebaseFirestore.collection('meets').doc(widget.groupId);
     users_in_meet = meet.snapshots();
     DocumentSnapshot data = await meet.get();
     Map mapData = data.data() as Map;
+    for (int i = 0; i < mapData['users'].length; i++) {
+      var user = await firebaseFirestore
+          .collection('users')
+          .doc(mapData['users'][i])
+          .get();
+      if (user.data() == null) continue;
+      user_info.add(UserInfo(
+        user['fullName'],
+        user['age'].toString(),
+        user['city'],
+        user['profilePic'],
+        user['группа'],
+        user['uid'],
+        user.data() as Map,
+      ));
+    }
     userWOutN = mapData['usersWithoutNotification'] ?? [];
     checkNotification();
-    setState(() {});
+    setState(() {
+      awaitUsers = false;
+    });
   }
 
-  getUserInfo(String id) async {}
-
-  chatMessages() {
+  Widget chatMessages() {
     return StreamBuilder(
       stream: chats,
       builder: (context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
+                controller: ScrollController(),
+                reverse: true,
                 padding: const EdgeInsets.only(bottom: 70, top: 16),
-                itemExtent: 70,
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
+                  UserInfo senderData = UserInfo("", "", "", "", "", "", {});
+                  if (!awaitUsers) {
+                    for (int i = 0; i < user_info.length; i++) {
+                      if (user_info[i].uid ==
+                          snapshot.data.docs[index]['sender']) {
+                        senderData = user_info[i];
+                        break;
+                      }else{
+                      }
+                    }
+                  }
                   return MessageTile(
+                    avatar: user_info.isNotEmpty
+                        ? userImageWithCircle(
+                            senderData.image_url, senderData.group, 50.0, 50.0)
+                        : Container(),
+                    name: snapshot.data.docs[index]['name'],
+                    sender: snapshot.data.docs[index]['sender'],
                     chatId: widget.groupId,
                     message: snapshot.data.docs[index],
-                    sender: snapshot.data.docs[index]['sender'],
-                    name: snapshot.data.docs[index]['name'],
                     sentByMe: firebaseAuth.currentUser!.uid ==
                         snapshot.data.docs[index]['sender'],
                     isRead: true,
-                    avatar: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CachedNetworkImage(
-                          imageUrl: snapshot.data.docs[index]['avatar'],
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        )),
                     isChat: false,
                   );
                 },
@@ -464,111 +608,52 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  listUsers(context, StateSetter setState) {
-    List users = widget.users;
-    return StreamBuilder(
-        stream: users_in_meet,
-        builder: (context, AsyncSnapshot snapshot) {
-          return ListView.builder(
-              itemCount: users.length,
-              itemExtent: 80,
-              itemBuilder: (context, index) {
-                return Card(
-                  color: Colors.white60,
-                  child: ListTile(
-                    onTap: () async {
-                      UserInfo user = user_info[index];
-                      nextScreen(
-                          context,
-                          SomebodyProfile(
-                              uid: user.uid,
-                              photoUrl: user.image_url,
-                              name: user.name,
-                              userInfo: user.userInfo.data() as Map));
-                    },
-                    trailing: isMeAdmin &&
-                            users[index] != firebaseAuth.currentUser!.uid
-                        ? IconButton(
-                            onPressed: () async {
-                              var doc = await firebaseFirestore
-                                  .collection('meets')
-                                  .doc(widget.groupId)
-                                  .get()
-                                  .then((doc) => doc.data());
-                              List kicked = doc?['kicked'] ?? [];
-                              kicked.add(users[index]);
-                              users.removeAt(index);
-                              user_info.removeAt(index);
-                              firebaseFirestore
-                                  .collection('meets')
-                                  .doc(widget.groupId)
-                                  .update({'users': users, 'kicked': kicked});
-                            },
-                            icon: const Icon(Icons.delete))
-                        : null,
-                    title: Text(user_info[index].name),
-                    subtitle: Row(
-                      children: [
-                        int.parse(user_info[index].age) % 10 == 0
-                            ? Text('${user_info[index].age} лет')
-                            : int.parse(user_info[index].age) % 10 == 1
-                                ? Text('${user_info[index].age} год')
-                                : int.parse(user_info[index].age) % 10 != 5
-                                    ? Text('${user_info[index].age} года')
-                                    : Text('${user_info[index].age} лет'),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            "Город ${user_info[index].city}",
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        )
-                      ],
-                    ),
-                    leading: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(200),
-                              child: userImageWithCircle(
-                                  user_info[index].image_url,
-                                  user_info[index].group,
-                                  60.0,
-                                  60.0))),
-                    ),
-                    dense: false,
-                  ),
-                );
-              });
-        });
-  }
-
-  sendMessage() async {
+  void sendMessage() async {
     DocumentSnapshot doc = await firebaseFirestore
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .get();
     String name = doc.get('fullName');
-    if (messageController.text.isNotEmpty) {
-      Map<String, dynamic> chatMessageMap = {
-        "message": messageController.text,
-        "sender": firebaseAuth.currentUser!.uid,
-        "avatar": firebaseAuth.currentUser!.photoURL,
-        "group": doc.get('группа'),
-        'name': name,
-        "time": DateTime.now(),
-      };
+    Map<String, dynamic> chatMessageMap = {
+      "message": messageController.text,
+      "sender": firebaseAuth.currentUser!.uid,
+      "avatar": firebaseAuth.currentUser!.photoURL,
+      "group": doc.get('группа'),
+      'name': name,
+      "time": DateTime.now(),
+    };
 
-      DatabaseService().sendMessageGroup(widget.groupId, chatMessageMap);
-      setState(() {
-        messageController.clear();
-      });
+    DatabaseService().sendMessageGroup(widget.groupId, chatMessageMap);
+    if (!awaitUsers) {
+      addNotification();
+    }
+    setState(() {
+      messageController.clear();
+    });
+  }
+
+  void addNotification() async {
+    List users = widget.users;
+    users.removeWhere((element) => element == firebaseAuth.currentUser!.uid);
+    Map notification = {
+      'isChat': false,
+      'groupId': widget.groupId,
+      'groupName': widget.groupName,
+      'users': widget.users,
+      'isUserJoin': widget.is_user_join,
+      'message':
+          '${firebaseAuth.currentUser!.displayName}: ${messageController.text}',
+    };
+    String token = "";
+
+    for (int i = 0; i < users.length; i++) {
+      if (!userWOutN.contains(users[i])) {
+        var doc =
+            await firebaseFirestore.collection('TOKENS').doc(users[i]).get();
+        token = doc.get('token');
+        NotificationsService().sendPushMessageGroup(
+            token, notification, widget.groupName, 1, widget.groupId);
+      }
     }
   }
 
@@ -576,7 +661,7 @@ class _ChatPageState extends State<ChatPage> {
     return Future.value(false);
   }
 
-  joinUser(String uid, String groupID) {
+  void joinUser(String uid, String groupID) {
     widget.users.add(uid);
     firebaseFirestore
         .collection('meets')

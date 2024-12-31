@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/pages/about_meet.dart';
@@ -27,9 +28,6 @@ class _HomePageState extends State<HomePage> {
   AuthService authService = AuthService();
 
   Stream? chatRoomsStream;
-
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
 
   getChatRooms() async {
     chatRoomsStream = await DatabaseService().getChatRooms();
@@ -57,64 +55,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   initInfo() {
-    const AndroidInitializationSettings('@mipmap/launcher_icon');
-    const DarwinInitializationSettings();
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
-        message.notification!.body.toString(),
-        htmlFormatBigText: true,
-        contentTitle: message.notification!.title.toString(),
-        htmlFormatContentTitle: true,
-      );
-
-      AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails('wbrs', 'wbrs',
-              importance: Importance.max,
-              styleInformation: bigTextStyleInformation,
-              priority: Priority.max,
-              playSound: true);
-
-      NotificationDetails platformChannelSpecifics =
-          NotificationDetails(android: androidNotificationDetails);
-
-      try {
-        await flutterLocalNotificationsPlugin.show(
-            0,
-            message.notification?.title,
-            message.notification?.body,
-            platformChannelSpecifics,
-            payload: message.notification!.body);
-      } on Exception catch (e) {
-        showSnackbar(context, Colors.red, e);
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      Map body = jsonDecode(message.data['payload']);
-      if (body['isChat'] == true) {
-        nextScreenReplace(
-            context,
-            ChatScreen(
-              chatWithUsername: body['chatWith'],
-              photoUrl: body['photoUrl'],
-              id: body['id'],
-              chatId: body['chatId'],
-            ));
-      } else {
-        body['users'] =
-            body['users'].toString().replaceAll('[', '').replaceAll(']', '');
-        List users = body['users'].toString().split(',');
-        nextScreenReplace(
-            context,
-            AboutMeet(
-              id: body['groupId'],
-              users: users,
-              name: body['groupName'],
-              is_user_join: body['isUserJoin'].toString() == 'true',
-            ));
-      }
-    });
   }
 
   void saveUserToken(String token) {

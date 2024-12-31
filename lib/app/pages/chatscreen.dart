@@ -175,9 +175,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               }
 
                               Map newDs = ds.data() as Map;
-
                               if (newDs.containsKey('')) {
                                 return MessageTile(
+                                  avatar:
+                                  anotherUserInfo.isNotEmpty
+                                  ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
+                                  : Container(),
                                   chatId: widget.chatId,
                                   sender: ds["sendBy"],
                                   name: ds["sendBy"],
@@ -194,6 +197,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                   if (ds["deleteFor"] !=
                                       firebaseAuth.currentUser!.uid) {
                                     return MessageTile(
+                                      avatar:
+                                      anotherUserInfo.isNotEmpty
+                                          ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
+                                          : Container(),
                                       chatId: widget.chatId,
                                       sender: ds["sendBy"],
                                       name: ds["sendBy"],
@@ -209,6 +216,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                   }
                                 } else {
                                   return MessageTile(
+                                    avatar:
+                                    anotherUserInfo.isNotEmpty
+                                        ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
+                                        : Container(),
                                     chatId: widget.chatId,
                                     sender: ds["sendBy"],
                                     name: ds["sendBy"],
@@ -249,11 +260,11 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  getAndSetMessages() async {
+  void getAndSetMessages() async {
     messageStream = await DatabaseService().getChatRoomMessages(widget.chatId);
   }
 
-  doThisOnLaunch() async {
+  void doThisOnLaunch() async {
     DocumentSnapshot snap =
         await firebaseFirestore.collection('users').doc(widget.id).get();
     setState(() {
@@ -263,7 +274,7 @@ class _ChatScreenState extends State<ChatScreen> {
     getAndSetMessages();
   }
 
-  chatWith_Update(String id) async {
+  void chatWith_Update(String id) async {
     String myId = firebaseAuth.currentUser!.uid;
     await firebaseFirestore
         .collection('users')
@@ -320,7 +331,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final ScrollController _scrollController = ScrollController();
 
-  switchNotification() async {
+  void switchNotification() async {
     String myUID = firebaseAuth.currentUser!.uid;
     setState(() {
       if (!isNotificationEnable) {
@@ -507,7 +518,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  uploadFile(String filePath) async {
+  Future<String> uploadFile(String filePath) async {
     File file = File(filePath);
     var storage = FirebaseStorage.instance;
     String ref = '${widget.id}/${DateTime.now().toString()}.jpg';

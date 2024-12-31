@@ -369,7 +369,7 @@ class _FilterPage2State extends State<FilterPage2> {
                       ageStart = int.parse(filtrAgeStart.text);
                       ageEnd = int.parse(filtrAgeEnd.text);
                       nextScreenReplace(
-                          context, ProfilesList(startPosition: 0, group: x));
+                          context, ProfilesList(startPosition: 0, group:filterByGroup? x : ''));
                     });
                   },
                   child: const Text('Применить фильтры',

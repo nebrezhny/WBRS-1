@@ -35,7 +35,7 @@ class DatabaseService {
       "email": email,
       "chats": [],
       'balance': 27,
-      "profilePic": "",
+      "profilePic": firebaseAuth.currentUser!.photoURL,
       "uid": uid,
       "age": age,
       "rost": rost,
@@ -48,18 +48,23 @@ class DatabaseService {
       "images": [],
       "pol": pol,
       "группа": "",
+      "isUnVisible": false,
+      "lastOnlineTS": DateTime.now().millisecondsSinceEpoch,
+      "online": true,
+      "status": "active"
     });
   }
 
   Future updateUserData(String fullName, String email, int age, String about,
-      String hobbi, String city) async {
+      String hobbi, String city, bool deti) async {
     return await userCollection.doc(firebaseAuth.currentUser!.uid).update({
       "fullName": fullName,
       "email": email,
       "age": age,
       "about": about,
       "hobbi": hobbi,
-      "city": city
+      "city": city,
+      "deti": deti
     });
   }
 
@@ -206,7 +211,7 @@ class DatabaseService {
         .collection("meets")
         .doc(chatRoomId)
         .collection("messages")
-        .orderBy('time', descending: false)
+        .orderBy('time', descending: true)
         .snapshots();
   }
 

@@ -3,6 +3,7 @@ import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/login_page.dart';
 import 'package:wbrs/app/pages/auth/writing_data_user.dart';
+import 'package:wbrs/app/pages/policy/confidecialnost.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -183,6 +184,29 @@ class _RegisterPageState extends State<RegisterPage> {
                                 },
                               ),
                             ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text.rich(
+                              textAlign: TextAlign.center,
+                              TextSpan(
+                                text: "Нажимая кнопку 'зарегистрироваться', вы подтверждаете , что согласны с ",
+                                style: const TextStyle(
+                                    color: Colors.white),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: "политикой конфиденциальности и пользовательским соглашением",
+                                      style: const TextStyle(
+                                          color: Colors.blue,
+                                          decoration:
+                                              TextDecoration.underline),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          nextScreen(context,
+                                              const Politica());
+                                        }),
+                                ]
+                            )),
                             const SizedBox(
                               height: 10,
                             ),

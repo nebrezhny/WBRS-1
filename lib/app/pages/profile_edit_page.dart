@@ -84,6 +84,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     about!.text = widget.about;
     hobbi!.text = widget.hobbi;
     city!.text = widget.city;
+    deti = widget.deti ? 'да' : 'нет';
   }
 
   @override
@@ -242,33 +243,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           .add({
                                         'url': downloadUrl,
                                       }).then((value) => print("done"));
-
-                                      var chats = await FirebaseFirestore
-                                          .instance
-                                          .collection('chats')
-                                          .get();
-
-                                      for (int i = 0; i < chats.size; i++) {
-                                        if (chats.docs[i]['user1'] ==
-                                            FirebaseAuth
-                                                .instance.currentUser!.uid) {
-                                          db
-                                              .collection('chats')
-                                              .doc(chats.docs[i].id)
-                                              .update(
-                                                  {'user1_image': downloadUrl});
-                                        } else if (chats.docs[i]['user2'] ==
-                                            FirebaseAuth
-                                                .instance.currentUser!.uid) {
-                                          db
-                                              .collection('chats')
-                                              .doc(chats.docs[i].id)
-                                              .update(
-                                                  {'user2_image': downloadUrl});
-                                        } else {
-                                          null;
-                                        }
-                                      }
                                       updateVisiterImage(downloadUrl);
                                     }
                                   },
@@ -297,7 +271,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -346,7 +320,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -394,7 +368,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -441,7 +415,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -490,7 +464,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -540,7 +514,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -663,7 +637,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: white70,
+                                color: grey,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8)),
                               ),
@@ -688,7 +662,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           .map((String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
-                                          child: Text(value),
+                                          child: Text(value, style: const TextStyle(color: Colors.white),),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
@@ -705,7 +679,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         "нет",
                                         style: TextStyle(color: Colors.white),
                                       ),
-                                      dropdownColor: Colors.white,
+                                      dropdownColor: darkGrey,
                                     ),
                                   ),
                                 ],
@@ -747,14 +721,23 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     null;
                                   }
                                 }
+                                bool haveDeti = widget.deti;
                                 setState(() {
+                                  if(deti != null && deti == 'да')
+                                  {
+                                    haveDeti = true;
+                                  }else{
+                                    haveDeti = false;
+                                  }
+                                  GlobalDeti = haveDeti;
                                   DatabaseService().updateUserData(
                                       widget.userName,
                                       widget.email,
                                       int.parse(widget.age),
                                       widget.about,
                                       widget.hobbi,
-                                      city!.text);
+                                      city!.text,
+                                      haveDeti);
                                   firebaseAuth.currentUser!
                                       .updateDisplayName(widget.userName);
                                   global.GlobalAge = widget.age;
@@ -770,7 +753,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       about: widget.about,
                                       age: widget.age,
                                       hobbi: widget.hobbi,
-                                      deti: widget.deti,
+                                      deti: haveDeti,
                                       city: city!.text,
                                       rost: widget.rost,
                                       pol: GlobalPol.toString(),
@@ -835,38 +818,40 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
 
                                                       List chatsId = [];
 
-                                                      await db
-                                                          .collection('chats')
-                                                          .where(Filter.or(
-                                                              Filter('user1',
-                                                                  isEqualTo:
-                                                                      currentUser
-                                                                          .uid),
-                                                              Filter('user2',
-                                                                  isEqualTo:
-                                                                      currentUser
-                                                                          .uid)))
-                                                          .get()
-                                                          .then((value) {
-                                                        setState(() {
-                                                          chatsId.add(value
-                                                              .docs[0]
-                                                              .data());
-                                                        });
-                                                      });
-
-                                                      for (int i = 0;
-                                                          i < chatsId.length;
-                                                          i++) {
-                                                        db
-                                                            .collection(
-                                                                'removedChats')
-                                                            .add(chatsId[i]);
-                                                        db
+                                                      if(chatsId.isNotEmpty){
+                                                        await db
                                                             .collection('chats')
-                                                            .doc(chatsId[i]
-                                                                ['chatId'])
-                                                            .delete();
+                                                            .where(Filter.or(
+                                                            Filter('user1',
+                                                                isEqualTo:
+                                                                currentUser
+                                                                    .uid),
+                                                            Filter('user2',
+                                                                isEqualTo:
+                                                                currentUser
+                                                                    .uid)))
+                                                            .get()
+                                                            .then((value) {
+                                                          setState(() {
+                                                            chatsId.add(value
+                                                                .docs[0]
+                                                                .data());
+                                                          });
+                                                        });
+
+                                                        for (int i = 0;
+                                                        i < chatsId.length;
+                                                        i++) {
+                                                          db
+                                                              .collection(
+                                                              'removedChats')
+                                                              .add(chatsId[i]);
+                                                          db
+                                                              .collection('chats')
+                                                              .doc(chatsId[i]
+                                                          ['chatId'])
+                                                              .delete();
+                                                        }
                                                       }
 
                                                       currentUser.delete();
@@ -875,7 +860,10 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                           .collection('users')
                                                           .doc(currentUser.uid)
                                                           .delete();
+                                                      firebaseAuth.currentUser!
+                                                          .delete();
 
+                                                      AuthService().signOut();
                                                       nextScreenReplace(context,
                                                           const LoginPage());
                                                     },

@@ -38,6 +38,9 @@ class _ProfilesListState extends State<ProfilesList> {
         .where('uid', isNotEqualTo: firebaseAuth.currentUser!.uid)
         .where('age', isGreaterThanOrEqualTo: ageStart)
         .where('age', isLessThanOrEqualTo: ageEnd);
+    if(widget.group != '' && filterByGroup) {
+      query = query.where('группа', whereIn: getListOfGroup(widget.group));
+    }
     if(filterCity.text != '') {
       query = query.where('city', isEqualTo: filterCity.text);
     }
@@ -118,6 +121,11 @@ class _ProfilesListState extends State<ProfilesList> {
         ? snapshot.length - widget.startPosition
         : 15;
 
+    int circlesCount = (snapshot.length / 15).round();
+    if(snapshot.length / 15 > circlesCount){
+      circlesCount++;
+    }
+
     return Column(
       children: [
         const FilterPage2(),
@@ -151,7 +159,7 @@ class _ProfilesListState extends State<ProfilesList> {
               },
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: (snapshot.length / 15).round(),
+              itemCount: circlesCount,
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
@@ -214,4 +222,94 @@ Widget _buildUserCardContent(Map user, BuildContext context) {
       ],
     ),
   );
+}
+
+List getListOfGroup(String group) {
+  switch (group) {
+    case "коричнево-красная" ||
+    "коричнево-синяя" ||
+    "коричневая" ||
+    "коричнево-белая":
+      return [
+        "коричнево-красная",
+        "коричнево-синяя",
+        "коричневая",
+        "коричнево-белая",
+        "бело-коричневая",
+        "бело-красная",
+        "бело-синяя",
+        "белая",
+        "сине-белая"
+      ];
+
+    case "красно-синяя" || "красно-белая" || "красная":
+      return [
+        "синяя",
+        "сине-коричневая",
+      ];
+
+    case "красно-коричневая":
+      return [
+        "коричнево-белая",
+        "сине-белая",
+        "бело-коричневая",
+        "бело-красная",
+        "бело-синяя",
+        "белая",
+      ];
+
+    case "коричнево-белая":
+      return [
+        "коричнево-красная",
+        "коричнево-синяя",
+        "коричневая",
+        "коричнево-белая",
+        "бело-коричневая",
+        "бело-красная",
+        "бело-синяя",
+        "белая",
+        "сине-белая",
+        "красно-коричневая",
+      ];
+
+    case "синяя" || "сине-коричневая":
+      return [
+        "красная",
+        "красно-белая",
+        "сине-красная",
+        "красно-синяя",
+      ];
+
+    case "сине-белая":
+      return [
+        "коричнево-красная",
+        "коричнево-синяя",
+        "коричневая",
+        "коричнево-белая",
+        "бело-коричневая",
+        "бело-красная",
+        "бело-синяя",
+        "белая",
+        "красно-коричневая",
+      ];
+
+    case "сине-красная":
+      return [
+        "синяя",
+        "сине-коричневая",
+      ];
+
+    case "бело-красная" || "бело-синяя" || "белая" || "бело-коричневая":
+      return [
+        "коричнево-красная",
+        "коричнево-синяя",
+        "коричневая",
+        "коричнево-белая",
+        "сине-белая",
+        "красно-коричневая",
+      ];
+
+    default:
+      return [];
+  }
 }

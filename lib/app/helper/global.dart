@@ -28,6 +28,7 @@ int selectedIndex = 1;
 String FiltrPol = "";
 int ageStart = 18, ageEnd = 100;
 TextEditingController filterCity = TextEditingController();
+String meetCity = '';
 bool filterByGroup = false;
 
 bool imageStream = true;

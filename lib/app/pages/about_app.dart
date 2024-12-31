@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/pages/policy/confidecialnost.dart';
+import 'package:wbrs/app/pages/policy/soglashenie.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
@@ -13,19 +14,12 @@ class About_App extends StatelessWidget {
     return MaterialApp(
       home: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Colors.green,
-              )
-            ]),
-            child: Image.asset(
-              "assets/fon.jpg",
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              scale: 0.6,
-            ),
+          Image.asset(
+            "assets/fon.jpg",
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+            scale: 0.6,
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
@@ -45,14 +39,16 @@ class About_App extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      nextScreenReplace(context, const Politica());
+                      nextScreen(context, const Politica());
                     },
                     style: const ButtonStyle(
+                      padding: WidgetStatePropertyAll(EdgeInsets.all(15)),
                         backgroundColor:
                             WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
-                      'Политика конфиденциальности',
-                      style: TextStyle(fontSize: 18),
+                      'Политика конфиденциальности и обработки персональных данных',
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400),
+                      textAlign: TextAlign.left,
                     ),
                   ),
                   const Divider(
@@ -61,14 +57,19 @@ class About_App extends StatelessWidget {
                     thickness: 1,
                   ),
                   ElevatedButton(
-                      onPressed: () {},
-                      style: const ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Colors.transparent)),
-                      child: const Text(
-                        'Пользовательское соглашение',
-                        style: TextStyle(fontSize: 18),
-                      )),
+                    onPressed: () {
+                      nextScreen(context, const Rules(  ));
+                    },
+                    style: const ButtonStyle(
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(15)),
+                        backgroundColor:
+                        WidgetStatePropertyAll(Colors.transparent)),
+                    child: const Text(
+                      'Правила использования приложения',
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
                   const Divider(
                     height: 5,
                     color: Colors.white,

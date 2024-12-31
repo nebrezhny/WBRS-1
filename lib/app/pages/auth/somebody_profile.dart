@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/chatscreen.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/shop.dart';
+import 'package:wbrs/app/widgets/fullscreen_image_slider.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
@@ -62,7 +64,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
     var MyUserInfo =
         await db.collection('users').doc(firebaseAuth.currentUser!.uid).get();
 
-    if (!MyUserInfo.data()!['isUnVisible']) {
+    if (!MyUserInfo.data()!['isUnVisible']!) {
       if (!doc.exists) {
         firebaseFirestore
             .collection('users')
@@ -345,48 +347,35 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     style: TextStyle(color: Colors.white),
                                   )
                                 : SizedBox(
-                                    height: 140,
+                                    height:
+                                        MediaQuery.of(context).size.width / 2,
                                     width: MediaQuery.of(context).size.width,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemBuilder: (BuildContext BuildContext,
-                                          int index) {
-                                        return Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(15),
-                                                  bottomLeft:
-                                                      Radius.circular(15))),
-                                          width: 140,
-                                          child: InkWell(
-                                              radius: 15,
-                                              onTap: () {
-                                                openImage(index, images);
-                                              },
-                                              child: Container(
-                                                decoration: const BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(15)),
-                                                ),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  child: CachedNetworkImage(
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          const SizedBox
-                                                              .shrink(),
-                                                      imageUrl: images[index],
-                                                      fit: BoxFit.cover),
-                                                ),
-                                              )),
-                                        );
-                                      },
-                                      itemCount: images.length,
-                                    ),
+                                    child: CarouselSlider(
+                                        items: images
+                                            .map((item) => GestureDetector(
+                                                  onTap: () {
+                                                    int initPage =
+                                                        images.indexOf(item);
+                                                    nextScreen(
+                                                        context,
+                                                        FullscreenSliderDemo(
+                                                            imgList: images,
+                                                            initialPage:
+                                                                initPage));
+                                                  },
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: item,
+                                                      fit: BoxFit.cover,
+                                                      width: 250,
+                                                      height: 250,
+                                                    ),
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        options: CarouselOptions(
+                                            enableInfiniteScroll: false)),
                                   ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -726,9 +715,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                 image: NetworkImage(
                   urls[index],
                 ),
-                fit: BoxFit.fitWidth),
+                fit: BoxFit.fitHeight),
           ),
-          height: MediaQuery.of(context).size.height / 1.5,
+          height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/register_page.dart';
@@ -263,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(
-                                height: 10,
+                                height: 30,
                               ),
                               Text.rich(TextSpan(
                                 text: "Нет аккаунта? ",
@@ -370,12 +371,30 @@ class _LoginPageState extends State<LoginPage> {
             selectedIndex = 1;
             await HelperFunctions.saveUserLoggedInStatus(true);
             if (context.mounted) {
-              await firebaseFirestore
-                  .collection('users')
-                  .doc(firebaseAuth.currentUser!.uid)
-                  .update({'online': value});
-              showSnackbar(context, Colors.green, 'Вы авторизовались');
-              nextScreenReplace(context, const HomePage());
+                DocumentSnapshot data = await firebaseFirestore
+                    .collection('users')
+                    .doc(firebaseAuth.currentUser!.uid)
+                    .get();
+
+                if (data.exists) {
+                  if(data.get('status') == 'blocked') {
+                    showSnackbar(context, Colors.red, 'Ваш аккаунт заблокирован');
+                    await firebaseAuth.signOut();
+                    nextScreenReplace(context, const LoginPage());
+                  }else{
+                    await firebaseFirestore
+                        .collection('users')
+                        .doc(firebaseAuth.currentUser!.uid)
+                        .update({'online': value});
+                    showSnackbar(context, Colors.green, 'Вы авторизовались');
+                    nextScreenReplace(context, const HomePage());
+                  }
+                } else {
+                  await firebaseAuth.currentUser!.delete();
+                  showSnackbar(context, Colors.red, 'Ваш аккаунт удален');
+                  nextScreenReplace(context, const LoginPage());
+                }
+
             }
           } else {
             showSnackbar(context, Colors.red, value);

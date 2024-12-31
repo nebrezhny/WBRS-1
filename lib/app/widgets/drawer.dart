@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/about_app.dart';
+import 'package:wbrs/app/pages/admin/panel.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/meetings.dart';
 import 'package:wbrs/app/pages/shop.dart';
@@ -27,9 +28,9 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  var userName;
-  var email;
-  var currentUser;
+  String? userName;
+  String? email;
+  User? currentUser;
 
   FirebaseAuth auth = firebaseAuth;
   get uid => auth.currentUser!.uid;
@@ -37,7 +38,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
   Stream? groups;
   String groupName = "";
-  var displayName;
+  String? displayName;
 
   @override
   void initState() {
@@ -96,32 +97,7 @@ class _MyDrawerState extends State<MyDrawer> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () async {
-                    setState(() {
-                      selectedIndex = 0;
-                    });
-                    var x = await getUserGroup();
-
-                    var doc = await firebaseFirestore
-                        .collection('users')
-                        .doc(firebaseAuth.currentUser!.uid)
-                        .get();
-
-                    nextScreenReplace(
-                        context,
-                        ProfilePage(
-                          group: x,
-                          email: firebaseAuth.currentUser!.email.toString(),
-                          userName: FirebaseAuth
-                              .instance.currentUser!.displayName
-                              .toString(),
-                          about: doc.get('about'),
-                          age: doc.get('age').toString(),
-                          rost: doc.get('rost'),
-                          hobbi: doc.get('hobbi'),
-                          city: doc.get('city'),
-                          deti: doc.get('deti'),
-                          pol: doc.get('pol'),
-                        ));
+                    goToProfile(context);
                   },
                   child: Column(
                     children: [
@@ -147,7 +123,7 @@ class _MyDrawerState extends State<MyDrawer> {
                             height: 15,
                           ),
                           Text(
-                            userName,
+                            userName!,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -178,6 +154,16 @@ class _MyDrawerState extends State<MyDrawer> {
                     nextScreen(context, const FirstGroupRed());
                   },
                 ),
+                GestureDetector(
+                  onTap: (){
+                    showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.transparent,
+                    child: const Text('Поддержать проект  ❤️🫴', textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                  ),
+                ),
                 ListTile(
                   onTap: () {
                     setState(() {
@@ -194,63 +180,6 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   title: const Text(
                     "Чаты",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                ListTile(
-                  onTap: () async {
-                    bool isLoading = true;
-                    setState(() {
-                      selectedIndex = 0;
-                      isLoading = true;
-                    });
-                    nextScreenReplace(context, const SplashScreen());
-                    DocumentSnapshot doc = await firebaseFirestore
-                        .collection('users')
-                        .doc(uid)
-                        .get();
-                    Images = doc.get('images');
-                    CountImages = Images.length;
-                    setState(() {
-                      isLoading = false;
-                    });
-
-                    if (isLoading) {
-                      nextScreenReplace(context, const SplashScreen());
-                    } else {
-                      var x = await getUserGroup();
-
-                      var doc = await firebaseFirestore
-                          .collection('users')
-                          .doc(firebaseAuth.currentUser!.uid)
-                          .get();
-
-                      nextScreenReplace(
-                          context,
-                          ProfilePage(
-                            group: x,
-                            email: firebaseAuth.currentUser!.email.toString(),
-                            userName: FirebaseAuth
-                                .instance.currentUser!.displayName
-                                .toString(),
-                            about: doc.get('about'),
-                            age: doc.get('age').toString(),
-                            rost: doc.get('rost'),
-                            hobbi: doc.get('hobbi'),
-                            city: doc.get('city'),
-                            deti: doc.get('deti'),
-                            pol: doc.get('pol'),
-                          ));
-                    }
-                  },
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  leading: const Icon(
-                    Icons.person,
-                    color: Colors.grey,
-                  ),
-                  title: const Text(
-                    "Профиль",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -353,6 +282,23 @@ class _MyDrawerState extends State<MyDrawer> {
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 ),
+                const Divider(
+                  color: Colors.grey,
+                ),
+                if(['T4zb6OLzDgMh0qrfp3eEahNKmNl1',
+                'lyNcv2xr33Ms6G9fI0bhBEcDKFj2', 'vLeB8v4b1pUL8h5dtxJSkifF2v72'].contains(firebaseAuth.currentUser!.uid))
+                ListTile(
+                  onTap:()=> nextScreenReplace(context, const AdminPanel()) ,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  leading: const Icon(
+                    Icons.admin_panel_settings_outlined,
+                    color: Colors.grey,
+                  ),
+                  title: const Text(
+                    "Панель для админа",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
                 ListTile(
                   onTap: () async {
                     showDialog(
@@ -360,19 +306,23 @@ class _MyDrawerState extends State<MyDrawer> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
+                            backgroundColor: darkGrey,
+                            elevation: 0.0,
+                            titleTextStyle: const TextStyle(color: Colors.white),
+                            contentTextStyle: const TextStyle(color: Colors.white),
                             title: const Text("Выйти"),
                             content: const Text("Вы уверены что хотите выйти?"),
                             actions: [
-                              IconButton(
+                              TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                icon: const Icon(
-                                  Icons.cancel,
-                                  color: Colors.red,
+                                child: const Text(
+                                  "Нет",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                              IconButton(
+                              TextButton(
                                 onPressed: () async {
                                   firebaseFirestore
                                       .collection('TOKENS')
@@ -390,9 +340,9 @@ class _MyDrawerState extends State<MyDrawer> {
                                               const LoginPage()),
                                       (route) => false);
                                 },
-                                icon: const Icon(
-                                  Icons.done,
-                                  color: Colors.green,
+                                child: const Text(
+                                  "Да",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ],
@@ -417,5 +367,34 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
       ],
     );
+  }
+
+  goToProfile(context) async {
+    setState(() {
+      selectedIndex = 0;
+    });
+    var x = await getUserGroup();
+
+    var doc = await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .get();
+
+    nextScreenReplace(
+        context,
+        ProfilePage(
+          group: x,
+          email: firebaseAuth.currentUser!.email.toString(),
+          userName: FirebaseAuth
+              .instance.currentUser!.displayName
+              .toString(),
+          about: doc.get('about'),
+          age: doc.get('age').toString(),
+          rost: doc.get('rost'),
+          hobbi: doc.get('hobbi'),
+          city: doc.get('city'),
+          deti: doc.get('deti'),
+          pol: doc.get('pol'),
+        ));
   }
 }

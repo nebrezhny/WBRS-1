@@ -130,11 +130,17 @@ class _ProfilePageState extends State<ProfilePage> {
               IconButton(
                 onPressed: () {
                   showModalBottomSheet(
+                    backgroundColor: darkGrey,
                       context: context,
                       builder: (context) {
                         return Container(
                           height: MediaQuery.of(context).size.height,
                           padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20))),
                           child: Container(
                             padding: EdgeInsets.only(
                                 bottom:
@@ -148,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     obscureText: true,
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Colors.white),
                                         labelText: "Введите пароль",
                                         prefixIcon: Icon(
                                           Icons.lock,
@@ -175,7 +181,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     obscureText: true,
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
-                                            color: Colors.black),
+                                            color: Colors.white),
                                         labelText: "Повторите пароль",
                                         prefixIcon: Icon(
                                           Icons.lock,
@@ -219,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: const Text(
                                         "Сменить пароль",
                                         style: TextStyle(
-                                            color: Colors.orangeAccent),
+                                            color: Colors.white),
                                       )),
                                 ]),
                               ),
@@ -254,12 +260,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                           Stack(
                             children: [
-                              userImageWithCircle(
-                                  (currentUser!.photoURL == "" ||
-                                          currentUser!.photoURL == null)
-                                      ? "assets/profile.png"
-                                      : currentUser!.photoURL.toString(),
-                                  widget.group),
+                              StreamBuilder(stream: firebaseFirestore.collection('users').doc(currentUser!.uid).snapshots(), builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return userImageWithCircle(snapshot.data!['profilePic'], widget.group);
+                                } else {
+                                  return userImageWithCircle(currentUser!.photoURL, widget.group);
+                                }
+                              }),
                             ],
                           ),
                           const SizedBox(
@@ -569,23 +576,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 300,
                   child: InkWell(
                       onTap: () {
-                        nextScreenReplace(
+                        nextScreen(
                             context,
                             ShowImage(
                               urls: urls,
                               initList: initList,
                               index: index,
                               snapshot: snapshot,
-                              userName: widget.userName,
-                              group: widget.group,
-                              email: widget.email,
-                              about: widget.about,
-                              age: widget.age,
-                              rost: widget.rost,
-                              city: widget.city,
-                              hobbi: widget.hobbi,
-                              deti: widget.deti,
-                              pol: widget.pol,
                             ));
                       },
                       child: Container(

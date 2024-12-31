@@ -60,6 +60,10 @@ class _ChatRoomListState extends State<ChatRoomList> {
               child: CircularProgressIndicator(),
             );
           } else {
+            String group = '';
+            if(snapshot.data!.data() != null){
+              group = snapshot.data!.get("группа");
+            }
             return ListTile(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40.0)),
@@ -140,19 +144,19 @@ class _ChatRoomListState extends State<ChatRoomList> {
                     ? widget.snapshot.get("user2_image") != ""
                         ? userImageWithCircle(
                             widget.snapshot.get("user2_image"),
-                            snapshot.data?.get('группа'),
+                            group,
                             50.0,
                             50.0)
                         : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 50.0, 50.0)
+                            '', group, 50.0, 50.0)
                     : widget.snapshot.get("user1_image") != ""
                         ? userImageWithCircle(
                             widget.snapshot.get("user1_image"),
-                            snapshot.data?.get('группа'),
+                    group,
                             50.0,
                             50.0)
                         : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 50.0, 50.0),
+                            '', group, 50.0, 50.0),
               ),
               tileColor: grey,
               contentPadding: const EdgeInsets.all(15.0),

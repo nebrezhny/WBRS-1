@@ -36,6 +36,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   String? deti;
   String? pol;
   bool Deti = false;
+  String profilePic= "";
 
   var currentUser;
   var displayName;
@@ -76,7 +77,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
             backgroundColor: Colors.orangeAccent,
           ),
           backgroundColor: Colors.transparent,
-          drawer: const MyDrawer(),
           body: SingleChildScrollView(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 37),
@@ -122,9 +122,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             height: 50,
                             child: IconButton(
                               onPressed: () async {
-                                // print(await firebaseFirestore.collection('chats').where('user2',isEqualTo: AuthName)
-                                //     .snapshots().length);
-
                                 XFile? image = await ImagePicker()
                                     .pickImage(source: ImageSource.gallery);
 
@@ -142,7 +139,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 } on FirebaseException catch (e) {
                                   e.message;
                                 }
-                                var downloadUrl = await storage
+                                String downloadUrl = await storage
                                     .ref(
                                         'avatar-${firebaseAuth.currentUser!.displayName}')
                                     .getDownloadURL();
@@ -151,10 +148,11 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 await firebaseFirestore
                                     .collection("users")
                                     .doc(firebaseAuth.currentUser!.uid)
-                                    .update({'profilePic': downloadUrl});
-
-                                firebaseAuth.currentUser!
-                                    .updatePhotoURL(downloadUrl);
+                                    .collection("images")
+                                    .add({
+                                  'url': downloadUrl,
+                                }).then((value) => print("done"));
+                                profilePic = downloadUrl.toString();
                               },
                               icon: const Icon(
                                 Icons.camera_alt_outlined,
@@ -478,17 +476,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                   const SizedBox(
                     height: 20,
                   ),
-                  // if(testIsComplete){
-                  //
-                  // }
-                  // ElevatedButton(onPressed: ()async{
-                  //   Uri url = Uri.parse('https://psytests.org/temperament/belov.html');
-                  //   if (await canLaunchUrl(url)!=true) {
-                  //     await launchUrl(url);
-                  //   } else {
-                  //     throw 'Could not launch $url';
-                  //   }
-                  // }, child: Text("Пройти тест")),
                   const SizedBox(
                     height: 20,
                   ),
@@ -549,7 +536,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             Age = false;
                           });
                         }
-                        if (deti == "" || deti == "нет") {
+                        if (deti == "" || deti == "нет" || deti == null) {
                           Deti = false;
                         } else {
                           Deti = true;
@@ -576,6 +563,10 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           displayName = "Error";
                           email = 'test4@test.ru';
                         }
+
+                        setState(() {
+                          print(Deti);
+                        });
 
                         if (city.text.isNotEmpty &&
                             age.text.isNotEmpty &&
@@ -608,6 +599,10 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                               nextScreenReplace(context, const FirstGroupRed());
                             }
                           }
+
+                          setState(() {
+
+                          });
 
                           //showSnackbar(context, Colors.green, "Успешно!");
                         }

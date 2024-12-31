@@ -88,7 +88,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
               child: Column(
                 children: [
                   const Text(
-                    "Отметьте знаком «+» те качества , которые для вас обычны и «-» если противоположны, повседневны. Итак, если вы:",
+                    "Отметьте знаком «+» те качества , которые для вас обычны, в обратном случае можете отметить знаком «-» или оставить пустым. Итак, если вы:",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                   SizedBox(

@@ -783,12 +783,12 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                         ),
                       );
                     });
-                // setState(() {
-                //   isUnvisible = !isUnvisible;
-                // });
-                // db.collection('users').doc(auth.currentUser!.uid).update({
-                //   "isUnVisible":isUnvisible
-                // });
+                setState(() {
+                  isUnvisible = !isUnvisible;
+                });
+                db.collection('users').doc(auth.currentUser!.uid).update({
+                  "isUnVisible":isUnvisible
+                });
               },
               style: ButtonStyle(
                   backgroundColor: isUnvisible
