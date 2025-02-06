@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://chatapp-4e347-default-rtdb.firebaseio.com',
     storageBucket: 'chatapp-4e347.appspot.com',
     androidClientId: '737154946294-530tiijgnp59nh2eo4f0jvbkgiq7720v.apps.googleusercontent.com',
-    iosBundleId: 'com.example.wbrs',
+    iosBundleId: 'com.wbrs',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -79,7 +79,7 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://chatapp-4e347-default-rtdb.firebaseio.com',
     storageBucket: 'chatapp-4e347.appspot.com',
     androidClientId: '737154946294-530tiijgnp59nh2eo4f0jvbkgiq7720v.apps.googleusercontent.com',
-    iosBundleId: 'com.example.wbrs',
+    iosBundleId: 'com.wbrs',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

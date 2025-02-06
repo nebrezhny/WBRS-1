@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/pages/policy/confidecialnost.dart';
+import 'package:wbrs/app/pages/policy/offer.dart';
+import 'package:wbrs/app/pages/policy/rules.dart';
 import 'package:wbrs/app/pages/policy/soglashenie.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
@@ -42,67 +44,105 @@ class About_App extends StatelessWidget {
                       nextScreen(context, const Politica());
                     },
                     style: const ButtonStyle(
-                      padding: WidgetStatePropertyAll(EdgeInsets.all(15)),
+                      padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
                             WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
-                      'Политика конфиденциальности и обработки персональных данных',
-                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400),
+                      'Политика в отношении обработки персональных данных',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),
                   const Divider(
-                    height: 5,
+                    height: 2,
                     color: Colors.white,
                     thickness: 1,
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      nextScreen(context, const Rules(  ));
+                      nextScreen(context, const Rules());
                     },
                     style: const ButtonStyle(
-                        padding: WidgetStatePropertyAll(EdgeInsets.all(15)),
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
                         WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
-                      'Правила использования приложения',
-                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400),
+                      'Пользовательское соглашение',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),
                   const Divider(
-                    height: 5,
+                    height: 2,
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      nextScreen(context, const Offer());
+                    },
+                    style: const ButtonStyle(
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
+                        backgroundColor:
+                        WidgetStatePropertyAll(Colors.transparent)),
+                    child: const Text(
+                      'Публичная оферта',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  const Divider(
+                    height: 2,
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      nextScreen(context, const Rule());
+                    },
+                    style: const ButtonStyle(
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
+                        backgroundColor:
+                        WidgetStatePropertyAll(Colors.transparent)),
+                    child: const Text(
+                      'Правила использования приложения',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  const Divider(
+                    height: 2,
                     color: Colors.white,
                     thickness: 1,
                   ),
                   Container(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(10),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Версия приложения',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                         Text(
                           '1.0',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(fontSize: 16, color: Colors.white),
                         )
                       ],
                     ),
                   ),
                   const Divider(
-                    height: 5,
+                    height: 2,
                   ),
                   GestureDetector(
                       onTap: () {
                         //nextScreenReplace(context, const ComplaintForm());
                       },
                       child: Container(
-                          padding: const EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(10),
                           child: const Text(
                             'Обратная связь',
-                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           )))
                 ],
               ),

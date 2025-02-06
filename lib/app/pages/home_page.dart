@@ -1,15 +1,6 @@
-// ignore_for_file: use_build_context_synchronously, unnecessary_string_escapes
-
-import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/pages/about_meet.dart';
-import 'package:wbrs/app/pages/chatscreen.dart';
 import 'package:wbrs/service/auth_service.dart';
-import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/chat_room_list.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
 import 'package:flutter/material.dart';
@@ -26,12 +17,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   AuthService authService = AuthService();
-
-  Stream? chatRoomsStream;
-
-  getChatRooms() async {
-    chatRoomsStream = await DatabaseService().getChatRooms();
-  }
 
   @override
   void initState() {

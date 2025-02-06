@@ -108,6 +108,14 @@ listenNotify(context)async{
   });
 }
 
+migrate(){
+  firebaseFirestore.collection('users').get().then((value) {
+    for (var element in value.docs) {
+      firebaseFirestore.collection('users').doc(element.id).update({'chatWithId': ''});
+    }
+  });
+}
+
 void main() async {
   late final FirebaseApp app;
   WidgetsFlutterBinding.ensureInitialized();

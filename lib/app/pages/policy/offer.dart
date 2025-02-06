@@ -1,16 +1,23 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-class Politica extends StatefulWidget {
-  const Politica({super.key});
+class Offer extends StatefulWidget {
+  const Offer({super.key});
 
   @override
-  State<Politica> createState() => _PoliticaState();
+  State<Offer> createState() => _OfferState();
 }
 
-class _PoliticaState extends State<Politica> {
+class _OfferState extends State<Offer> {
 
   String text = "";
+
+  Uri emailLaunch = Uri(
+    scheme: 'mailto',
+    path: "myemail@email.com",
+  );
 
   @override
   void initState() {
@@ -26,7 +33,7 @@ class _PoliticaState extends State<Politica> {
   }
 
   Future<String> loadAsset() async {
-    return await rootBundle.loadString('assets/policy.txt');
+    return await rootBundle.loadString('assets/offer.txt');
   }
 
   @override
@@ -48,13 +55,12 @@ class _PoliticaState extends State<Politica> {
           ),
         ),
         Scaffold(
-            appBar: AppBar(title: const Text("Политика в отношении обработки персональных данных", style: TextStyle(color: Colors.white),), backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white),),
+            appBar: AppBar(title: const Text("Публичная оферта", style: TextStyle(color: Colors.white),), backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white),),
             backgroundColor: Colors.transparent,
             body: SingleChildScrollView(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text("Политика в отношении обработки персональных данных",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                   Text(text, textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.white, height: 1, fontFamily: 'Colibri'),),
                 ],
               ),

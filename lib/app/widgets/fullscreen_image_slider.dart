@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class FullscreenSliderDemo extends StatelessWidget {
   final int initialPage;
   final List imgList;
-  const FullscreenSliderDemo({super.key, required this.initialPage, required this.imgList});
+  const FullscreenSliderDemo(
+      {super.key, required this.initialPage, required this.imgList});
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +20,35 @@ class FullscreenSliderDemo extends StatelessWidget {
         ),
         Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(backgroundColor: Colors.transparent, iconTheme: IconThemeData(color: Colors.white),),
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            iconTheme: IconThemeData(color: Colors.white),
+          ),
           body: Builder(
             builder: (context) {
               final double height = MediaQuery.of(context).size.height;
               return CarouselSlider(
                 options: CarouselOptions(
                   height: height,
-                  aspectRatio: 1/1,
+                  aspectRatio: 1 / 1,
                   viewportFraction: 1.0,
                   enlargeCenterPage: false,
-                  initialPage: initialPage ?? 0,
+                  initialPage: initialPage,
                   enableInfiniteScroll: false,
                   // autoPlay: false,
                 ),
-                items: imgList
-                    .map((item) => Center(
-                        child: InteractiveViewer(
-                          maxScale: 4.0,
-                          minScale: 0.5,
-                          child: CachedNetworkImage(imageUrl: item,
-                          ),
-                        )))
-                    .toList(),
+                items: imgList.map((item) {
+                  print(item);
+                  return Center(
+                      child: InteractiveViewer(
+                    maxScale: 4.0,
+                    minScale: 0.5,
+                    child: CachedNetworkImage(
+                      key: ValueKey(item),
+                      imageUrl: item,
+                    ),
+                  ));
+                }).toList(),
               );
             },
           ),

@@ -2,6 +2,7 @@
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wbrs/app/pages/home_page.dart';
 import 'package:wbrs/app/pages/meetings.dart';
 import 'package:wbrs/app/pages/profile_page.dart';
@@ -135,6 +136,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           ),
           GestureDetector(
             onTap: (){
+              //nextScreen(context, WebPage());
+              launchUrl(Uri.parse('https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=01&bank=100000000008&crc=C752'), mode: LaunchMode.externalApplication);
               showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
             },
             child: Container(

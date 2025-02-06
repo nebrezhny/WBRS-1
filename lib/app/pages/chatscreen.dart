@@ -65,11 +65,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   addMessage(bool sendClicked, String type) async {
     if (messageTextEdittingController.text != "") {
-      QuerySnapshot querySnap = await firebaseFirestore
+      DocumentSnapshot querySnap = await firebaseFirestore
           .collection('users')
-          .where('fullName', isEqualTo: widget.chatWithUsername)
+          .doc(widget.id)
           .get();
-      String chatWith = querySnap.docs[0]['chatWithId'];
+      String chatWith = querySnap.get('chatWithId');
       bool isUserInChat = chatWith == firebaseAuth.currentUser!.uid;
 
       isUserInChat
@@ -381,13 +381,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: () async {
-                          DocumentSnapshot doc = await FirebaseFirestore
-                              .instance
-                              .collection('users')
-                              .doc(widget.id)
-                              .get();
-                          Images = doc.get('images');
-                          CountImages = Images.length;
                           if (!mounted) return;
                           nextScreen(
                               context,

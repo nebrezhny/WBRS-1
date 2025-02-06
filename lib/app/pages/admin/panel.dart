@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wbrs/app/pages/admin/meets.dart';
 import 'package:wbrs/app/pages/admin/users.dart';
 import 'package:wbrs/app/widgets/bottom_nav_bar.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
@@ -37,17 +38,21 @@ class AdminPanel extends StatelessWidget {
   }
 
   Widget adminPanelPage(context) {
-    return Container(
-      child: Column(
-        children: [
-          ListTile(
-            onTap: ()=> nextScreen(context, const Users()),
-            title: const Text('Пользователи', style: TextStyle(color: Colors.white),),
-            leading: const Icon(Icons.account_circle, color: Colors.white,),
-            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white,),
-          )
-        ],
-      ),
+    return Column(
+      children: [
+        ListTile(
+          onTap: ()=> nextScreen(context, const Users()),
+          title: const Text('Пользователи', style: TextStyle(color: Colors.white),),
+          leading: const Icon(Icons.account_circle, color: Colors.white,),
+          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white,),
+        ),
+        ListTile(
+          onTap: ()=> nextScreen(context, const Meets()),
+          title: const Text('Встречи', style: TextStyle(color: Colors.white),),
+          leading: const Icon(Icons.account_circle, color: Colors.white,),
+          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white,),
+        )
+      ],
     );
   }
 }

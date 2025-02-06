@@ -27,7 +27,7 @@ class NotificationsService {
                 'icon': "@mipmap/launcher_icon",
                 'sound': "default",
                 'payload': jsonEncode(body),
-                'unreadMsgCount': unreadMsgCount,
+                'unreadMsgCount': unreadMsgCount.toString(),
               },
               "notification": <String, dynamic>{
                 "title": title,

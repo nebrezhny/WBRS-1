@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/about_app.dart';
@@ -51,7 +52,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
     firebaseFirestore
         .collection("users")
-        .where("fullName", isEqualTo: displayName)
+        .where("uid", isEqualTo: currentUser!.uid)
         .get()
         .then((QuerySnapshot snapshot) {
       setState(() {
@@ -155,8 +156,16 @@ class _MyDrawerState extends State<MyDrawer> {
                   },
                 ),
                 GestureDetector(
-                  onTap: (){
-                    showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
+                  onTap: () async {
+                    bool resp = await launchUrl(
+                        Uri.parse(
+                            'https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=02&bank=100000000008&sum=100&crc=C752'),
+                        mode: LaunchMode.externalApplication).then((value) {
+                          if(value){
+                            showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
+                          }
+                          return value;
+                        });
                   },
                   child: Container(
                     width: double.infinity,

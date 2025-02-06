@@ -864,11 +864,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     ];
     return ElevatedButton(
       onPressed: () {
-        showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return const OplataPage();
-            });
+
       },
       style: ButtonStyle(
         minimumSize: WidgetStatePropertyAll(
@@ -937,9 +933,31 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     return ElevatedButton(
       onPressed: () {
         showModalBottomSheet(
+          backgroundColor: grey,
             context: context,
             builder: (context) {
-              return const OplataPage();
+              String sum = '';
+              switch (index) {
+                case 0:
+                  sum = '150';
+                  break;
+                case 1:
+                  sum = '299';
+                  break;
+                case 2:
+                  sum = '490';
+                  break;
+                case 3:
+                  sum = '990';
+                  break;
+                case 4:
+                  sum = '1490';
+                  break;
+                case 5:
+                  sum = '2880';
+                  break;
+              }
+              return OplataPage(sum: sum,);
             });
       },
       style: ButtonStyle(

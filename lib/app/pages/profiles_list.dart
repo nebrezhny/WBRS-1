@@ -2,9 +2,7 @@
 
 import 'dart:async';
 
-import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
@@ -228,8 +226,7 @@ List getListOfGroup(String group) {
   switch (group) {
     case "коричнево-красная" ||
     "коричнево-синяя" ||
-    "коричневая" ||
-    "коричнево-белая":
+    "коричневая":
       return [
         "коричнево-красная",
         "коричнево-синяя",
