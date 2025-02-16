@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -15,18 +16,39 @@ import 'package:http/http.dart' as http;
 
 class RobokassaWebview extends StatefulWidget {
   final String sum;
-  const RobokassaWebview({super.key, required this.sum});
+  final int count;
+  const RobokassaWebview({super.key, required this.sum, required this.count});
 
   @override
   State<RobokassaWebview> createState() => _RobokassaWebviewState();
 }
 
-class _RobokassaWebviewState extends State<RobokassaWebview> {
+class _RobokassaWebviewState extends State<RobokassaWebview>
+    with WidgetsBindingObserver {
   var ctrl = WebViewController();
-  int count = 0, _progress = 0;
+  int _progress = 0;
+  String sbpUrl = '', signature = '';
+  Future addTransaction() async {
+    await firebaseFirestore.collection('transaction').get().then((value) async {
+      setState(() {
+        firebaseFirestore
+            .collection('transaction')
+            .doc(widget.count.toString())
+            .set({
+          'id': widget.count.toString(),
+          'sum': widget.sum,
+          'user_email': firebaseAuth.currentUser!.email,
+          'user_id': firebaseAuth.currentUser!.uid,
+          'time': DateTime.now().toString(),
+        });
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       params = WebKitWebViewControllerCreationParams(
@@ -38,31 +60,25 @@ class _RobokassaWebviewState extends State<RobokassaWebview> {
     }
 
     final WebViewController controller =
-    WebViewController.fromPlatformCreationParams(params);
-    // #enddocregion platform_features
-    firebaseFirestore.collection('transaction').get().then((value) {
-      count = value.docs.length;
-    });
-    firebaseFirestore.collection('transaction').doc(count.toString()).set({
-      'id': count.toString(),
-      'sum': widget.sum,
-      'user_email': firebaseAuth.currentUser!.email,
-      'user_id': firebaseAuth.currentUser!.uid,
-      'time': DateTime.now().toString(),
-    });
-    String signature = md5.convert(utf8.encode('WBRS:1:$count:Grebat-kopat3102-')).toString();
+        WebViewController.fromPlatformCreationParams(params);
 
+    addTransaction();
+
+    signature = md5
+        .convert(utf8.encode('WBRS:1:${widget.count}:Grebat-kopat3102-'))
+        .toString();
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
+          onProgress: (int progress) async {
             debugPrint('WebView is loading (progress : $progress%)');
             setState(() {
               _progress = progress;
             });
           },
-          onPageStarted: (String url) {
+          onPageStarted: (String url) async {
+            await addTransaction();
             debugPrint('Page started loading: $url');
           },
           onPageFinished: (String url) {
@@ -70,11 +86,11 @@ class _RobokassaWebviewState extends State<RobokassaWebview> {
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint('''
-Page resource error:
-  code: ${error.errorCode}
-  description: ${error.description}
-  errorType: ${error.errorType}
-  isForMainFrame: ${error.isForMainFrame}
+              Page resource error:
+              code: ${error.errorCode}
+              description: ${error.description}
+              errorType: ${error.errorType}
+              isForMainFrame: ${error.isForMainFrame}
           ''');
           },
           onNavigationRequest: (NavigationRequest request) {
@@ -88,12 +104,38 @@ Page resource error:
           onHttpError: (HttpResponseError error) {
             debugPrint('Error occurred on page: ${error.response?.statusCode}');
           },
-          onUrlChange: (UrlChange change) {
+          onUrlChange: (UrlChange change) async {
             debugPrint('url change to ${change.url}');
+            String? url = change.url!;
+            if (url.startsWith('http')) {
+              //await launchUrl(Uri.parse(url));
+              return;
+            } else {
+              try {
+                await launchUrl(
+                  Uri.parse(url),
+                  mode: LaunchMode.externalApplication,
+                );
+                controller.loadRequest(Uri.parse(sbpUrl));
+                if (!mounted) return;
+              } on Object catch (_) {
+                if (url.startsWith('intent')) {
+                  controller.loadRequest(
+                      Uri.parse(url.replaceFirst('intent', 'https')));
+                  sbpUrl = url.replaceFirst('intent', 'https');
+                } else {
+                  AndroidFlutterLocalNotificationsPlugin().show(
+                      0, 'Robokassa', 'У вас не установлено приложение банка',
+                      notificationDetails: const AndroidNotificationDetails(
+                          'wbrs', 'wbrs',
+                          importance: Importance.max),
+                      payload: 'test');
+                  controller.loadRequest(Uri.parse(sbpUrl));
+                }
+              }
+            }
           },
-          onHttpAuthRequest: (HttpAuthRequest request) {
-            print(request);
-          },
+          onHttpAuthRequest: (HttpAuthRequest request) {},
         ),
       )
       ..addJavaScriptChannel(
@@ -104,7 +146,8 @@ Page resource error:
           );
         },
       )
-      ..loadRequest(Uri.parse('https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=1&InvoiceID=$count&Description=test&SignatureValue=$signature'));
+      ..loadRequest(Uri.parse(
+          'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=1&InvoiceID=${widget.count}&Description=test&SignatureValue=$signature'));
 
     // setBackgroundColor is not currently supported on macOS.
     if (kIsWeb || !Platform.isMacOS) {
@@ -124,46 +167,95 @@ Page resource error:
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
   void dispose() {
-    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     ctrl = WebViewController();
+    super.dispose();
+  }
+
+  addSilver() async {
+    int balance = await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .get()
+        .then((value) => value['balance']);
+
+    switch (widget.sum) {
+      case '150':
+        balance += 39;
+        break;
+      case '299':
+        balance += 86;
+        break;
+      case '490':
+        balance += 145;
+        break;
+      case '990':
+        balance += 305;
+        break;
+      case '1490':
+        balance += 490;
+        break;
+      case '2880':
+        balance += 1020;
+        break;
+    }
+
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'balance': balance});
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvokedWithResult: (value, result) async {
-        String signature_status = md5.convert(utf8.encode('WBRS:$count:Zhevat-kopat3103-')).toString();
+        String signatureStatus = md5
+            .convert(utf8.encode('WBRS:${widget.count}:Zhevat-kopat3103-'))
+            .toString();
         String resultCode = '';
-        while(resultCode == '' || resultCode == '5') {
-          var res = await http.post(
-            Uri.parse('https://auth.robokassa.ru/Merchant/WebService/Service.asmx/OpStateExt?MerchantLogin=WBRS&InvoiceID=$count&Signature=$signature_status'),
-            headers: <String, String>{
-              'Content-Type': 'application/json'
-            },
-          );
-          XmlDocument document = XmlDocument.parse(res.body);
-          print(document);
-          if(document.findAllElements('Code').first.innerText == '0') {
-            print(document.findAllElements('Code'));
-            resultCode = document.findAllElements('Code').elementAt(1).innerText;
-          }
+        var res = await http.post(
+          Uri.parse(
+              'https://auth.robokassa.ru/Merchant/WebService/Service.asmx/OpStateExt?MerchantLogin=WBRS&InvoiceID=${widget.count}&Signature=$signatureStatus'),
+          headers: <String, String>{'Content-Type': 'application/json'},
+        );
+
+        XmlDocument document = XmlDocument.parse(res.body);
+        if (document.findAllElements('Code').first.innerText == '0') {
+          resultCode = document.findAllElements('Code').elementAt(1).innerText;
         }
-        print(resultCode);
-        if(resultCode == '100'){
-          AndroidFlutterLocalNotificationsPlugin().show(0, 'Robokassa', 'Оплата прошла успешно', notificationDetails: const AndroidNotificationDetails('wbrs', 'wbrs', importance: Importance.max), payload: 'test');
-        } else{
-          AndroidFlutterLocalNotificationsPlugin().show(0, 'Robokassa', 'Оплата не прошла', notificationDetails: const AndroidNotificationDetails('wbrs', 'wbrs', importance: Importance.max), payload: 'test');
+        if (resultCode == '100') {
+          addSilver();
+          AndroidFlutterLocalNotificationsPlugin().show(
+              0, 'Robokassa', 'Оплата прошла успешно',
+              notificationDetails: const AndroidNotificationDetails(
+                  'wbrs', 'wbrs',
+                  importance: Importance.max),
+              payload: 'test');
+        } else {
+          AndroidFlutterLocalNotificationsPlugin().show(
+              0, 'Robokassa', 'Оплата не прошла',
+              notificationDetails: const AndroidNotificationDetails(
+                  'wbrs', 'wbrs',
+                  importance: Importance.max),
+              payload: 'test');
         }
       },
-      child:
-          _progress < 100
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              :      WebViewWidget(
-            controller: ctrl,
-          ),
+      child: _progress < 100
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : WebViewWidget(
+              controller: ctrl,
+            ),
     );
   }
 }

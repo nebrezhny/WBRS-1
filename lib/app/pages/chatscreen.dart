@@ -30,7 +30,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  String messageId = "";
+  String messageId = '';
   Stream? messageStream;
   late String myName, myProfilePic, myUserName, myEmail;
   String? _image;
@@ -57,18 +57,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   getChatRoomIdByUsernames(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
+      return '$b\_$a';
     } else {
-      return "$a\_$b";
+      return '$a\_$b';
     }
   }
 
   addMessage(bool sendClicked, String type) async {
-    if (messageTextEdittingController.text != "") {
-      DocumentSnapshot querySnap = await firebaseFirestore
-          .collection('users')
-          .doc(widget.id)
-          .get();
+    if (messageTextEdittingController.text != '') {
+      DocumentSnapshot querySnap =
+          await firebaseFirestore.collection('users').doc(widget.id).get();
       String chatWith = querySnap.get('chatWithId');
       bool isUserInChat = chatWith == firebaseAuth.currentUser!.uid;
 
@@ -80,26 +78,26 @@ class _ChatScreenState extends State<ChatScreen> {
       var lastMessageTs = DateTime.now();
 
       Map<String, dynamic> messageInfoMap = {
-        "type": type,
-        "message": type == "text" ? message : _image,
-        "sendBy": firebaseAuth.currentUser!.displayName,
-        "sendByID": firebaseAuth.currentUser!.uid,
-        "ts": lastMessageTs,
-        "isRead": isUserInChat ? true : false
+        'type': type,
+        'message': type == 'text' ? message : _image,
+        'sendBy': firebaseAuth.currentUser!.displayName,
+        'sendByID': firebaseAuth.currentUser!.uid,
+        'ts': lastMessageTs,
+        'isRead': isUserInChat ? true : false
       };
 
       //messageId
-      if (messageId == "") {
+      if (messageId == '') {
         messageId = randomAlphaNumeric(12);
       }
       DatabaseService()
           .addMessage(widget.chatId, messageId, messageInfoMap)
           .then((value) {
         Map<String, dynamic> lastMessageInfoMap = {
-          "lastMessage": message,
-          "lastMessageSendTs": lastMessageTs,
-          "lastMessageSendBy": firebaseAuth.currentUser!.displayName,
-          "lastMessageSendByID": firebaseAuth.currentUser!.uid,
+          'lastMessage': message,
+          'lastMessageSendTs': lastMessageTs,
+          'lastMessageSendBy': firebaseAuth.currentUser!.displayName,
+          'lastMessageSendByID': firebaseAuth.currentUser!.uid,
         };
 
         DatabaseService()
@@ -107,9 +105,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
         if (sendClicked) {
           // remove the text in the message input field
-          messageTextEdittingController.text = "";
+          messageTextEdittingController.text = '';
           // make message id blank to get regenerated on next message send
-          messageId = "";
+          messageId = '';
         }
       });
 
@@ -131,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
             firebaseAuth.currentUser!.displayName.toString(), 4, widget.chatId);
       }
     }
-    messageTextEdittingController.text = "";
+    messageTextEdittingController.text = '';
   }
 
   Widget chatMessages() {
@@ -164,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             itemBuilder: (context, index) {
                               DocumentSnapshot ds = snapshot.data.docs[index];
                               ds.id;
-                              if (ds["sendByID"] !=
+                              if (ds['sendByID'] !=
                                   firebaseAuth.currentUser!.uid) {
                                 firebaseFirestore
                                     .collection('chats')
@@ -177,38 +175,44 @@ class _ChatScreenState extends State<ChatScreen> {
                               Map newDs = ds.data() as Map;
                               if (newDs.containsKey('')) {
                                 return MessageTile(
-                                  avatar:
-                                  anotherUserInfo.isNotEmpty
-                                  ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
-                                  : Container(),
+                                  avatar: anotherUserInfo.isNotEmpty
+                                      ? userImageWithCircle(
+                                          anotherUserInfo['profilePic'],
+                                          anotherUserInfo['группа'],
+                                          50.0,
+                                          50.0)
+                                      : Container(),
                                   chatId: widget.chatId,
-                                  sender: ds["sendBy"],
-                                  name: ds["sendBy"],
+                                  sender: ds['sendBy'],
+                                  name: ds['sendBy'],
                                   message: ds,
                                   sentByMe: firebaseAuth.currentUser!.uid ==
-                                      ds["sendByID"],
-                                  isRead: ds["isRead"],
+                                      ds['sendByID'],
+                                  isRead: ds['isRead'],
                                   isChat: true,
                                 );
                               } else {
                                 var x =
                                     ds.data().toString().contains('deleteFor');
                                 if (x) {
-                                  if (ds["deleteFor"] !=
+                                  if (ds['deleteFor'] !=
                                       firebaseAuth.currentUser!.uid) {
                                     return MessageTile(
-                                      avatar:
-                                      anotherUserInfo.isNotEmpty
-                                          ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
+                                      avatar: anotherUserInfo.isNotEmpty
+                                          ? userImageWithCircle(
+                                              anotherUserInfo['profilePic'],
+                                              anotherUserInfo['группа'],
+                                              50.0,
+                                              50.0)
                                           : Container(),
                                       chatId: widget.chatId,
-                                      sender: ds["sendBy"],
-                                      name: ds["sendBy"],
+                                      sender: ds['sendBy'],
+                                      name: ds['sendBy'],
                                       message: ds,
                                       sentByMe: FirebaseAuth
                                               .instance.currentUser!.uid ==
-                                          ds["sendByID"],
-                                      isRead: ds["isRead"],
+                                          ds['sendByID'],
+                                      isRead: ds['isRead'],
                                       isChat: true,
                                     );
                                   } else {
@@ -216,18 +220,21 @@ class _ChatScreenState extends State<ChatScreen> {
                                   }
                                 } else {
                                   return MessageTile(
-                                    avatar:
-                                    anotherUserInfo.isNotEmpty
-                                        ? userImageWithCircle(anotherUserInfo['profilePic'], anotherUserInfo['группа'], 50.0, 50.0)
+                                    avatar: anotherUserInfo.isNotEmpty
+                                        ? userImageWithCircle(
+                                            anotherUserInfo['profilePic'],
+                                            anotherUserInfo['группа'],
+                                            50.0,
+                                            50.0)
                                         : Container(),
                                     chatId: widget.chatId,
-                                    sender: ds["sendBy"],
-                                    name: ds["sendBy"],
+                                    sender: ds['sendBy'],
+                                    name: ds['sendBy'],
                                     message: ds,
                                     sentByMe: FirebaseAuth
                                             .instance.currentUser!.uid ==
-                                        ds["sendByID"],
-                                    isRead: ds["isRead"],
+                                        ds['sendByID'],
+                                    isRead: ds['isRead'],
                                     isChat: true,
                                   );
                                 }
@@ -352,7 +359,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon2.jpg",
+          'assets/fon2.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -477,9 +484,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                             color: Colors.white),
                                         decoration: InputDecoration(
                                             border: InputBorder.none,
-                                            hintText: "Введите сообщение",
-                                            hintStyle: TextStyle(
-                                                color: white70)),
+                                            hintText: 'Введите сообщение',
+                                            hintStyle:
+                                                TextStyle(color: white70)),
                                       )),
                                   GestureDetector(
                                     onTap: () {
@@ -489,7 +496,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       Icons.send,
                                       color:
                                           messageTextEdittingController.text !=
-                                                  ""
+                                                  ''
                                               ? Colors.white
                                               : white70,
                                     ),

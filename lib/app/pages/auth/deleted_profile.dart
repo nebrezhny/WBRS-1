@@ -9,7 +9,7 @@ class DeletedProfile extends StatelessWidget {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -23,7 +23,10 @@ class DeletedProfile extends StatelessWidget {
           ),
           bottomNavigationBar: const MyBottomNavigationBar(),
           body: const Center(
-            child: Text("Профиль был удален", style: TextStyle(color: Colors.white),),
+            child: Text(
+              'Профиль был удален',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ),
       ],

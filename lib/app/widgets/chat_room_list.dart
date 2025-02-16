@@ -61,13 +61,13 @@ class _ChatRoomListState extends State<ChatRoomList> {
             );
           } else {
             String group = '';
-            if(snapshot.data!.data() != null){
-              group = snapshot.data!.get("группа");
+            if (snapshot.data!.data() != null) {
+              group = snapshot.data!.get('группа');
             }
             return ListTile(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40.0)),
-              subtitle: widget.snapshot.get("lastMessage") != ""
+              subtitle: widget.snapshot.get('lastMessage') != ''
                   ? Container(
                       padding: const EdgeInsets.only(right: 20),
                       child: Row(
@@ -80,15 +80,15 @@ class _ChatRoomListState extends State<ChatRoomList> {
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),
-                          widget.snapshot.get("lastMessageSendByID") != myUid
-                              ? widget.snapshot.get("unreadMessage") != null
-                                  ? widget.snapshot.get("unreadMessage") != 0
+                          widget.snapshot.get('lastMessageSendByID') != myUid
+                              ? widget.snapshot.get('unreadMessage') != null
+                                  ? widget.snapshot.get('unreadMessage') != 0
                                       ? CircleAvatar(
                                           backgroundColor: Colors.white,
                                           radius: 10,
                                           child: Text(
                                             widget.snapshot
-                                                .get("unreadMessage")
+                                                .get('unreadMessage')
                                                 .toString(),
                                             style: const TextStyle(
                                                 color: Colors.black,
@@ -104,28 +104,28 @@ class _ChatRoomListState extends State<ChatRoomList> {
                       ),
                     )
                   : const Text(
-                      "нет сообщений",
+                      'нет сообщений',
                       style: TextStyle(color: Colors.white),
                     ),
-              title: widget.snapshot.get("user1") == myUid
+              title: widget.snapshot.get('user1') == myUid
                   ? Text(
-                      widget.snapshot.get("user2Nickname"),
+                      widget.snapshot.get('user2Nickname'),
                       style: const TextStyle(color: Colors.white),
                     )
                   : Text(
-                      widget.snapshot.get("user1Nickname"),
+                      widget.snapshot.get('user1Nickname'),
                       style: const TextStyle(color: Colors.white),
                     ),
               onTap: () async {
-                if (widget.snapshot.get("user1") == myUid) {
-                  nick = widget.snapshot.get("user2Nickname");
-                  id = widget.snapshot.get("user2");
+                if (widget.snapshot.get('user1') == myUid) {
+                  nick = widget.snapshot.get('user2Nickname');
+                  id = widget.snapshot.get('user2');
 
-                  photoUrl = widget.snapshot.get("user2_image");
+                  photoUrl = widget.snapshot.get('user2_image');
                 } else {
-                  nick = widget.snapshot.get("user1Nickname");
-                  id = widget.snapshot.get("user1");
-                  photoUrl = widget.snapshot.get("user1_image");
+                  nick = widget.snapshot.get('user1Nickname');
+                  id = widget.snapshot.get('user1');
+                  photoUrl = widget.snapshot.get('user1_image');
                 }
 
                 setState(() {
@@ -140,23 +140,21 @@ class _ChatRoomListState extends State<ChatRoomList> {
               },
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(100.0),
-                child: widget.snapshot.get("user1") == myUid
-                    ? widget.snapshot.get("user2_image") != ""
+                child: widget.snapshot.get('user1') == myUid
+                    ? widget.snapshot.get('user2_image') != ''
                         ? userImageWithCircle(
-                            widget.snapshot.get("user2_image"),
+                            widget.snapshot.get('user2_image'),
                             group,
                             50.0,
                             50.0)
-                        : userImageWithCircle(
-                            '', group, 50.0, 50.0)
-                    : widget.snapshot.get("user1_image") != ""
+                        : userImageWithCircle('', group, 50.0, 50.0)
+                    : widget.snapshot.get('user1_image') != ''
                         ? userImageWithCircle(
-                            widget.snapshot.get("user1_image"),
-                    group,
+                            widget.snapshot.get('user1_image'),
+                            group,
                             50.0,
                             50.0)
-                        : userImageWithCircle(
-                            '', group, 50.0, 50.0),
+                        : userImageWithCircle('', group, 50.0, 50.0),
               ),
               tileColor: grey,
               contentPadding: const EdgeInsets.all(15.0),

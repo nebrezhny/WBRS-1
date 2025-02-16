@@ -59,7 +59,7 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -115,9 +115,9 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                     onSelected: (String val) {
                       setState(() {
                         city.text = val
-                            .split(RegExp(r"(?! )\s{2,}"))
+                            .split(RegExp(r'(?! )\s{2,}'))
                             .join(' ')
-                            .split(RegExp(r"\s+$"))
+                            .split(RegExp(r'\s+$'))
                             .join('');
                       });
                     },
@@ -266,9 +266,9 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                           collectionReference.add({
                             'timeStamp': DateTime.now(),
                             'name': nameMeet.text
-                                .split(RegExp(r"(?! )\s{2,}"))
+                                .split(RegExp(r'(?! )\s{2,}'))
                                 .join(' ')
-                                .split(RegExp(r"\s+$"))
+                                .split(RegExp(r'\s+$'))
                                 .join(''),
                             'city': city.text,
                             'description': description.text,
@@ -290,7 +290,7 @@ class _CreateMeetPageState extends State<CreateMeetPage> {
                         });
                       },
                       child: const Text(
-                        "Сохранить",
+                        'Сохранить',
                         style:
                             TextStyle(fontSize: 20, color: Colors.orangeAccent),
                       ))

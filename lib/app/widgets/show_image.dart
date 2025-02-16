@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/pages/profile_page.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class ShowImage extends StatefulWidget {
@@ -11,19 +10,19 @@ class ShowImage extends StatefulWidget {
   final List initList;
   final List urls;
   final AsyncSnapshot snapshot;
-  const ShowImage(
-      {super.key,
-      required this.urls,
-      required this.index,
-      required this.initList,
-      required this.snapshot,});
+  const ShowImage({
+    super.key,
+    required this.urls,
+    required this.index,
+    required this.initList,
+    required this.snapshot,
+  });
 
   @override
   State<ShowImage> createState() => _ShowImageState();
 }
 
 class _ShowImageState extends State<ShowImage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,22 +94,24 @@ class _ShowImageState extends State<ShowImage> {
   }
 
   moveToNext() {
-    if (widget.index == widget.urls.length - 1){
+    if (widget.index == widget.urls.length - 1) {
       nextScreenReplace(
           context,
           ShowImage(
-              index: 0,
-              initList: widget.initList,
-              urls: widget.urls,
-              snapshot: widget.snapshot,));
-    }else{
+            index: 0,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
+    } else {
       nextScreenReplace(
           context,
           ShowImage(
-              index: widget.index + 1,
-              initList: widget.initList,
-              urls: widget.urls,
-              snapshot: widget.snapshot,));
+            index: widget.index + 1,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
     }
   }
 
@@ -119,19 +120,20 @@ class _ShowImageState extends State<ShowImage> {
       nextScreenReplace(
           context,
           ShowImage(
-              index: widget.urls.length - 1,
-              initList: widget.initList,
-              urls: widget.urls,
-              snapshot: widget.snapshot,));
-    }
-    else{
+            index: widget.urls.length - 1,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
+    } else {
       nextScreenReplace(
           context,
           ShowImage(
-              index: widget.index - 1,
-              initList: widget.initList,
-              urls: widget.urls,
-              snapshot: widget.snapshot,));
+            index: widget.index - 1,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
     }
   }
 
@@ -158,9 +160,8 @@ class _ShowImageState extends State<ShowImage> {
                       fontStyle: FontStyle.normal,
                       color: Colors.white,
                       fontSize: 16),
-                  child: Text("Вы уверены, что хотите удалить это фото?"),
+                  child: Text('Вы уверены, что хотите удалить это фото?'),
                 ),
-
                 const SizedBox(
                   height: 20,
                 ),

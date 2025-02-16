@@ -28,7 +28,7 @@ class _MeetingPageState extends State<MeetingPage> {
         .collection('meets')
         .orderBy('timeStamp', descending: true)
         .snapshots();
-    if(meetCity != '') {
+    if (meetCity != '') {
       meets = firebaseFirestore
           .collection('meets')
           .where('city', isEqualTo: meetCity)
@@ -56,7 +56,7 @@ class _MeetingPageState extends State<MeetingPage> {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -75,7 +75,7 @@ class _MeetingPageState extends State<MeetingPage> {
                   icon: const Icon(Icons.add))
             ],
             title: const Text(
-              "Встречи",
+              'Встречи',
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.transparent,
@@ -90,8 +90,7 @@ class _MeetingPageState extends State<MeetingPage> {
                 TextButton(
                   onPressed: () {
                     showModalBottomSheet(
-                        backgroundColor:
-                            grey,
+                        backgroundColor: grey,
                         context: context,
                         builder: (context) {
                           return Container(
@@ -123,7 +122,7 @@ class _MeetingPageState extends State<MeetingPage> {
                           );
                         });
                   },
-                  child: const Text("Как создать встречу",
+                  child: const Text('Как создать встречу',
                       style: TextStyle(color: Colors.white, fontSize: 18)),
                 ),
                 Container(
@@ -162,19 +161,19 @@ class _MeetingPageState extends State<MeetingPage> {
                           onSelected: (String val) {
                             setState(() {
                               city.text = val
-                                  .split(RegExp(r"(?! )\s{2,}"))
+                                  .split(RegExp(r'(?! )\s{2,}'))
                                   .join(' ')
-                                  .split(RegExp(r"\s+$"))
+                                  .split(RegExp(r'\s+$'))
                                   .join('');
                               meetCity = city.text;
                               meets = firebaseFirestore
                                   .collection('meets')
                                   .where('city',
-                                  isEqualTo: city.text
-                                      .split(RegExp(r"(?! )\s{2,}"))
-                                      .join(' ')
-                                      .split(RegExp(r"\s+$"))
-                                      .join(''))
+                                      isEqualTo: city.text
+                                          .split(RegExp(r'(?! )\s{2,}'))
+                                          .join(' ')
+                                          .split(RegExp(r'\s+$'))
+                                          .join(''))
                                   .snapshots();
                             });
                           },
@@ -187,7 +186,7 @@ class _MeetingPageState extends State<MeetingPage> {
                               decoration: const InputDecoration(
                                 alignLabelWithHint: false,
                                 border: InputBorder.none,
-                                hintText: "Введите ваш город",
+                                hintText: 'Введите ваш город',
                                 hintStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w400,
@@ -199,19 +198,19 @@ class _MeetingPageState extends State<MeetingPage> {
                               onChanged: (value) {
                                 setState(() {
                                   city.text = value
-                                      .split(RegExp(r"(?! )\s{2,}"))
+                                      .split(RegExp(r'(?! )\s{2,}'))
                                       .join(' ')
-                                      .split(RegExp(r"\s+$"))
+                                      .split(RegExp(r'\s+$'))
                                       .join('');
                                   meetCity = city.text;
                                   meets = firebaseFirestore
                                       .collection('meets')
                                       .where('city',
-                                      isEqualTo: city.text
-                                          .split(RegExp(r"(?! )\s{2,}"))
-                                          .join(' ')
-                                          .split(RegExp(r"\s+$"))
-                                          .join(''))
+                                          isEqualTo: city.text
+                                              .split(RegExp(r'(?! )\s{2,}'))
+                                              .join(' ')
+                                              .split(RegExp(r'\s+$'))
+                                              .join(''))
                                       .snapshots();
                                 });
                               },
@@ -231,9 +230,9 @@ class _MeetingPageState extends State<MeetingPage> {
                                   .collection('meets')
                                   .where('city',
                                       isEqualTo: city.text
-                                          .split(RegExp(r"(?! )\s{2,}"))
+                                          .split(RegExp(r'(?! )\s{2,}'))
                                           .join(' ')
-                                          .split(RegExp(r"\s+$"))
+                                          .split(RegExp(r'\s+$'))
                                           .join(''))
                                   .snapshots();
                             }
@@ -342,15 +341,14 @@ class _MeetingPageState extends State<MeetingPage> {
                 }
               }),
               child: Container(
-
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    color: Colors.orangeAccent.shade700.withOpacity(0.3)),
+                    color: Colors.orangeAccent.shade700.withValues(alpha: 0.3)),
                 width: double.infinity,
                 child: ListTile(
                   title: SizedBox(
-                    height:70,
+                    height: 70,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -360,49 +358,65 @@ class _MeetingPageState extends State<MeetingPage> {
                               "${snapshot.data.docs[index]['city']}, ${snapshot.data.docs[index]['name']}",
                               overflow: TextOverflow.fade,
                               softWrap: false,
-                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 14),
                             ),
                           ),
                           const SizedBox(
                             width: 5,
                           ),
-                          Text(snapshot.data.docs[index]['description'], softWrap: false, overflow: TextOverflow.fade,style: const TextStyle(color: Colors.white, fontSize: 14),),
+                          Text(
+                            snapshot.data.docs[index]['description'],
+                            softWrap: false,
+                            overflow: TextOverflow.fade,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
+                          ),
                           const SizedBox(
                             width: 5,
                           ),
                           Flexible(
-                              child:
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(snapshot.data.docs[index]['datetime'],style: const TextStyle(color: Colors.white, fontSize: 14),),
-                                      if(snapshot.data.docs[index]['admin']==firebaseAuth.currentUser!.uid)
-                                        const Text(
-                                          'Вы владелец',
-                                          style: TextStyle(color: Colors.greenAccent),
-                                          softWrap: false,
-                                        ),
-                                      if(snapshot.data.docs[index]['admin']!=firebaseAuth.currentUser!.uid
-                                          && snapshot.data.docs[index]['users'].contains(firebaseAuth.currentUser!.uid))
-                                        const Text(
-                                          'Вы участник',
-                                          style: TextStyle(color: Colors.yellow),
-                                          overflow: TextOverflow.fade,
-                                          softWrap: false,
-                                        )
-                                    ],
-                                  )
-                          ),
+                              child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                snapshot.data.docs[index]['datetime'],
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                              if (snapshot.data.docs[index]['admin'] ==
+                                  firebaseAuth.currentUser!.uid)
+                                const Text(
+                                  'Вы владелец',
+                                  style: TextStyle(color: Colors.greenAccent),
+                                  softWrap: false,
+                                ),
+                              if (snapshot.data.docs[index]['admin'] !=
+                                      firebaseAuth.currentUser!.uid &&
+                                  snapshot.data.docs[index]['users']
+                                      .contains(firebaseAuth.currentUser!.uid))
+                                const Text(
+                                  'Вы участник',
+                                  style: TextStyle(color: Colors.yellow),
+                                  overflow: TextOverflow.fade,
+                                  softWrap: false,
+                                )
+                            ],
+                          )),
                         ]),
                   ),
                   subtitle: snapshot.data.docs[index]['recentMessage'] == ''
                       ? const SizedBox(
-                          child: Text('Нет сообщений',style: TextStyle(color: Colors.white),),
+                          child: Text(
+                            'Нет сообщений',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         )
                       : Row(children: [
                           Text(
                             snapshot.data.docs[index]['recentMessageSender'] +
-                                ':',style: const TextStyle(color: Colors.white),
+                                ':',
+                            style: const TextStyle(color: Colors.white),
                           ),
                           const SizedBox(
                             width: 5,
@@ -410,7 +424,7 @@ class _MeetingPageState extends State<MeetingPage> {
                           Flexible(
                               child: Text(
                             snapshot.data.docs[index]['recentMessage'],
-                                style: const TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                             softWrap: false,
                             overflow: TextOverflow.ellipsis,
                           )),

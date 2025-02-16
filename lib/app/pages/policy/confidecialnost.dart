@@ -9,8 +9,7 @@ class Politica extends StatefulWidget {
 }
 
 class _PoliticaState extends State<Politica> {
-
-  String text = "";
+  String text = '';
 
   @override
   void initState() {
@@ -20,9 +19,7 @@ class _PoliticaState extends State<Politica> {
 
   void getText() async {
     text = await loadAsset();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Future<String> loadAsset() async {
@@ -40,7 +37,7 @@ class _PoliticaState extends State<Politica> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -48,14 +45,36 @@ class _PoliticaState extends State<Politica> {
           ),
         ),
         Scaffold(
-            appBar: AppBar(title: const Text("Политика в отношении обработки персональных данных", style: TextStyle(color: Colors.white),), backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white),),
+            appBar: AppBar(
+              title: const Text(
+                'Политика в отношении обработки персональных данных',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
             backgroundColor: Colors.transparent,
             body: SingleChildScrollView(
               padding: EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text("Политика в отношении обработки персональных данных",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                  Text(text, textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.white, height: 1, fontFamily: 'Colibri'),),
+                  const Text(
+                    'Политика в отношении обработки персональных данных',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  Text(
+                    text,
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        height: 1,
+                        fontFamily: 'Colibri'),
+                  ),
                 ],
               ),
             )),

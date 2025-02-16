@@ -16,7 +16,7 @@ import '../widgets/circle_user_image.dart';
 import 'filter_pages/filter_page.dart';
 
 class ProfilesList extends StatefulWidget {
-  int startPosition;
+  final int startPosition;
   final String group;
 
   ProfilesList({super.key, required this.group, required this.startPosition});
@@ -29,6 +29,7 @@ class _ProfilesListState extends State<ProfilesList> {
   AuthService authService = AuthService();
   List<Map> users = [];
   bool isLoading = true;
+  int _startPosition = 0;
 
   Stream getStream() {
     Query query = firebaseFirestore
@@ -36,15 +37,15 @@ class _ProfilesListState extends State<ProfilesList> {
         .where('uid', isNotEqualTo: firebaseAuth.currentUser!.uid)
         .where('age', isGreaterThanOrEqualTo: ageStart)
         .where('age', isLessThanOrEqualTo: ageEnd);
-    if(widget.group != '' && filterByGroup) {
+    if (widget.group != '' && filterByGroup) {
       query = query.where('группа', whereIn: getListOfGroup(widget.group));
     }
-    if(filterCity.text != '') {
+    if (filterCity.text != '') {
       query = query.where('city', isEqualTo: filterCity.text);
     }
 
-    if(FiltrPol != '') {
-      query = query.where('pol', isEqualTo: FiltrPol);
+    if (filtrPol != '') {
+      query = query.where('pol', isEqualTo: filtrPol);
     }
 
     query = query.orderBy('lastOnlineTS', descending: true);
@@ -57,9 +58,9 @@ class _ProfilesListState extends State<ProfilesList> {
   @override
   void initState() {
     usersStream = getStream();
-    Group = widget.group;
+    group = widget.group;
     super.initState();
-
+    _startPosition = _startPosition;
     isLoading = false;
   }
 
@@ -68,7 +69,7 @@ class _ProfilesListState extends State<ProfilesList> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           filterQuality: FilterQuality.low,
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -83,7 +84,7 @@ class _ProfilesListState extends State<ProfilesList> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              "Пользователи",
+              'Пользователи',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 27,
@@ -91,7 +92,9 @@ class _ProfilesListState extends State<ProfilesList> {
             ),
           ),
           drawer: const MyDrawer(),
-          body: isLoading ? const Center(child: CircularProgressIndicator()) : _buildStreamContent(),
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _buildStreamContent(),
         )
       ],
     );
@@ -106,8 +109,8 @@ class _ProfilesListState extends State<ProfilesList> {
             return const Center(child: CircularProgressIndicator());
           } else {
             if (snapshot.data == null) {
-              return const Center(child: Text("Пользователи не найдены"));
-            }else{
+              return const Center(child: Text('Пользователи не найдены'));
+            } else {
               return createTable(snapshot.data!.docs);
             }
           }
@@ -115,12 +118,12 @@ class _ProfilesListState extends State<ProfilesList> {
   }
 
   Widget createTable(List snapshot) {
-    int count = widget.startPosition + 15 > snapshot.length
-        ? snapshot.length - widget.startPosition
+    int count = _startPosition + 15 > snapshot.length
+        ? snapshot.length - _startPosition
         : 15;
 
     int circlesCount = (snapshot.length / 15).round();
-    if(snapshot.length / 15 > circlesCount){
+    if (snapshot.length / 15 > circlesCount) {
       circlesCount++;
     }
 
@@ -139,8 +142,9 @@ class _ProfilesListState extends State<ProfilesList> {
               return SizedBox(
                 width: MediaQuery.of(context).size.width * 0.3,
                 height: MediaQuery.of(context).size.height * 0.3,
-                key: ValueKey(snapshot[index + widget.startPosition].data()),
-                child: userCard(snapshot[index + widget.startPosition].data(), context),
+                key: ValueKey(snapshot[index + _startPosition].data()),
+                child:
+                    userCard(snapshot[index + _startPosition].data(), context),
               );
             },
           ),
@@ -162,13 +166,15 @@ class _ProfilesListState extends State<ProfilesList> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      widget.startPosition = index * 15;
+                      _startPosition = index * 15;
                     });
                   },
                   child: CircleAvatar(
-                    backgroundColor: index==widget.startPosition/15? Colors.orangeAccent: Colors.orangeAccent.shade100 ,
+                    backgroundColor: index == _startPosition / 15
+                        ? Colors.orangeAccent
+                        : Colors.orangeAccent.shade100,
                     radius: 15,
-                    child: Text((index+1).toString()),
+                    child: Text((index + 1).toString()),
                   ),
                 );
               },
@@ -178,7 +184,7 @@ class _ProfilesListState extends State<ProfilesList> {
   }
 }
 
-Widget userCard(Map user, context){
+Widget userCard(Map user, context) {
   return GestureDetector(
     onTap: () {
       nextScreen(
@@ -202,7 +208,7 @@ Widget _buildUserCardContent(Map user, BuildContext context) {
         UserImage(
           userPhotoUrl: user['profilePic'],
           uid: user['uid'],
-          group: user["группа"],
+          group: user['группа'],
           width: 70.ceilToDouble(),
           height: 70.ceilToDouble(),
         ),
@@ -224,86 +230,84 @@ Widget _buildUserCardContent(Map user, BuildContext context) {
 
 List getListOfGroup(String group) {
   switch (group) {
-    case "коричнево-красная" ||
-    "коричнево-синяя" ||
-    "коричневая":
+    case 'коричнево-красная' || 'коричнево-синяя' || 'коричневая':
       return [
-        "коричнево-красная",
-        "коричнево-синяя",
-        "коричневая",
-        "коричнево-белая",
-        "бело-коричневая",
-        "бело-красная",
-        "бело-синяя",
-        "белая",
-        "сине-белая"
+        'коричнево-красная',
+        'коричнево-синяя',
+        'коричневая',
+        'коричнево-белая',
+        'бело-коричневая',
+        'бело-красная',
+        'бело-синяя',
+        'белая',
+        'сине-белая'
       ];
 
-    case "красно-синяя" || "красно-белая" || "красная":
+    case 'красно-синяя' || 'красно-белая' || 'красная':
       return [
-        "синяя",
-        "сине-коричневая",
+        'синяя',
+        'сине-коричневая',
       ];
 
-    case "красно-коричневая":
+    case 'красно-коричневая':
       return [
-        "коричнево-белая",
-        "сине-белая",
-        "бело-коричневая",
-        "бело-красная",
-        "бело-синяя",
-        "белая",
+        'коричнево-белая',
+        'сине-белая',
+        'бело-коричневая',
+        'бело-красная',
+        'бело-синяя',
+        'белая',
       ];
 
-    case "коричнево-белая":
+    case 'коричнево-белая':
       return [
-        "коричнево-красная",
-        "коричнево-синяя",
-        "коричневая",
-        "коричнево-белая",
-        "бело-коричневая",
-        "бело-красная",
-        "бело-синяя",
-        "белая",
-        "сине-белая",
-        "красно-коричневая",
+        'коричнево-красная',
+        'коричнево-синяя',
+        'коричневая',
+        'коричнево-белая',
+        'бело-коричневая',
+        'бело-красная',
+        'бело-синяя',
+        'белая',
+        'сине-белая',
+        'красно-коричневая',
       ];
 
-    case "синяя" || "сине-коричневая":
+    case 'синяя' || 'сине-коричневая':
       return [
-        "красная",
-        "красно-белая",
-        "сине-красная",
-        "красно-синяя",
+        'красная',
+        'красно-белая',
+        'сине-красная',
+        'красно-синяя',
       ];
 
-    case "сине-белая":
+    case 'сине-белая':
       return [
-        "коричнево-красная",
-        "коричнево-синяя",
-        "коричневая",
-        "коричнево-белая",
-        "бело-коричневая",
-        "бело-красная",
-        "бело-синяя",
-        "белая",
-        "красно-коричневая",
+        'коричнево-красная',
+        'коричнево-синяя',
+        'коричневая',
+        'коричнево-белая',
+        'бело-коричневая',
+        'бело-красная',
+        'бело-синяя',
+        'белая',
+        'красно-коричневая',
       ];
 
-    case "сине-красная":
+    case 'сине-красная':
       return [
-        "синяя",
-        "сине-коричневая",
+        'синяя',
+        'сине-коричневая',
       ];
 
-    case "бело-красная" || "бело-синяя" || "белая" || "бело-коричневая":
+    case 'бело-красная' || 'бело-синяя' || 'белая' || 'бело-коричневая':
       return [
-        "коричнево-красная",
-        "коричнево-синяя",
-        "коричневая",
-        "коричнево-белая",
-        "сине-белая",
-        "красно-коричневая",
+        'коричнево-красная',
+        'коричнево-синяя',
+        'коричневая',
+        'коричнево-белая',
+        'сине-белая',
+        'красно-коричневая',
       ];
 
     default:

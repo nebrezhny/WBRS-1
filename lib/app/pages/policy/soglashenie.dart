@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -11,12 +9,11 @@ class Rules extends StatefulWidget {
 }
 
 class _RulesState extends State<Rules> {
-
-  String text = "";
+  String text = '';
 
   Uri emailLaunch = Uri(
     scheme: 'mailto',
-    path: "myemail@email.com",
+    path: 'myemail@email.com',
   );
 
   @override
@@ -27,9 +24,7 @@ class _RulesState extends State<Rules> {
 
   void getText() async {
     text = await loadAsset();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Future<String> loadAsset() async {
@@ -47,7 +42,7 @@ class _RulesState extends State<Rules> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -55,13 +50,28 @@ class _RulesState extends State<Rules> {
           ),
         ),
         Scaffold(
-            appBar: AppBar(title: const Text("Пользовательское соглашени", style: TextStyle(color: Colors.white),), backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white),),
+            appBar: AppBar(
+              title: const Text(
+                'Пользовательское соглашени',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
             backgroundColor: Colors.transparent,
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  Text(text, textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.white, height: 1, fontFamily: 'Colibri'),),
+                  Text(
+                    text,
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        height: 1,
+                        fontFamily: 'Colibri'),
+                  ),
                 ],
               ),
             )),

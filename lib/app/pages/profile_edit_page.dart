@@ -48,8 +48,8 @@ class ProfilePageEdit extends StatefulWidget {
 class _ProfilePageEditState extends State<ProfilePageEdit> {
   String? dropdownValue;
   FirebaseStorage storage = FirebaseStorage.instance;
-  String imageUrl = " ";
-  String chatIdThis = "";
+  String imageUrl = ' ';
+  String chatIdThis = '';
   XFile? _image;
   TextEditingController? name = TextEditingController();
   TextEditingController? age = TextEditingController();
@@ -68,7 +68,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("profilepic${firebaseAuth.currentUser?.uid}.jpg");
+        .child('profilepic${firebaseAuth.currentUser?.uid}.jpg');
 
     await ref.putFile(File(image!.path));
     ref.getDownloadURL().then((value) {
@@ -105,7 +105,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -134,14 +134,14 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                           deti: widget.deti,
                           city: widget.city,
                           rost: widget.rost,
-                          pol: GlobalPol.toString(),
+                          pol: globalPol.toString(),
                         ));
                   },
                   icon: const Icon(
                     Icons.arrow_back_ios_new_rounded,
                   )),
               title: const Text(
-                "Редактирование профиля",
+                'Редактирование профиля',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -152,7 +152,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
               child: Container(
                 decoration: const BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("assets/fon.jpg"),
+                        image: AssetImage('assets/fon.jpg'),
                         fit: BoxFit.fitHeight)),
                 padding: const EdgeInsets.symmetric(vertical: 17),
                 child: Center(
@@ -162,7 +162,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                       Stack(
                         children: [
                           (_image == null)
-                              ? (firebaseAuth.currentUser!.photoURL == "" ||
+                              ? (firebaseAuth.currentUser!.photoURL == '' ||
                                       FirebaseAuth
                                               .instance.currentUser!.photoURL ==
                                           null)
@@ -170,7 +170,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       borderRadius:
                                           BorderRadius.circular(100.0),
                                       child: Image.asset(
-                                        "assets/profile.png",
+                                        'assets/profile.png',
                                         fit: BoxFit.cover,
                                         height: 100.0,
                                         width: 100.0,
@@ -228,21 +228,21 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           .updatePhotoURL(
                                               downloadUrl.toString());
                                       await db
-                                          .collection("users")
+                                          .collection('users')
                                           .doc(FirebaseAuth
                                               .instance.currentUser!.uid)
                                           .update({
                                         'profilePic': downloadUrl,
-                                      }).then((value) => print("done"));
+                                      });
 
                                       await db
-                                          .collection("users")
+                                          .collection('users')
                                           .doc(FirebaseAuth
                                               .instance.currentUser!.uid)
-                                          .collection("images")
+                                          .collection('images')
                                           .add({
                                         'url': downloadUrl,
-                                      }).then((value) => print("done"));
+                                      });
                                       updateVisiterImage(downloadUrl);
                                     }
                                   },
@@ -280,7 +280,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Имя",
+                                    'Имя',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -329,7 +329,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Возраст",
+                                    'Возраст',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -377,7 +377,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Рост",
+                                    'Рост',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -424,7 +424,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "О себе",
+                                    'О себе',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -473,7 +473,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Хобби",
+                                    'Хобби',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -523,7 +523,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Город",
+                                    'Город',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -564,10 +564,10 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                       title: Text(
                                                         option
                                                             .split(RegExp(
-                                                                r"(?! )\s{2,}"))
+                                                                r'(?! )\s{2,}'))
                                                             .join(' ')
                                                             .split(
-                                                                RegExp(r"\s+$"))
+                                                                RegExp(r'\s+$'))
                                                             .join(''),
                                                         style: const TextStyle(
                                                             color:
@@ -597,9 +597,9 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       onSelected: (String val) {
                                         setState(() {
                                           city!.text = val
-                                              .split(RegExp(r"(?! )\s{2,}"))
+                                              .split(RegExp(r'(?! )\s{2,}'))
                                               .join(' ')
-                                              .split(RegExp(r"\s+$"))
+                                              .split(RegExp(r'\s+$'))
                                               .join('');
                                         });
                                       },
@@ -618,9 +618,9 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           onChanged: (value) {
                                             setState(() {
                                               city!.text = value
-                                                  .split(RegExp(r"(?! )\s{2,}"))
+                                                  .split(RegExp(r'(?! )\s{2,}'))
                                                   .join(' ')
-                                                  .split(RegExp(r"\s+$"))
+                                                  .split(RegExp(r'\s+$'))
                                                   .join('');
                                             });
                                           },
@@ -646,7 +646,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Наличие детей",
+                                    'Наличие детей',
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -662,7 +662,11 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                           .map((String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
-                                          child: Text(value, style: const TextStyle(color: Colors.white),),
+                                          child: Text(
+                                            value,
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
@@ -676,7 +680,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                         color: Color.fromRGBO(128, 128, 128, 1),
                                       ),
                                       hint: const Text(
-                                        "нет",
+                                        'нет',
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       dropdownColor: darkGrey,
@@ -723,13 +727,12 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                 }
                                 bool haveDeti = widget.deti;
                                 setState(() {
-                                  if(deti != null && deti == 'да')
-                                  {
+                                  if (deti != null && deti == 'да') {
                                     haveDeti = true;
-                                  }else{
+                                  } else {
                                     haveDeti = false;
                                   }
-                                  GlobalDeti = haveDeti;
+                                  globalDeti = haveDeti;
                                   DatabaseService().updateUserData(
                                       widget.userName,
                                       widget.email,
@@ -740,8 +743,8 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       haveDeti);
                                   firebaseAuth.currentUser!
                                       .updateDisplayName(widget.userName);
-                                  global.GlobalAge = widget.age;
-                                  global.GlobalAbout = widget.about;
+                                  global.globalAge = widget.age;
+                                  global.globalAbout = widget.about;
                                 });
                                 var x = await getUserGroup();
                                 nextScreenReplace(
@@ -756,7 +759,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                       deti: haveDeti,
                                       city: city!.text,
                                       rost: widget.rost,
-                                      pol: GlobalPol.toString(),
+                                      pol: globalPol.toString(),
                                     ));
                               },
                               style: const ButtonStyle(
@@ -766,7 +769,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                     WidgetStatePropertyAll(Colors.green),
                               ),
                               child: const Text(
-                                "Сохранить",
+                                'Сохранить',
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,
@@ -818,18 +821,18 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
 
                                                       List chatsId = [];
 
-                                                      if(chatsId.isNotEmpty){
+                                                      if (chatsId.isNotEmpty) {
                                                         await db
                                                             .collection('chats')
                                                             .where(Filter.or(
-                                                            Filter('user1',
-                                                                isEqualTo:
-                                                                currentUser
-                                                                    .uid),
-                                                            Filter('user2',
-                                                                isEqualTo:
-                                                                currentUser
-                                                                    .uid)))
+                                                                Filter('user1',
+                                                                    isEqualTo:
+                                                                        currentUser
+                                                                            .uid),
+                                                                Filter('user2',
+                                                                    isEqualTo:
+                                                                        currentUser
+                                                                            .uid)))
                                                             .get()
                                                             .then((value) {
                                                           setState(() {
@@ -840,16 +843,17 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                         });
 
                                                         for (int i = 0;
-                                                        i < chatsId.length;
-                                                        i++) {
+                                                            i < chatsId.length;
+                                                            i++) {
                                                           db
                                                               .collection(
-                                                              'removedChats')
+                                                                  'removedChats')
                                                               .add(chatsId[i]);
                                                           db
-                                                              .collection('chats')
+                                                              .collection(
+                                                                  'chats')
                                                               .doc(chatsId[i]
-                                                          ['chatId'])
+                                                                  ['chatId'])
                                                               .delete();
                                                         }
                                                       }
@@ -935,8 +939,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
               .collection('visiters')
               .doc(firebaseAuth.currentUser!.uid)
               .update({'photoUrl': photourl});
-        } else {
-          print(isEmpty);
         }
       }
     }

@@ -27,7 +27,7 @@ class _AboutMeetState extends State<AboutMeet> {
       groupId: widget.id,
       groupName: widget.name,
       users: widget.users,
-      is_user_join: widget.is_user_join,
+      isUserJoin: widget.is_user_join,
     );
   }
 }

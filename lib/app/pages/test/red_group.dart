@@ -38,8 +38,8 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
   ];
 
   final List<String> questions = [
-    "неусидчивы, суетливы",
-    "невыдержанны, вспыльчивы",
+    'неусидчивы, суетливы',
+    'невыдержанны, вспыльчивы',
     'нетерпеливы',
     'резки и прямолинейны в отношениях с людьми',
     'решительны и инициативны',
@@ -66,7 +66,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -78,7 +78,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
             iconTheme: const IconThemeData(color: Colors.white),
             backgroundColor: Colors.transparent,
             title: const Text(
-              "Ответьте на вопросы",
+              'Ответьте на вопросы',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -88,7 +88,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
               child: Column(
                 children: [
                   const Text(
-                    "Отметьте знаком «+» те качества , которые для вас обычны, в обратном случае можете отметить знаком «-» или оставить пустым. Итак, если вы:",
+                    'Отметьте знаком «+» те качества , которые для вас обычны, в обратном случае можете отметить знаком «-» или оставить пустым. Итак, если вы:',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                   SizedBox(
@@ -106,11 +106,11 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        BrownGroup = counter;
+                        brownGroup = counter;
                       });
                       nextScreenReplace(context, const GreenPage());
                     },
-                    child: const Text("Дальше"),
+                    child: const Text('Дальше'),
                   )
                 ],
               ),
@@ -147,7 +147,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "+",
+                      '+',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),
@@ -165,7 +165,7 @@ class _FirstGroupRedState extends State<FirstGroupRed> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "-",
+                      '-',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),

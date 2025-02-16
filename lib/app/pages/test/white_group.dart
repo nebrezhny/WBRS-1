@@ -39,8 +39,8 @@ class _WhitePageState extends State<WhitePage> {
   ];
 
   final List<String> questions = [
-    "спокойны и хладнокровны",
-    "последовательны и обстоятельны в делах",
+    'спокойны и хладнокровны',
+    'последовательны и обстоятельны в делах',
     'осторожны и рассудительны',
     'умеете ждать',
     'молчаливы и не любите попусту болтать',
@@ -72,7 +72,7 @@ class _WhitePageState extends State<WhitePage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -85,7 +85,7 @@ class _WhitePageState extends State<WhitePage> {
               iconTheme: const IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
               title: const Text(
-                "Ответьте на вопросы",
+                'Ответьте на вопросы',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -111,11 +111,11 @@ class _WhitePageState extends State<WhitePage> {
                       ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              WhiteGroup = counter;
+                              whiteGroup = counter;
                             });
                             nextScreenReplace(context, const OrangePage());
                           },
-                          child: const Text("Дальше"))
+                          child: const Text('Дальше'))
                     ],
                   ),
                 ))),
@@ -149,7 +149,7 @@ class _WhitePageState extends State<WhitePage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "+",
+                      '+',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),
@@ -167,7 +167,7 @@ class _WhitePageState extends State<WhitePage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "-",
+                      '-',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),

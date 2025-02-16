@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +36,7 @@ class _MyDrawerState extends State<MyDrawer> {
   AuthService authService = AuthService();
 
   Stream? groups;
-  String groupName = "";
+  String groupName = '';
   String? displayName;
 
   @override
@@ -51,18 +49,18 @@ class _MyDrawerState extends State<MyDrawer> {
     }
 
     firebaseFirestore
-        .collection("users")
-        .where("uid", isEqualTo: currentUser!.uid)
+        .collection('users')
+        .where('uid', isEqualTo: currentUser!.uid)
         .get()
         .then((QuerySnapshot snapshot) {
       setState(() {
-        GlobalAge = snapshot.docs[0].get("age".toString()).toString();
-        GlobalAbout = snapshot.docs[0].get("about".toString()).toString();
-        GlobalCity = snapshot.docs[0]["city"].toString();
-        GlobalHobbi = snapshot.docs[0]["hobbi"];
-        GlobalRost = snapshot.docs[0]["rost"];
-        GlobalDeti = snapshot.docs[0]["deti"];
-        Group = snapshot.docs[0]["группа"];
+        globalAge = snapshot.docs[0].get('age'.toString()).toString();
+        globalAbout = snapshot.docs[0].get('about'.toString()).toString();
+        globalCity = snapshot.docs[0]['city'].toString();
+        globalHobbi = snapshot.docs[0]['hobbi'];
+        globalRost = snapshot.docs[0]['rost'];
+        globalDeti = snapshot.docs[0]['deti'];
+        group = snapshot.docs[0]['группа'];
       });
     });
 
@@ -83,7 +81,7 @@ class _MyDrawerState extends State<MyDrawer> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: double.infinity,
           width: 300,
           fit: BoxFit.cover,
@@ -104,7 +102,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     children: [
                       Column(
                         children: [
-                          firebaseAuth.currentUser!.photoURL == "" ||
+                          firebaseAuth.currentUser!.photoURL == '' ||
                                   firebaseAuth.currentUser!.photoURL == null
                               ? const Icon(
                                   Icons.account_circle,
@@ -112,14 +110,14 @@ class _MyDrawerState extends State<MyDrawer> {
                                   color: Colors.white,
                                 )
                               : userImageWithCircle(
-                                  (firebaseAuth.currentUser!.photoURL == "" ||
+                                  (firebaseAuth.currentUser!.photoURL == '' ||
                                           firebaseAuth.currentUser!.photoURL ==
                                               null)
-                                      ? "assets/profile.png"
+                                      ? 'assets/profile.png'
                                       : FirebaseAuth
                                           .instance.currentUser!.photoURL
                                           .toString(),
-                                  Group),
+                                  group),
                           const SizedBox(
                             height: 15,
                           ),
@@ -147,7 +145,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     color: Colors.grey,
                   ),
                   title: const Text(
-                    "Пройти тест",
+                    'Пройти тест',
                     style: TextStyle(color: Colors.white),
                   ),
                   onTap: () {
@@ -157,20 +155,28 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    bool resp = await launchUrl(
-                        Uri.parse(
-                            'https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=02&bank=100000000008&sum=100&crc=C752'),
-                        mode: LaunchMode.externalApplication).then((value) {
-                          if(value){
-                            showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
-                          }
-                          return value;
-                        });
+                    await launchUrl(
+                            Uri.parse(
+                                'https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=02&bank=100000000008&sum=100&crc=C752'),
+                            mode: LaunchMode.externalApplication)
+                        .then((value) {
+                      if (value) {
+                        if (context.mounted) {
+                          showSnackbar(context, Colors.lightGreen,
+                              'Спасибо за поддержку!');
+                        }
+                      }
+                      return value;
+                    });
                   },
                   child: Container(
                     width: double.infinity,
                     color: Colors.transparent,
-                    child: const Text('Поддержать проект  ❤️🫴', textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                    child: const Text(
+                      'Поддержать проект  ❤️🫴',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
                 ListTile(
@@ -188,7 +194,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     color: Colors.grey,
                   ),
                   title: const Text(
-                    "Чаты",
+                    'Чаты',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -205,7 +211,7 @@ class _MyDrawerState extends State<MyDrawer> {
                           visiters: visiters,
                         ));
                   },
-                  title: const Text("Гости",
+                  title: const Text('Гости',
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.transfer_within_a_station,
@@ -229,12 +235,15 @@ class _MyDrawerState extends State<MyDrawer> {
                       nextScreenReplace(context, const SplashScreen());
                     } else {
                       var x = await getUserGroup();
-                      nextScreenReplace(
-                          context,
-                          ProfilesList(
-                            startPosition: 0,
-                            group: x,
-                          ));
+
+                      if (context.mounted) {
+                        nextScreenReplace(
+                            context,
+                            ProfilesList(
+                              startPosition: 0,
+                              group: x,
+                            ));
+                      }
                     }
                   },
                   leading: const Icon(
@@ -244,7 +253,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   title: const Text(
-                    "Список пользователей",
+                    'Список пользователей',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -252,7 +261,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () {
                     nextScreenReplace(context, const ShopPage());
                   },
-                  title: const Text("Дарить подарки",
+                  title: const Text('Дарить подарки',
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.shopping_basket,
@@ -268,7 +277,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     });
                     nextScreenReplace(context, const MeetingPage());
                   },
-                  title: const Text("Встречи",
+                  title: const Text('Встречи',
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.person_pin_circle,
@@ -282,7 +291,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () {
                     nextScreenReplace(context, const About_App());
                   },
-                  title: const Text("О приложении",
+                  title: const Text('О приложении',
                       style: TextStyle(color: Colors.white)),
                   leading: const Icon(
                     Icons.info,
@@ -294,20 +303,24 @@ class _MyDrawerState extends State<MyDrawer> {
                 const Divider(
                   color: Colors.grey,
                 ),
-                if(['T4zb6OLzDgMh0qrfp3eEahNKmNl1',
-                'lyNcv2xr33Ms6G9fI0bhBEcDKFj2', 'vLeB8v4b1pUL8h5dtxJSkifF2v72'].contains(firebaseAuth.currentUser!.uid))
-                ListTile(
-                  onTap:()=> nextScreenReplace(context, const AdminPanel()) ,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  leading: const Icon(
-                    Icons.admin_panel_settings_outlined,
-                    color: Colors.grey,
+                if ([
+                  'T4zb6OLzDgMh0qrfp3eEahNKmNl1',
+                  'lyNcv2xr33Ms6G9fI0bhBEcDKFj2',
+                  'vLeB8v4b1pUL8h5dtxJSkifF2v72'
+                ].contains(firebaseAuth.currentUser!.uid))
+                  ListTile(
+                    onTap: () => nextScreenReplace(context, const AdminPanel()),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    leading: const Icon(
+                      Icons.admin_panel_settings_outlined,
+                      color: Colors.grey,
+                    ),
+                    title: const Text(
+                      'Панель для админа',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  title: const Text(
-                    "Панель для админа",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
                 ListTile(
                   onTap: () async {
                     showDialog(
@@ -317,17 +330,19 @@ class _MyDrawerState extends State<MyDrawer> {
                           return AlertDialog(
                             backgroundColor: darkGrey,
                             elevation: 0.0,
-                            titleTextStyle: const TextStyle(color: Colors.white),
-                            contentTextStyle: const TextStyle(color: Colors.white),
-                            title: const Text("Выйти"),
-                            content: const Text("Вы уверены что хотите выйти?"),
+                            titleTextStyle:
+                                const TextStyle(color: Colors.white),
+                            contentTextStyle:
+                                const TextStyle(color: Colors.white),
+                            title: const Text('Выйти'),
+                            content: const Text('Вы уверены что хотите выйти?'),
                             actions: [
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
                                 child: const Text(
-                                  "Нет",
+                                  'Нет',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -343,14 +358,16 @@ class _MyDrawerState extends State<MyDrawer> {
                                       .doc(firebaseAuth.currentUser!.uid)
                                       .update({'online': false});
                                   await authService.signOut();
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LoginPage()),
-                                      (route) => false);
+                                  if (context.mounted) {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LoginPage()),
+                                        (route) => false);
+                                  }
                                 },
                                 child: const Text(
-                                  "Да",
+                                  'Да',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -365,7 +382,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     color: Colors.grey,
                   ),
                   title: const Text(
-                    "Выйти",
+                    'Выйти',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -394,9 +411,7 @@ class _MyDrawerState extends State<MyDrawer> {
         ProfilePage(
           group: x,
           email: firebaseAuth.currentUser!.email.toString(),
-          userName: FirebaseAuth
-              .instance.currentUser!.displayName
-              .toString(),
+          userName: FirebaseAuth.instance.currentUser!.displayName.toString(),
           about: doc.get('about'),
           age: doc.get('age').toString(),
           rost: doc.get('rost'),

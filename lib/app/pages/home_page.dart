@@ -39,9 +39,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  initInfo() {
-
-  }
+  initInfo() {}
 
   void saveUserToken(String token) {
     firebaseFirestore
@@ -67,7 +65,9 @@ class _HomePageState extends State<HomePage> {
           AuthorizationStatus.provisional) {
       } else {}
     } on Exception catch (e) {
-      showSnackbar(context, Colors.red, e);
+      if (mounted) {
+        showSnackbar(context, Colors.red, e);
+      }
       firebaseFirestore
           .collection('users')
           .doc(firebaseAuth.currentUser!.uid)
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePage> {
               centerTitle: true,
               backgroundColor: Colors.transparent,
               title: const Text(
-                "Чаты",
+                'Чаты',
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       if (!snapshot.hasData) {
                         return const Text(
-                          "Нет чатов",
+                          'Нет чатов',
                           textAlign: TextAlign.center,
                         );
                       } else {
@@ -147,12 +147,12 @@ class _HomePageState extends State<HomePage> {
                               itemCount: sortedList.length,
                               itemBuilder: (context, index) {
                                 return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 7.0, horizontal: 15),
-                                  child:
-                                      SizedBox(
-                                          height: 100,
-                                          child: ChatRoomList(snapshot: sortedList[index])),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 7.0, horizontal: 15),
+                                  child: SizedBox(
+                                      height: 100,
+                                      child: ChatRoomList(
+                                          snapshot: sortedList[index])),
                                 );
                               });
                         } else {

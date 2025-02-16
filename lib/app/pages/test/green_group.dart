@@ -39,8 +39,8 @@ class _GreenPageState extends State<GreenPage> {
   ];
 
   final List<String> questions = [
-    "веселы и жизнерадостны",
-    "энергичны и деловиты",
+    'веселы и жизнерадостны',
+    'энергичны и деловиты',
     'часто не доводите начатое дело до конца',
     'склонны переоценивать себя',
     'способны быстро схватывать новое',
@@ -72,7 +72,7 @@ class _GreenPageState extends State<GreenPage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -85,7 +85,7 @@ class _GreenPageState extends State<GreenPage> {
               iconTheme: const IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
               title: const Text(
-                "Ответьте на вопросы",
+                'Ответьте на вопросы',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -111,11 +111,11 @@ class _GreenPageState extends State<GreenPage> {
                       ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              RedGroup = counter;
+                              redGroup = counter;
                             });
                             nextScreenReplace(context, const WhitePage());
                           },
-                          child: const Text("Дальше"))
+                          child: const Text('Дальше'))
                     ],
                   ),
                 ))),
@@ -149,7 +149,7 @@ class _GreenPageState extends State<GreenPage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "+",
+                      '+',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),
@@ -167,7 +167,7 @@ class _GreenPageState extends State<GreenPage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "-",
+                      '-',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),

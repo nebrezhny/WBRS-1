@@ -19,7 +19,7 @@ class _FilterPageState extends State<FilterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Фильтр"),
+        title: const Text('Фильтр'),
         backgroundColor: Colors.orangeAccent,
         //actions: [IconButton(onPressed: (){Navigator.pop(context);}, icon: Icon(CupertinoIcons.clear)),],
       ),
@@ -36,7 +36,7 @@ class FilterPage2 extends StatefulWidget {
 }
 
 class _FilterPage2State extends State<FilterPage2> {
-  String pol = "";
+  String pol = '';
   String city = filterCity.text;
   TextEditingController filtrAgeStart = TextEditingController();
   TextEditingController filtrAgeEnd = TextEditingController();
@@ -81,7 +81,7 @@ class _FilterPage2State extends State<FilterPage2> {
                     color: Colors.white,
                   ),
                   const SizedBox(width: 10),
-                  const Text("Фильтр по группам",
+                  const Text('Фильтр по группам',
                       style: TextStyle(color: Colors.white)),
                   const Spacer(),
                 ],
@@ -100,16 +100,16 @@ class _FilterPage2State extends State<FilterPage2> {
                     const SizedBox(
                       width: 10,
                     ),
-                    const Text("Пол:", style: TextStyle(color: Colors.white)),
+                    const Text('Пол:', style: TextStyle(color: Colors.white)),
                     const SizedBox(
                       width: 10,
                     ),
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          FiltrPol = "м";
+                          filtrPol = 'м';
                           nextScreenReplace(context,
-                              ProfilesList(startPosition: 0, group: Group));
+                              ProfilesList(startPosition: 0, group: group));
                         });
                       },
                       child: Container(
@@ -122,7 +122,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         child: Text(
                           'M',
                           style: TextStyle(
-                              color: FiltrPol == "м"
+                              color: filtrPol == 'м'
                                   ? Colors.orangeAccent
                                   : Colors.white24,
                               fontWeight: FontWeight.bold),
@@ -135,9 +135,9 @@ class _FilterPage2State extends State<FilterPage2> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          FiltrPol = "ж";
+                          filtrPol = 'ж';
                           nextScreenReplace(context,
-                              ProfilesList(startPosition: 0, group: Group));
+                              ProfilesList(startPosition: 0, group: group));
                         });
                       },
                       child: Container(
@@ -150,7 +150,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         child: Text(
                           'Ж',
                           style: TextStyle(
-                              color: FiltrPol == "ж"
+                              color: filtrPol == 'ж'
                                   ? Colors.orangeAccent
                                   : Colors.white24,
                               fontWeight: FontWeight.bold),
@@ -163,9 +163,9 @@ class _FilterPage2State extends State<FilterPage2> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          FiltrPol = "";
+                          filtrPol = '';
                           nextScreenReplace(context,
-                              ProfilesList(startPosition: 0, group: Group));
+                              ProfilesList(startPosition: 0, group: group));
                         });
                       },
                       child: Container(
@@ -178,7 +178,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         child: Text(
                           'Все',
                           style: TextStyle(
-                              color: FiltrPol == ""
+                              color: filtrPol == ''
                                   ? Colors.orangeAccent
                                   : Colors.white24,
                               fontWeight: FontWeight.bold),
@@ -208,7 +208,7 @@ class _FilterPage2State extends State<FilterPage2> {
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text("Возраст",
+                        const Text('Возраст',
                             style: TextStyle(color: Colors.white)),
                         const SizedBox(
                           width: 10,
@@ -256,7 +256,7 @@ class _FilterPage2State extends State<FilterPage2> {
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                 ),
-                                const Text("-",
+                                const Text('-',
                                     style: TextStyle(color: Colors.white)),
                                 SizedBox(
                                   width: 50,
@@ -305,7 +305,7 @@ class _FilterPage2State extends State<FilterPage2> {
                     const SizedBox(
                       width: 10,
                     ),
-                    const Text("Город:", style: TextStyle(color: Colors.white)),
+                    const Text('Город:', style: TextStyle(color: Colors.white)),
                     const SizedBox(
                       width: 10,
                     ),
@@ -369,7 +369,9 @@ class _FilterPage2State extends State<FilterPage2> {
                       ageStart = int.parse(filtrAgeStart.text);
                       ageEnd = int.parse(filtrAgeEnd.text);
                       nextScreenReplace(
-                          context, ProfilesList(startPosition: 0, group:filterByGroup? x : ''));
+                          context,
+                          ProfilesList(
+                              startPosition: 0, group: filterByGroup ? x : ''));
                     });
                   },
                   child: const Text('Применить фильтры',
@@ -378,7 +380,7 @@ class _FilterPage2State extends State<FilterPage2> {
                   onPressed: () async {
                     var x = await getUserGroup();
                     filterByGroup = false;
-                    FiltrPol = '';
+                    filtrPol = '';
                     setState(() {
                       filterCity.text = '';
                       ageStart = 0;

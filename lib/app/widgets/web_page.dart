@@ -1,7 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class WebPage extends StatefulWidget {
   const WebPage({super.key});
@@ -11,22 +9,9 @@ class WebPage extends StatefulWidget {
 }
 
 class _WebPageState extends State<WebPage> {
-
   @override
   void initState() {
     super.initState();
-    late final PlatformWebViewControllerCreationParams params;
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      params = const PlatformWebViewControllerCreationParams();
-    }
-
-    final WebViewController controller =
-    WebViewController.fromPlatformCreationParams(params);
   }
 
   @override
@@ -50,7 +35,8 @@ class _WebPageState extends State<WebPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=01&bank=100000000008&crc=C752'));
+      ..loadRequest(Uri.parse(
+          'https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=01&bank=100000000008&crc=C752'));
     return Scaffold(
       appBar: AppBar(
         title: Text('Страница оплаты'),

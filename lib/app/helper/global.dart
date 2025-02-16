@@ -3,29 +3,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-String? GlobalAbout,
-    GlobalAge = '',
-    GlobalPol,
-    GlobalCity,
-    GlobalRost,
-    GlobalHobbi;
-int GlobalBalance = 0;
-// ignore: non_constant_identifier_names
-bool GlobalDeti = false;
+String? globalAbout,
+    globalAge = '',
+    globalPol,
+    globalCity,
+    globalRost,
+    globalHobbi;
+int globalBalance = 0;
+bool globalDeti = false;
 
 //красная,зелёная,белая,оранжевая
 
-String Group = '';
-int BrownGroup = 0, WhiteGroup = 0, RedGroup = 0, BlueGroup = 0;
+String group = '';
+int brownGroup = 0, whiteGroup = 0, redGroup = 0, blueGroup = 0;
 bool testIsComlpete = false;
 
-int CountImages = 0;
-List Images = [];
+int countImages = 0;
+List images = [];
 
 int selectedIndex = 1;
 
 //Filter data
-String FiltrPol = "";
+String filtrPol = '';
 int ageStart = 18, ageEnd = 100;
 TextEditingController filterCity = TextEditingController();
 String meetCity = '';

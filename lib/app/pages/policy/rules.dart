@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
@@ -14,12 +12,11 @@ class Rule extends StatefulWidget {
 }
 
 class _RuleState extends State<Rule> {
-
-  String text = "";
+  String text = '';
 
   Uri emailLaunch = Uri(
     scheme: 'mailto',
-    path: "myemail@email.com",
+    path: 'myemail@email.com',
   );
 
   @override
@@ -30,9 +27,7 @@ class _RuleState extends State<Rule> {
 
   void getText() async {
     text = await loadAsset();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Future<String> loadAsset() async {
@@ -50,7 +45,7 @@ class _RuleState extends State<Rule> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -58,26 +53,68 @@ class _RuleState extends State<Rule> {
           ),
         ),
         Scaffold(
-            appBar: AppBar(title: const Text("Правила использования приложения", style: TextStyle(color: Colors.white),), backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white),),
+            appBar: AppBar(
+              title: const Text(
+                'Правила использования приложения',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
             backgroundColor: Colors.transparent,
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text("WBRS version 1.0",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                  const SizedBox(height: 20,),
+                  const Text(
+                    'WBRS version 1.0',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextButton(
-                      onPressed: (){
+                      onPressed: () {
                         try {
-                          launchUrl(Uri. parse("mailto:supp.wbrs@ya.ru"));
+                          launchUrl(Uri.parse('mailto:supp.wbrs@ya.ru'));
                         } on Exception catch (e) {
                           showSnackbar(context, Colors.red, e);
                         }
-                      }, child: const Text("supp.wbrs@ya.ru",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Colors.white),)),
-                  const Text("Здесь благодаря алгоритму и психологии вы легко найдете близкого человека для создания долгих, крепких отношений, дружбы, семьи",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Colors.white),),
-                  const SizedBox(height: 20,),
-                  const Text("Правила использования приложения",textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                  Text(text, textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.white, height: 1, fontFamily: 'Colibri'),),
+                      },
+                      child: const Text(
+                        'supp.wbrs@ya.ru',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      )),
+                  const Text(
+                    'Здесь благодаря алгоритму и психологии вы легко найдете близкого человека для создания долгих, крепких отношений, дружбы, семьи',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    'Правила использования приложения',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  Text(
+                    text,
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        height: 1,
+                        fontFamily: 'Colibri'),
+                  ),
                 ],
               ),
             )),

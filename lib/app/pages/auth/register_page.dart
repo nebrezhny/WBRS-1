@@ -19,9 +19,9 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
-  String email = "";
-  String password = "";
-  String fullName = "";
+  String email = '';
+  String password = '';
+  String fullName = '';
   AuthService authService = AuthService();
 
   @override
@@ -35,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon2.jpg",
+            'assets/fon2.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             const Text(
-                              "WBRS",
+                              'WBRS',
                               style: TextStyle(
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold,
@@ -69,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                              "Well-built relationships",
+                              'Well-built relationships',
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                                "Создайте профиль и присоединяйтесь к нам!",
+                                'Создайте профиль и присоединяйтесь к нам!',
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
@@ -90,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Никнэйм",
+                                  labelText: 'Никнэйм',
                                   prefixIcon: Icon(
                                     Icons.person,
                                     color: Theme.of(context).primaryColor,
@@ -104,7 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 if (val!.isNotEmpty) {
                                   return null;
                                 } else {
-                                  return "Имя не может быть пустым";
+                                  return 'Имя не может быть пустым';
                                 }
                               },
                             ),
@@ -116,7 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Email",
+                                  labelText: 'Email',
                                   prefixIcon: Icon(
                                     Icons.email,
                                     color: Theme.of(context).primaryColor,
@@ -133,7 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                         .hasMatch(val!)
                                     ? null
-                                    : "Введите корректный email";
+                                    : 'Введите корректный email';
                               },
                             ),
                             const SizedBox(height: 15),
@@ -143,14 +143,14 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Пароль",
+                                  labelText: 'Пароль',
                                   prefixIcon: Icon(
                                     Icons.lock,
                                     color: Theme.of(context).primaryColor,
                                   )),
                               validator: (val) {
                                 if (val!.length < 6) {
-                                  return "Пароль должен содержать 6 символов";
+                                  return 'Пароль должен содержать 6 символов';
                                 } else {
                                   return null;
                                 }
@@ -175,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         borderRadius:
                                             BorderRadius.circular(30))),
                                 child: const Text(
-                                  "Зарегистрироваться",
+                                  'Зарегистрироваться',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 16),
                                 ),
@@ -188,35 +188,35 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: 10,
                             ),
                             Text.rich(
-                              textAlign: TextAlign.center,
-                              TextSpan(
-                                text: "Нажимая кнопку 'зарегистрироваться', вы подтверждаете , что согласны с ",
-                                style: const TextStyle(
-                                    color: Colors.white),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: "политикой конфиденциальности и пользовательским соглашением",
-                                      style: const TextStyle(
-                                          color: Colors.blue,
-                                          decoration:
-                                              TextDecoration.underline),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          nextScreen(context,
-                                              const Politica());
-                                        }),
-                                ]
-                            )),
+                                textAlign: TextAlign.center,
+                                TextSpan(
+                                    text:
+                                        "Нажимая кнопку 'зарегистрироваться', вы подтверждаете , что согласны с ",
+                                    style: const TextStyle(color: Colors.white),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text:
+                                              'политикой конфиденциальности и пользовательским соглашением',
+                                          style: const TextStyle(
+                                              color: Colors.blue,
+                                              decoration:
+                                                  TextDecoration.underline),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              nextScreen(
+                                                  context, const Politica());
+                                            }),
+                                    ])),
                             const SizedBox(
                               height: 10,
                             ),
                             Text.rich(TextSpan(
-                              text: "Уже есть аккаунт? ",
+                              text: 'Уже есть аккаунт? ',
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 14),
                               children: <TextSpan>[
                                 TextSpan(
-                                    text: "Войти",
+                                    text: 'Войти',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         decoration: TextDecoration.underline),

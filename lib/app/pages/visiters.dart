@@ -44,11 +44,8 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
           },
           leading: SizedBox(
             width: 50,
-            child: userImageWithCircle(
-                snapshot.data!.docs[index]['photoUrl'],
-                snapshot.data!.docs[index]['group'],
-                50.0,
-                50.0),
+            child: userImageWithCircle(snapshot.data!.docs[index]['photoUrl'],
+                snapshot.data!.docs[index]['group'], 50.0, 50.0),
           ),
           title: Row(
             children: [
@@ -86,7 +83,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             ],
           ),
           subtitle: Text(
-            "Последнее посещение: \n${time.toDate().toString().substring(0, 16)}",
+            'Последнее посещение: \n${time.toDate().toString().substring(0, 16)}',
             style: const TextStyle(color: Colors.white),
           ),
           dense: false,
@@ -97,7 +94,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -109,7 +106,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             centerTitle: true,
             backgroundColor: Colors.transparent,
             title: const Text(
-              "Посетители страницы",
+              'Посетители страницы',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -135,7 +132,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                         child: const Align(
                           alignment: Alignment.center,
                           child: Text(
-                            "Пока на вашей странице не было гостей.",
+                            'Пока на вашей странице не было гостей.',
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ),
@@ -159,7 +156,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                       child: const Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Пока на вашей странице не было гостей.",
+                          'Пока на вашей странице не было гостей.',
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),

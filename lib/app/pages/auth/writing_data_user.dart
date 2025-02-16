@@ -6,7 +6,6 @@ import 'package:wbrs/service/database_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:wbrs/app/widgets/drawer.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../../helper/global.dart';
@@ -30,13 +29,13 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
   TextEditingController hobbi = TextEditingController();
   TextEditingController about = TextEditingController();
 
-  String imageUrl = " ";
-  String chatIdThis = "";
+  String imageUrl = ' ';
+  String chatIdThis = '';
   XFile? _image;
   String? deti;
   String? pol;
   bool Deti = false;
-  String profilePic= "";
+  String profilePic = '';
 
   var currentUser;
   var displayName;
@@ -62,7 +61,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
             )
           ]),
           child: Image.asset(
-            "assets/fon2.jpg",
+            'assets/fon2.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -146,12 +145,12 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 await firebaseAuth.currentUser!
                                     .updatePhotoURL(downloadUrl.toString());
                                 await firebaseFirestore
-                                    .collection("users")
+                                    .collection('users')
                                     .doc(firebaseAuth.currentUser!.uid)
-                                    .collection("images")
+                                    .collection('images')
                                     .add({
                                   'url': downloadUrl,
-                                }).then((value) => print("done"));
+                                });
                                 profilePic = downloadUrl.toString();
                               },
                               icon: const Icon(
@@ -177,7 +176,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Возраст"),
+                        const Text('Возраст'),
                         SizedBox(
                           width: 190,
                           height: 40,
@@ -190,11 +189,11 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             controller: age,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                                errorText: Age ? "Заполните поле" : null,
+                                errorText: Age ? 'Заполните поле' : null,
                                 border: InputBorder.none,
                                 contentPadding:
                                     const EdgeInsets.only(right: 30),
-                                hintText: "20",
+                                hintText: '20',
                                 hintStyle: const TextStyle(color: Colors.grey)),
                           ),
                         ),
@@ -213,7 +212,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Рост"),
+                        const Text('Рост'),
                         SizedBox(
                           width: 190,
                           height: 40,
@@ -224,11 +223,11 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             controller: rost,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                                errorText: Rost ? "Заполните поле" : null,
+                                errorText: Rost ? 'Заполните поле' : null,
                                 border: InputBorder.none,
                                 contentPadding:
                                     const EdgeInsets.only(right: 30),
-                                hintText: "20",
+                                hintText: '20',
                                 hintStyle: const TextStyle(color: Colors.grey)),
                           ),
                         ),
@@ -247,7 +246,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Город"),
+                        const Text('Город'),
                         SizedBox(
                           width: 150,
                           child: Autocomplete<String>(
@@ -277,9 +276,9 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                             tileColor: grey,
                                             title: Text(
                                               option
-                                                  .split(RegExp(r"(?! )\s{2,}"))
+                                                  .split(RegExp(r'(?! )\s{2,}'))
                                                   .join(' ')
-                                                  .split(RegExp(r"\s+$"))
+                                                  .split(RegExp(r'\s+$'))
                                                   .join(''),
                                               style: const TextStyle(
                                                   color: Colors.white),
@@ -306,9 +305,9 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             onSelected: (String val) {
                               setState(() {
                                 city.text = val
-                                    .split(RegExp(r"(?! )\s{2,}"))
+                                    .split(RegExp(r'(?! )\s{2,}'))
                                     .join(' ')
-                                    .split(RegExp(r"\s+$"))
+                                    .split(RegExp(r'\s+$'))
                                     .join('');
                               });
                             },
@@ -325,9 +324,9 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                                 onChanged: (value) {
                                   setState(() {
                                     city.text = value
-                                        .split(RegExp(r"(?! )\s{2,}"))
+                                        .split(RegExp(r'(?! )\s{2,}'))
                                         .join(' ')
-                                        .split(RegExp(r"\s+$"))
+                                        .split(RegExp(r'\s+$'))
                                         .join('');
                                   });
                                 },
@@ -350,7 +349,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Есть дети?"),
+                        const Text('Есть дети?'),
                         DropdownButton(
                           //
                           items: <String>['да', 'нет'].map((String value) {
@@ -366,7 +365,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           },
                           value: deti,
                           style: const TextStyle(color: Colors.black),
-                          hint: const Text("нет"),
+                          hint: const Text('нет'),
                         ),
                       ],
                     ),
@@ -383,7 +382,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Пол"),
+                        const Text('Пол'),
                         DropdownButton(
                           //
                           items: <String>['м', 'ж'].map((String value) {
@@ -399,7 +398,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           },
                           value: pol,
                           style: const TextStyle(color: Colors.black),
-                          hint: const Text(""),
+                          hint: const Text(''),
                         ),
                       ],
                     ),
@@ -416,7 +415,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Хобби"),
+                        const Text('Хобби'),
                         SizedBox(
                           width: 190,
                           height: 40,
@@ -431,7 +430,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.only(right: 30),
-                                hintText: "рисование, пение...",
+                                hintText: 'рисование, пение...',
                                 hintStyle: TextStyle(color: Colors.grey)),
                           ),
                         ),
@@ -450,7 +449,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("О себе"),
+                        const Text('О себе'),
                         SizedBox(
                           width: 190,
                           height: 140,
@@ -466,7 +465,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.only(right: 30),
-                                hintText: "",
+                                hintText: '',
                                 hintStyle: TextStyle(color: Colors.grey)),
                           ),
                         ),
@@ -491,7 +490,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                         children: [
                           const Flexible(
                             child: Text(
-                              "Вы подтверждаете, что вам есть 18 лет",
+                              'Вы подтверждаете, что вам есть 18 лет',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -508,7 +507,6 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           ),
                         ],
                       )),
-
                   const SizedBox(
                     height: 20,
                   ),
@@ -536,7 +534,7 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             Age = false;
                           });
                         }
-                        if (deti == "" || deti == "нет" || deti == null) {
+                        if (deti == '' || deti == 'нет' || deti == null) {
                           Deti = false;
                         } else {
                           Deti = true;
@@ -560,13 +558,9 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                             email = currentUser.email;
                           } on Exception catch (_) {}
                         } else {
-                          displayName = "Error";
+                          displayName = 'Error';
                           email = 'test4@test.ru';
                         }
-
-                        setState(() {
-                          print(Deti);
-                        });
 
                         if (city.text.isNotEmpty &&
                             age.text.isNotEmpty &&
@@ -581,33 +575,31 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                               hobbi.text,
                               about.text,
                               pol.toString());
-                          GlobalAge = age.text;
-                          GlobalAbout = about.text;
-                          GlobalPol = pol;
-                          GlobalCity = city.text;
-                          GlobalHobbi = hobbi.text;
-                          GlobalRost = rost.text;
-                          GlobalDeti = Deti;
+                          globalAge = age.text;
+                          globalAbout = about.text;
+                          globalPol = pol;
+                          globalCity = city.text;
+                          globalHobbi = hobbi.text;
+                          globalRost = rost.text;
+                          globalDeti = Deti;
 
                           if (!Is18) {
                             showSnackbar(context, Colors.red,
-                                "Подтвердите, что вам есть 18 лет.");
+                                'Подтвердите, что вам есть 18 лет.');
                           } else {
                             if (pol == null) {
-                              showSnackbar(context, Colors.red, "Укажите пол.");
+                              showSnackbar(context, Colors.red, 'Укажите пол.');
                             } else {
                               nextScreenReplace(context, const FirstGroupRed());
                             }
                           }
 
-                          setState(() {
-
-                          });
+                          setState(() {});
 
                           //showSnackbar(context, Colors.green, "Успешно!");
                         }
                       },
-                      child: const Text("Пройти тест для определения группы"))
+                      child: const Text('Пройти тест для определения группы'))
                 ],
               ),
             ),

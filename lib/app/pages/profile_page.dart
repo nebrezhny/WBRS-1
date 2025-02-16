@@ -52,7 +52,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String imageUrl = " ";
+  String imageUrl = ' ';
   TextEditingController? name = TextEditingController();
 
   final ImagePicker imagePicker = ImagePicker();
@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("profilepic${firebaseAuth.currentUser?.uid}.jpg");
+        .child('profilepic${firebaseAuth.currentUser?.uid}.jpg');
 
     await ref.putFile(File(image!.path));
     ref.getDownloadURL().then((value) {
@@ -88,8 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   AuthService authService = AuthService();
-  String password = "";
-  String passwordConfirm = "";
+  String password = '';
+  String passwordConfirm = '';
 
   var currentUser = firebaseAuth.currentUser;
   final formKey = GlobalKey<FormState>();
@@ -114,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
               IconButton(
                 onPressed: () {
                   showModalBottomSheet(
-                    backgroundColor: darkGrey,
+                      backgroundColor: darkGrey,
                       context: context,
                       builder: (context) {
                         return Container(
@@ -155,14 +155,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
                                             color: Colors.white),
-                                        labelText: "Введите пароль",
+                                        labelText: 'Введите пароль',
                                         prefixIcon: Icon(
                                           Icons.lock,
                                           color: Theme.of(context).primaryColor,
                                         )),
                                     validator: (val) {
                                       if (val!.length < 6) {
-                                        return "Пароль должен содержать 6 символов";
+                                        return 'Пароль должен содержать 6 символов';
                                       } else {
                                         return null;
                                       }
@@ -182,17 +182,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
                                             color: Colors.white),
-                                        labelText: "Повторите пароль",
+                                        labelText: 'Повторите пароль',
                                         prefixIcon: Icon(
                                           Icons.lock,
                                           color: Theme.of(context).primaryColor,
                                         )),
                                     validator: (val) {
                                       if (val!.length < 6) {
-                                        return "Пароль должен содержать 6 символов";
+                                        return 'Пароль должен содержать 6 символов';
                                       } else {
                                         if (val != password) {
-                                          return "Пароли не совпадают!";
+                                          return 'Пароли не совпадают!';
                                         }
                                         return null;
                                       }
@@ -216,16 +216,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                             nextScreenReplace(
                                                 context, const LoginPage());
                                             showSnackbar(context, Colors.green,
-                                                "Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.");
+                                                'Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.');
                                           } on Exception catch (e) {
-                                            print(e);
+                                            showSnackbar(context, Colors.red,
+                                                e.toString());
                                           }
                                         }
                                       },
                                       child: const Text(
-                                        "Сменить пароль",
-                                        style: TextStyle(
-                                            color: Colors.white),
+                                        'Сменить пароль',
+                                        style: TextStyle(color: Colors.white),
                                       )),
                                 ]),
                               ),
@@ -241,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              "Профиль",
+              'Профиль',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 27,
@@ -260,13 +260,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                           Stack(
                             children: [
-                              StreamBuilder(stream: firebaseFirestore.collection('users').doc(currentUser!.uid).snapshots(), builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return userImageWithCircle(snapshot.data!['profilePic'], widget.group);
-                                } else {
-                                  return userImageWithCircle(currentUser!.photoURL, widget.group);
-                                }
-                              }),
+                              StreamBuilder(
+                                  stream: firebaseFirestore
+                                      .collection('users')
+                                      .doc(currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return userImageWithCircle(
+                                          snapshot.data!['profilePic'],
+                                          widget.group);
+                                    } else {
+                                      return userImageWithCircle(
+                                          currentUser!.photoURL, widget.group);
+                                    }
+                                  }),
                             ],
                           ),
                           const SizedBox(
@@ -320,7 +328,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.white
-                                                    .withOpacity(0.5),
+                                                    .withValues(alpha: 0.5),
                                                 spreadRadius: 3,
                                                 blurRadius:
                                                     7, // changes position of shadow
@@ -350,7 +358,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               color: Colors.white,
                                             ))),
                                     const Text(
-                                      "Мои гости",
+                                      'Мои гости',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -373,8 +381,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           color: Colors.orangeAccent,
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.white.withOpacity(0.5),
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.5),
                                               spreadRadius: 3,
                                               blurRadius:
                                                   7, // changes position of shadow
@@ -384,7 +392,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               Radius.circular(50.0))),
                                       child: IconButton(
                                         onPressed: () {
-                                          global.GlobalPol = widget.pol;
+                                          global.globalPol = widget.pol;
                                           nextScreenReplace(
                                               context,
                                               ProfilePageEdit(
@@ -406,7 +414,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                     const Text(
-                                      "Изменить профиль",
+                                      'Изменить профиль',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -425,7 +433,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.white
-                                                    .withOpacity(0.5),
+                                                    .withValues(alpha: 0.5),
                                                 spreadRadius: 3,
                                                 blurRadius:
                                                     7, // changes position of shadow
@@ -452,7 +460,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               color: Colors.white,
                                             ))),
                                     const Text(
-                                      "Люди",
+                                      'Люди',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -610,7 +618,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: const ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
             child: const Text(
-              "Добавить фотографии",
+              'Добавить фотографии',
               style: TextStyle(color: Colors.white, fontSize: 16),
             )),
       ],
@@ -621,7 +629,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: [
         const Text(
-          "Нет фотографий",
+          'Нет фотографий',
           style: TextStyle(color: Colors.white),
         ),
         ElevatedButton(
@@ -631,7 +639,7 @@ class _ProfilePageState extends State<ProfilePage> {
           style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
           child: const Text(
-            "Добавить фотографии",
+            'Добавить фотографии',
             style: TextStyle(color: Colors.black),
           ),
         )
@@ -654,7 +662,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .collection('images')
-        .add({"url": downloadUrl});
+        .add({'url': downloadUrl});
   }
 
   ifGiftsSnapshotNotEmtpry(
@@ -714,7 +722,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return const Column(
       children: [
         Text(
-          "Нет подарков",
+          'Нет подарков',
           style: TextStyle(color: Colors.white),
         ),
       ],

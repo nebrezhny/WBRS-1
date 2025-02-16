@@ -28,6 +28,7 @@ import 'app/pages/about_meet.dart';
 import 'app/pages/chatscreen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
+
 updateUserStatus(value) async {
   await firebaseFirestore
       .collection('users')
@@ -45,13 +46,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
 }
 
-listenNotify(context)async{
+listenNotify(context) async {
   const AndroidInitializationSettings('@mipmap/launcher_icon');
   const DarwinInitializationSettings();
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+        FlutterLocalNotificationsPlugin();
     BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
       message.notification!.body.toString(),
       htmlFormatBigText: true,
@@ -60,21 +61,18 @@ listenNotify(context)async{
     );
 
     AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails('wbrs', 'wbrs',
-        importance: Importance.max,
-        styleInformation: bigTextStyleInformation,
-        priority: Priority.max,
-        playSound: true);
+        AndroidNotificationDetails('wbrs', 'wbrs',
+            importance: Importance.max,
+            styleInformation: bigTextStyleInformation,
+            priority: Priority.max,
+            playSound: true);
 
     NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidNotificationDetails);
+        NotificationDetails(android: androidNotificationDetails);
 
     try {
-      await flutterLocalNotificationsPlugin.show(
-          0,
-          message.notification?.title,
-          message.notification?.body,
-          platformChannelSpecifics,
+      await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
+          message.notification?.body, platformChannelSpecifics,
           payload: message.notification!.body);
     } on Exception catch (e) {
       showSnackbar(context, Colors.red, e);
@@ -108,10 +106,13 @@ listenNotify(context)async{
   });
 }
 
-migrate(){
+migrate() {
   firebaseFirestore.collection('users').get().then((value) {
     for (var element in value.docs) {
-      firebaseFirestore.collection('users').doc(element.id).update({'chatWithId': ''});
+      firebaseFirestore
+          .collection('users')
+          .doc(element.id)
+          .update({'chatWithId': ''});
     }
   });
 }
@@ -125,7 +126,8 @@ void main() async {
   );
 
   FlutterError.onError = (details) {
-    FirebaseCrashlytics.instance.recordError(details.exceptionAsString(), details.stack, fatal: true);
+    FirebaseCrashlytics.instance
+        .recordError(details.exceptionAsString(), details.stack, fatal: true);
   };
   FirebaseAuth.instanceFor(app: app);
   await SharedPreferences.getInstance();
@@ -137,11 +139,11 @@ void main() async {
     sound: true,
   );
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings("@mipmap/launcher_icon");
+      AndroidInitializationSettings('@mipmap/launcher_icon');
   const DarwinInitializationSettings initializationSettingsIOS =
-  DarwinInitializationSettings(
+      DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
@@ -259,8 +261,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         .doc(firebaseAuth.currentUser!.uid)
         .get();
 
-    GlobalBalance = doc.get('balance');
-    Group = doc.get('группа');
+    globalBalance = doc.get('balance');
+    group = doc.get('группа');
     initNotify();
   }
 
@@ -277,14 +279,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   getUserLoggedInStatus() async {
-    if(firebaseAuth.currentUser != null) {
+    if (firebaseAuth.currentUser != null) {
       DocumentSnapshot data = await firebaseFirestore
           .collection('users')
           .doc(firebaseAuth.currentUser!.uid)
           .get();
 
       if (data.exists) {
-        if(data.get('status') == 'blocked') {
+        if (data.get('status') == 'blocked') {
           showSnackbar(context, Colors.red, 'Ваш аккаунт заблокирован');
           await firebaseAuth.signOut();
           nextScreenReplace(context, const LoginPage());
@@ -323,48 +325,42 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     TextTheme tema = GoogleFonts.latoTextTheme(Theme.of(context).textTheme);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return OrientationBuilder(
-          builder: (context, orientation) {
-            return Sizer(
-              builder: (context, orientation, deviceType) {
-                return MaterialApp(
-                  theme: ThemeData(
-                      fontFamily: 'Roboto',
-                      primaryColor: Constants().primaryColor,
-                      scaffoldBackgroundColor: Colors.white,
-                      textTheme: tema),
-                  debugShowCheckedModeBanner: false,
-                  routes: {
-                    'profile': (context) {
-                      return ProfilePage(
-                        group: getUserGroup(),
-                        email: firebaseAuth.currentUser!.email.toString(),
-                        userName: firebaseAuth.currentUser!.displayName.toString(),
-                        about: doc.get('about'),
-                        age: doc.get('age').toString(),
-                        rost: doc.get('rost'),
-                        hobbi: doc.get('hobbi'),
-                        city: doc.get('city'),
-                        deti: doc.get('deti'),
-                        pol: doc.get('pol'),
-                      );
-                    }
-                  },
-                  home: _isSignedIn
-                      ? _loading
-                          ? const SplashScreen()
-                          : _isRegistrationEnd
-                              ? const HomePage()
-                              : const FirstGroupRed()
-                      : const LoginPage(),
+    return LayoutBuilder(builder: (context, constraints) {
+      return OrientationBuilder(builder: (context, orientation) {
+        return Sizer(builder: (context, orientation, deviceType) {
+          return MaterialApp(
+            theme: ThemeData(
+                fontFamily: 'Roboto',
+                primaryColor: Constants().primaryColor,
+                scaffoldBackgroundColor: Colors.white,
+                textTheme: tema),
+            debugShowCheckedModeBanner: false,
+            routes: {
+              'profile': (context) {
+                return ProfilePage(
+                  group: getUserGroup(),
+                  email: firebaseAuth.currentUser!.email.toString(),
+                  userName: firebaseAuth.currentUser!.displayName.toString(),
+                  about: doc.get('about'),
+                  age: doc.get('age').toString(),
+                  rost: doc.get('rost'),
+                  hobbi: doc.get('hobbi'),
+                  city: doc.get('city'),
+                  deti: doc.get('deti'),
+                  pol: doc.get('pol'),
                 );
               }
-            );
-          }
-        );
-      }
-    );
+            },
+            home: _isSignedIn
+                ? _loading
+                    ? const SplashScreen()
+                    : _isRegistrationEnd
+                        ? const HomePage()
+                        : const FirstGroupRed()
+                : const LoginPage(),
+          );
+        });
+      });
+    });
   }
 }

@@ -45,7 +45,7 @@ class Meets extends StatelessWidget {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -155,7 +155,7 @@ class EditMeet extends StatelessWidget {
   final String datetime;
   final String id;
   final List users;
-  EditMeet(
+  const EditMeet(
       {super.key,
       required this.description,
       required this.city,
@@ -163,12 +163,11 @@ class EditMeet extends StatelessWidget {
       required this.users,
       required this.id});
 
-  TextEditingController descEdit = TextEditingController();
-  TextEditingController cityEdit = TextEditingController();
-  TextEditingController dateAndTimeEdit = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    TextEditingController descEdit = TextEditingController();
+    TextEditingController cityEdit = TextEditingController();
+    TextEditingController dateAndTimeEdit = TextEditingController();
     descEdit.text = description;
     cityEdit.text = city;
     dateAndTimeEdit.text = datetime;
@@ -177,7 +176,7 @@ class EditMeet extends StatelessWidget {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -231,7 +230,7 @@ class EditMeet extends StatelessWidget {
                           decoration: const InputDecoration(
                             alignLabelWithHint: false,
                             border: InputBorder.none,
-                            hintText: "Введите ваш город",
+                            hintText: 'Введите ваш город',
                             hintStyle: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w400,
@@ -258,8 +257,8 @@ class EditMeet extends StatelessWidget {
                           if (usersUpdated.length != users.length) {
                             return GestureDetector(
                               onTap: () {
-                                nextScreen(
-                                    context, UsersEdit(id: id, users: usersUpdated));
+                                nextScreen(context,
+                                    UsersEdit(id: id, users: usersUpdated));
                               },
                               child: Container(
                                   padding: const EdgeInsets.all(10),
@@ -269,7 +268,7 @@ class EditMeet extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                      "Пользователи ->: ${usersUpdated.length}")),
+                                      'Пользователи ->: ${usersUpdated.length}')),
                             );
                           }
                         }
@@ -285,7 +284,7 @@ class EditMeet extends StatelessWidget {
                                 color: grey,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Text("Пользователи ->: ${users.length}")),
+                              child: Text('Пользователи ->: ${users.length}')),
                         );
                       }),
                   ElevatedButton(
@@ -297,7 +296,7 @@ class EditMeet extends StatelessWidget {
                       });
                       Navigator.pop(context);
                     },
-                    child: const Text("Сохранить"),
+                    child: const Text('Сохранить'),
                   )
                 ],
               ),
@@ -354,7 +353,7 @@ class _UsersEditState extends State<UsersEdit> {
       Container(
         decoration: const BoxDecoration(boxShadow: []),
         child: Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -451,10 +450,20 @@ class _UsersEditState extends State<UsersEdit> {
                                                             });
                                                             userInfo.clear();
                                                             getUsers();
-                                                            Navigator.pop(
-                                                                context);
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            }
                                                           },
-                                                          trailing: Text(snapshot.data!.docs[index]['city'], style: TextStyle(fontSize: 14),),
+                                                          trailing: Text(
+                                                            snapshot.data!
+                                                                    .docs[index]
+                                                                ['city'],
+                                                            style: TextStyle(
+                                                                fontSize: 14),
+                                                          ),
                                                           leading: SizedBox(
                                                             width: 50,
                                                             height: 50,
@@ -518,7 +527,7 @@ class _UsersEditState extends State<UsersEdit> {
                         context,
                         SomebodyProfile(
                             uid: user.uid,
-                            photoUrl: user.image_url,
+                            photoUrl: user.imageUrl,
                             name: user.name,
                             userInfo: user.userInfo));
                   },
@@ -536,14 +545,14 @@ class _UsersEditState extends State<UsersEdit> {
                                 contentTextStyle:
                                     const TextStyle(color: Colors.white),
                                 content: const Text(
-                                    "Вы уверены, что хотите исключить этого пользователя?"),
+                                    'Вы уверены, что хотите исключить этого пользователя?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
                                     child: const Text(
-                                      "Нет",
+                                      'Нет',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
@@ -572,11 +581,13 @@ class _UsersEditState extends State<UsersEdit> {
                                         'kicked': kicked
                                       });
 
-                                      Navigator.pop(context);
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                      }
                                       setState(() {});
                                     },
                                     child: const Text(
-                                      "Да",
+                                      'Да',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
@@ -604,7 +615,7 @@ class _UsersEditState extends State<UsersEdit> {
                       SizedBox(
                         width: 120,
                         child: Text(
-                          "Город ${userInfo[index].city}",
+                          'Город ${userInfo[index].city}',
                           overflow: TextOverflow.ellipsis,
                         ),
                       )

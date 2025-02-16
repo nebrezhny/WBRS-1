@@ -13,7 +13,7 @@ class FullscreenSliderDemo extends StatelessWidget {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -38,7 +38,6 @@ class FullscreenSliderDemo extends StatelessWidget {
                   // autoPlay: false,
                 ),
                 items: imgList.map((item) {
-                  print(item);
                   return Center(
                       child: InteractiveViewer(
                     maxScale: 4.0,

@@ -5,13 +5,13 @@ import 'package:wbrs/app/widgets/circle_user_image.dart';
 
 class HelperFunctions {
   //keys
-  static String userIdKey = "USERKEY";
-  static String photoUrl = "PHOTOURL";
-  static String userLoggedInKey = "LOGGEDINKEY";
-  static String userNameKey = "USERNAMEKEY";
-  static String userEmailKey = "USEREMAILKEY";
-  static String displayNameKey = "USERDISPLAYNAMEKEY";
-  static String userProfilePicKey = "USERPROFILEPICKEY";
+  static String userIdKey = 'USERKEY';
+  static String photoUrl = 'PHOTOURL';
+  static String userLoggedInKey = 'LOGGEDINKEY';
+  static String userNameKey = 'USERNAMEKEY';
+  static String userEmailKey = 'USEREMAILKEY';
+  static String displayNameKey = 'USERDISPLAYNAMEKEY';
+  static String userProfilePicKey = 'USERPROFILEPICKEY';
 
   // saving the data to SF
 
@@ -85,55 +85,55 @@ userImageWithCircle(userPhotoUrl, group, [width, height]) {
 
 List<Widget> getLikeGroup(myGroup) {
   List spisok = [];
-  if (myGroup == "коричнево-красная" ||
-      myGroup == "коричнево-синяя" ||
-      myGroup == "коричнево-белая" ||
-      myGroup == "коричневая") {
-    spisok = ["Все белые", "Все коричневые", "Сине-белая"];
-  } else if (myGroup == "красно-белая" || myGroup == "красно-синяя") {
+  if (myGroup == 'коричнево-красная' ||
+      myGroup == 'коричнево-синяя' ||
+      myGroup == 'коричнево-белая' ||
+      myGroup == 'коричневая') {
+    spisok = ['Все белые', 'Все коричневые', 'Сине-белая'];
+  } else if (myGroup == 'красно-белая' || myGroup == 'красно-синяя') {
     spisok = [
-      "Чистая синяя",
-      "Сине-коричневая",
+      'Чистая синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "красная") {
+  } else if (myGroup == 'красная') {
     spisok = [
-      "Чистая синяя",
-      "Сине-коричневая",
+      'Чистая синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "красно-коричневая") {
+  } else if (myGroup == 'красно-коричневая') {
     spisok = [
-      "Все белые",
-      "Коричнево-белая",
-      "Сине-белая",
+      'Все белые',
+      'Коричнево-белая',
+      'Сине-белая',
     ];
-  } else if (myGroup == "коричнево-белая") {
+  } else if (myGroup == 'коричнево-белая') {
     spisok = [
-      "Все белые",
-      "Сине-белая",
-      "Все коричневые",
-      "Красно-коричневая",
+      'Все белые',
+      'Сине-белая',
+      'Все коричневые',
+      'Красно-коричневая',
     ];
-  } else if (myGroup == "синяя" || myGroup == "сине-коричневая") {
-    spisok = ["Чисто красная", "Красно-белая", "Сине-красная", "Красно-синяя"];
-  } else if (myGroup == "сине-белая") {
+  } else if (myGroup == 'синяя' || myGroup == 'сине-коричневая') {
+    spisok = ['Чисто красная', 'Красно-белая', 'Сине-красная', 'Красно-синяя'];
+  } else if (myGroup == 'сине-белая') {
     spisok = [
-      "Все коричневые",
-      "Все белые",
-      "Красно-коричневая",
+      'Все коричневые',
+      'Все белые',
+      'Красно-коричневая',
     ];
-  } else if (myGroup == "сине-красная") {
+  } else if (myGroup == 'сине-красная') {
     spisok = [
-      "Чисто синяя",
-      "Сине-коричневая",
+      'Чисто синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "бело-красная" ||
-      myGroup == "бело-синяя" ||
-      myGroup == "бело-коричневая" ||
-      myGroup == "белая") {
+  } else if (myGroup == 'бело-красная' ||
+      myGroup == 'бело-синяя' ||
+      myGroup == 'бело-коричневая' ||
+      myGroup == 'белая') {
     spisok = [
-      "Все коричневые",
-      "Сине-белая",
-      "Красно-коричневая",
+      'Все коричневые',
+      'Сине-белая',
+      'Красно-коричневая',
     ];
   }
 

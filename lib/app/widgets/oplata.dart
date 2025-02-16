@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/widgets/robokassa_webview.dart';
@@ -15,58 +12,45 @@ class OplataPage extends StatefulWidget {
 }
 
 class _OplataPageState extends State<OplataPage> {
-
-  @override
-  void initState() {
-    print('object');
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
       child: Column(children: [
-        const Text('Виды оплат', style: TextStyle(fontSize: 20, color: Colors.white),),
+        const Text(
+          'Виды оплат',
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         PopScope(
-          onPopInvokedWithResult: (value, result) {
-            print(value);
-            print(result);
-          },
           child: ElevatedButton(
               onPressed: () async {
                 int count = 0;
-                firebaseFirestore.collection('transaction').get().then((value) {
-                  count = value.docs.length;
+                await firebaseFirestore
+                    .collection('transaction')
+                    .get()
+                    .then((value) {
+                  setState(() {
+                    count = value.docs.length + 1;
+                  });
                 });
-                await firebaseFirestore.collection('transaction').doc(count.toString()).set({
+                await firebaseFirestore
+                    .collection('transaction')
+                    .doc(count.toString())
+                    .set({
                   'id': count.toString(),
                   'sum': widget.sum,
                   'user_email': firebaseAuth.currentUser!.email,
                   'user_id': firebaseAuth.currentUser!.uid,
                   'time': DateTime.now().toString(),
                 });
-                String signature = md5.convert(utf8.encode('WBRS:${widget.sum}:$count:Grebat-kopat3102-')).toString();
-                nextScreen(context, RobokassaWebview(sum: widget.sum,));
-
-                // if(resp) {
-                //   String signature_status = md5.convert(utf8.encode('WBRS:$count:Zhevat-kopat3103-')).toString();
-                //   print(signature_status);
-                //   Duration duration = const Duration(seconds: 5);
-                //   http.Response res = http.Response('', 500);
-                //   Timer(duration, () async {
-                //     while(res.statusCode != 200) {
-                //       await Future.delayed(const Duration(seconds: 1));
-                //       res = await http.post(
-                //         Uri.parse('https://auth.robokassa.ru/Merchant/WebService/Service.asmx/OpStateExt?MerchantLogin=WBRS&InvoiceID=$count&Signature=$signature_status'),
-                //         headers: <String, String>{
-                //           'Content-Type': 'application/json'
-                //         },
-                //       );
-                //       print(XmlDocument.parse(res.body).findAllElements('Code').first.innerText);
-                //     }
-                //   });
-                // }
+                if (context.mounted) {
+                  nextScreen(
+                      context,
+                      RobokassaWebview(
+                        sum: widget.sum,
+                        count: count,
+                      ));
+                }
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

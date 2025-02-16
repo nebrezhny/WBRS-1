@@ -34,35 +34,35 @@ class UserImage extends StatelessWidget {
 
   List<Color> getColorsByGroup(String group) {
     switch (group) {
-      case "красная":
+      case 'красная':
         return [Colors.red, Colors.red];
-      case "синяя":
+      case 'синяя':
         return [Colors.blue, Colors.blue];
-      case "коричневая":
+      case 'коричневая':
         return [Colors.brown, Colors.brown];
-      case "красно-синяя":
+      case 'красно-синяя':
         return [Colors.red, Colors.blue];
-      case "красно-коричневая":
+      case 'красно-коричневая':
         return [Colors.red, Colors.brown];
-      case "красно-белая":
+      case 'красно-белая':
         return [Colors.red, Colors.white];
-      case "сине-коричневая":
+      case 'сине-коричневая':
         return [Colors.blue, Colors.brown];
-      case "сине-белая":
+      case 'сине-белая':
         return [Colors.blue, Colors.white];
-      case "сине-красная":
+      case 'сине-красная':
         return [Colors.blue, Colors.red];
-      case "коричнево-белая":
+      case 'коричнево-белая':
         return [Colors.brown, Colors.white];
-      case "коричнево-красная":
+      case 'коричнево-красная':
         return [Colors.brown, Colors.red];
-      case "коричнево-синяя":
+      case 'коричнево-синяя':
         return [Colors.brown, Colors.blue];
-      case "бело-красная":
+      case 'бело-красная':
         return [Colors.white, Colors.red];
-      case "бело-синяя":
+      case 'бело-синяя':
         return [Colors.white, Colors.blue];
-      case "бело-коричневая":
+      case 'бело-коричневая':
         return [Colors.white, Colors.brown];
 
       default:
@@ -82,12 +82,12 @@ class UserImage extends StatelessWidget {
   }
 
   Widget _buildUserAvatar(context) {
-    if (userPhotoUrl != "" && userPhotoUrl != null) {
+    if (userPhotoUrl != '' && userPhotoUrl != null) {
       return CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 50, // Учитываем padding
         child: CachedNetworkImage(
-          cacheKey: uid,
+            cacheKey: uid,
             imageBuilder: (context, imageProvider, {bool? loadProgress}) {
               return ClipOval(
                 child: Image(
@@ -98,23 +98,20 @@ class UserImage extends StatelessWidget {
                 ),
               );
             },
-          imageUrl: userPhotoUrl!,
-          placeholder: (context, url) =>
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: grey
-                ),),
-          errorWidget: (context, url, error) => const CircleAvatar(
-            radius: 50, // Учитываем padding
-            backgroundImage: AssetImage("assets/profile.png"),
-          )
-        ),
+            imageUrl: userPhotoUrl!,
+            placeholder: (context, url) => Container(
+                  decoration:
+                      BoxDecoration(shape: BoxShape.circle, color: grey),
+                ),
+            errorWidget: (context, url, error) => const CircleAvatar(
+                  radius: 50, // Учитываем padding
+                  backgroundImage: AssetImage('assets/profile.png'),
+                )),
       );
     }
     return const CircleAvatar(
       radius: 39, // Учитываем padding
-      backgroundImage: AssetImage("assets/profile.png"),
+      backgroundImage: AssetImage('assets/profile.png'),
     );
   }
 }

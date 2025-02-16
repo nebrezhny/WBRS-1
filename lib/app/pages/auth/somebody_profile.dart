@@ -34,17 +34,17 @@ class SomebodyProfile extends StatefulWidget {
 
 class _SomebodyProfileState extends State<SomebodyProfile> {
   FirebaseFirestore db = firebaseFirestore;
-  CollectionReference users = firebaseFirestore.collection("users");
+  CollectionReference users = firebaseFirestore.collection('users');
   bool isLoading = true;
   getChatRoomIdByUsernames(String a, String b) {
     if (a.isNotEmpty && b.isNotEmpty) {
       if (a.substring(0, 1).codeUnitAt(0) <= b.substring(0, 1).codeUnitAt(0)) {
-        return "$a\_$b";
+        return '$a\_$b';
       } else {
-        return "$b\_$a";
+        return '$b\_$a';
       }
     } else {
-      return "abrakadabra";
+      return 'abrakadabra';
     }
   }
 
@@ -72,13 +72,13 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
             .collection('visiters')
             .doc(myUid)
             .set({
-          "uid": myUid,
-          "photoUrl": firebaseAuth.currentUser!.photoURL,
-          "lastVisitTs": DateTime.now(),
-          "fullName": firebaseAuth.currentUser!.displayName,
-          "age": MyUserInfo.get('age'),
-          "group": MyUserInfo.get('группа'),
-          "city": MyUserInfo.get('city')
+          'uid': myUid,
+          'photoUrl': firebaseAuth.currentUser!.photoURL,
+          'lastVisitTs': DateTime.now(),
+          'fullName': firebaseAuth.currentUser!.displayName,
+          'age': MyUserInfo.get('age'),
+          'group': MyUserInfo.get('группа'),
+          'city': MyUserInfo.get('city')
         });
       } else {
         db
@@ -87,11 +87,11 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
             .collection('visiters')
             .doc(myUid)
             .update({
-          "photoUrl": firebaseAuth.currentUser!.photoURL,
-          "lastVisitTs": DateTime.now(),
-          "fullName": firebaseAuth.currentUser!.displayName,
-          "age": MyUserInfo.get('age'),
-          "city": MyUserInfo.get('city')
+          'photoUrl': firebaseAuth.currentUser!.photoURL,
+          'lastVisitTs': DateTime.now(),
+          'fullName': firebaseAuth.currentUser!.displayName,
+          'age': MyUserInfo.get('age'),
+          'city': MyUserInfo.get('city')
         });
       }
     }
@@ -140,7 +140,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
       return Stack(
         children: [
           Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -163,7 +163,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                     TextButton(
                       onPressed: () {
                         showSnackbar(context, Colors.green,
-                            "Спасибо за отклик! Мы уже рассматриваем заявку.");
+                            'Спасибо за отклик! Мы уже рассматриваем заявку.');
                       },
                       child: const Row(
                         children: [
@@ -204,9 +204,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                 }
                               },
                               child: userImageWithCircle(
-                                  (widget.photoUrl != "")
+                                  (widget.photoUrl != '')
                                       ? widget.photoUrl
-                                      : "",
+                                      : '',
                                   widget.userInfo['группа'],
                                   100.0,
                                   100.0),
@@ -227,32 +227,32 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                               child: TextButton(
                                 onPressed: () async {
                                   Map<String, dynamic> chatRoomInfoMap = {
-                                    "user1": FirebaseAuth
+                                    'user1': FirebaseAuth
                                         .instance.currentUser!.uid
                                         .toString(),
-                                    "user2": widget.uid,
-                                    "user1Nickname": FirebaseAuth
+                                    'user2': widget.uid,
+                                    'user1Nickname': FirebaseAuth
                                         .instance.currentUser!.displayName,
-                                    "user2Nickname": widget.name,
-                                    "user1_image": FirebaseAuth
+                                    'user2Nickname': widget.name,
+                                    'user1_image': FirebaseAuth
                                         .instance.currentUser!.photoURL,
-                                    "user2_image": widget.photoUrl,
-                                    "lastMessage": "",
-                                    "lastMessageSendBy": "",
-                                    "lastMessageSendTs": DateTime.now(),
-                                    "unreadMessage": 0,
-                                    "chatId": getChatRoomIdByUsernames(
+                                    'user2_image': widget.photoUrl,
+                                    'lastMessage': '',
+                                    'lastMessageSendBy': '',
+                                    'lastMessageSendTs': DateTime.now(),
+                                    'unreadMessage': 0,
+                                    'chatId': getChatRoomIdByUsernames(
                                         FirebaseAuth
                                             .instance.currentUser!.displayName
                                             .toString(),
                                         widget.name)
                                   };
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user1",
+                                      .collection('chats')
+                                      .where('user1',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user2", isEqualTo: widget.uid)
+                                      .where('user2', isEqualTo: widget.uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -261,11 +261,11 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     }
                                   });
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user2",
+                                      .collection('chats')
+                                      .where('user2',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user1", isEqualTo: widget.uid)
+                                      .where('user1', isEqualTo: widget.uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -274,8 +274,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     }
                                   });
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("chatId",
+                                      .collection('chats')
+                                      .where('chatId',
                                           isEqualTo: getChatRoomIdByUsernames(
                                               firebaseAuth
                                                   .currentUser!.displayName
@@ -343,7 +343,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                 padding: EdgeInsets.symmetric(vertical: 10.0)),
                             images.isEmpty
                                 ? const Text(
-                                    "Нет фотографий",
+                                    'Нет фотографий',
                                     style: TextStyle(color: Colors.white),
                                   )
                                 : SizedBox(
@@ -364,7 +364,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                                                 initPage));
                                                   },
                                                   child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                     child: CachedNetworkImage(
                                                       imageUrl: item,
                                                       fit: BoxFit.cover,
@@ -392,32 +394,32 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     onPressed: () async {
                                       String chatID = '';
                                       Map<String, dynamic> chatRoomInfoMap = {
-                                        "user1": FirebaseAuth
+                                        'user1': FirebaseAuth
                                             .instance.currentUser!.uid
                                             .toString(),
-                                        "user2": widget.uid,
-                                        "user1Nickname": FirebaseAuth
+                                        'user2': widget.uid,
+                                        'user1Nickname': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "user2Nickname": widget.name,
-                                        "user1_image": FirebaseAuth
+                                        'user2Nickname': widget.name,
+                                        'user1_image': FirebaseAuth
                                             .instance.currentUser!.photoURL,
-                                        "user2_image": widget.photoUrl,
-                                        "lastMessage": "",
-                                        "lastMessageSendBy": "",
-                                        "lastMessageSendTs": DateTime.now(),
-                                        "unreadMessage": 0,
-                                        "chatId": getChatRoomIdByUsernames(
+                                        'user2_image': widget.photoUrl,
+                                        'lastMessage': '',
+                                        'lastMessageSendBy': '',
+                                        'lastMessageSendTs': DateTime.now(),
+                                        'unreadMessage': 0,
+                                        'chatId': getChatRoomIdByUsernames(
                                             firebaseAuth
                                                 .currentUser!.displayName
                                                 .toString(),
                                             widget.name)
                                       };
                                       await firebaseFirestore
-                                          .collection("chats")
-                                          .where("user1",
+                                          .collection('chats')
+                                          .where('user1',
                                               isEqualTo: FirebaseAuth
                                                   .instance.currentUser!.uid)
-                                          .where("user2", isEqualTo: widget.uid)
+                                          .where('user2', isEqualTo: widget.uid)
                                           .get()
                                           .then((QuerySnapshot snapshot) {
                                         if (snapshot.docs.isEmpty) {
@@ -427,11 +429,11 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                         }
                                       });
                                       await firebaseFirestore
-                                          .collection("chats")
-                                          .where("user2",
+                                          .collection('chats')
+                                          .where('user2',
                                               isEqualTo: FirebaseAuth
                                                   .instance.currentUser!.uid)
-                                          .where("user1", isEqualTo: widget.uid)
+                                          .where('user1', isEqualTo: widget.uid)
                                           .get()
                                           .then((QuerySnapshot snapshot) {
                                         if (snapshot.docs.isEmpty) {
@@ -441,8 +443,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                         }
                                       });
                                       await firebaseFirestore
-                                          .collection("chats")
-                                          .where("chatId",
+                                          .collection('chats')
+                                          .where('chatId',
                                               isEqualTo:
                                                   getChatRoomIdByUsernames(
                                                       FirebaseAuth
@@ -517,7 +519,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Возраст: ",
+                                      'Возраст: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -538,7 +540,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Рост: ",
+                                      'Рост: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -559,7 +561,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Хобби: ",
+                                      'Хобби: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -569,9 +571,9 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        widget.userInfo['hobbi'] != ""
+                                        widget.userInfo['hobbi'] != ''
                                             ? widget.userInfo['hobbi']
-                                            : "не заполнено",
+                                            : 'не заполнено',
                                         textAlign: TextAlign.end,
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 17),
@@ -590,14 +592,14 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Дети: ",
+                                      'Дети: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      widget.userInfo['deti'] ? "есть" : "нет",
+                                      widget.userInfo['deti'] ? 'есть' : 'нет',
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 17),
                                     )
@@ -611,7 +613,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Группа: ",
+                                      'Группа: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -634,7 +636,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      "Города: ",
+                                      'Города: ',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -654,7 +656,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text("О себе",
+                                    const Text('О себе',
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,

@@ -17,7 +17,7 @@ class About_App extends StatelessWidget {
       home: Stack(
         children: [
           Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -29,7 +29,7 @@ class About_App extends StatelessWidget {
               iconTheme: const IconThemeData(color: Colors.white),
               titleTextStyle:
                   const TextStyle(color: Colors.white, fontSize: 22),
-              title: const Text("О приложении"),
+              title: const Text('О приложении'),
               backgroundColor: Colors.transparent,
             ),
             drawer: const MyDrawer(),
@@ -44,12 +44,15 @@ class About_App extends StatelessWidget {
                       nextScreen(context, const Politica());
                     },
                     style: const ButtonStyle(
-                      padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
                             WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
                       'Политика в отношении обработки персональных данных',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),
@@ -65,10 +68,13 @@ class About_App extends StatelessWidget {
                     style: const ButtonStyle(
                         padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
-                        WidgetStatePropertyAll(Colors.transparent)),
+                            WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
                       'Пользовательское соглашение',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),
@@ -84,10 +90,13 @@ class About_App extends StatelessWidget {
                     style: const ButtonStyle(
                         padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
-                        WidgetStatePropertyAll(Colors.transparent)),
+                            WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
                       'Публичная оферта',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),
@@ -103,10 +112,13 @@ class About_App extends StatelessWidget {
                     style: const ButtonStyle(
                         padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
                         backgroundColor:
-                        WidgetStatePropertyAll(Colors.transparent)),
+                            WidgetStatePropertyAll(Colors.transparent)),
                     child: const Text(
                       'Правила использования приложения',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.left,
                     ),
                   ),

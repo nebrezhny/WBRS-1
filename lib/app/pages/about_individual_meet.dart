@@ -17,29 +17,28 @@ class AboutIndividualMeet extends StatelessWidget {
   final AsyncSnapshot snapshot;
   final int index;
   final DocumentSnapshot doc;
-  AboutIndividualMeet({
-    super.key,
-    required this.snapshot,
-    required this.index,
-    required this.doc// Pass myUid as a required parameter
-  });
-
-  String myUid = firebaseAuth.currentUser!.uid;
+  const AboutIndividualMeet(
+      {super.key,
+      required this.snapshot,
+      required this.index,
+      required this.doc // Pass myUid as a required parameter
+      });
 
   getChatRoomIdByUsernames(String a, String b) {
     if (a.isNotEmpty && b.isNotEmpty) {
       if (a.substring(0, 1).codeUnitAt(0) <= b.substring(0, 1).codeUnitAt(0)) {
-        return "$a\_$b";
+        return '$a\_$b';
       } else {
-        return "$b\_$a";
+        return '$b\_$a';
       }
     } else {
-      return "abrakadabra";
+      return 'abrakadabra';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    String myUid = firebaseAuth.currentUser!.uid;
     bool isMeAdmin = doc.id == myUid;
     addNotification() async {
       Map notification = {
@@ -48,7 +47,7 @@ class AboutIndividualMeet extends StatelessWidget {
         'message':
             '${firebaseAuth.currentUser!.displayName} принял приглашение в группу',
       };
-      String token = "";
+      String token = '';
       var meet = snapshot.data.docs[index];
 
       var data =
@@ -61,7 +60,7 @@ class AboutIndividualMeet extends StatelessWidget {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -77,9 +76,7 @@ class AboutIndividualMeet extends StatelessWidget {
                   ? IconButton(
                       onPressed: () {
                         nextScreenReplace(
-                            context,
-                            EditMeet(
-                                meet: snapshot.data.docs[index]));
+                            context, EditMeet(meet: snapshot.data.docs[index]));
                       },
                       icon: const Icon(Icons.edit_calendar_outlined))
                   : const SizedBox()
@@ -201,11 +198,11 @@ class AboutIndividualMeet extends StatelessWidget {
                                   String name = userDoc.get('fullName');
                                   String photoUrl = userDoc.get('profilePic');
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user1",
+                                      .collection('chats')
+                                      .where('user1',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user2", isEqualTo: uid)
+                                      .where('user2', isEqualTo: uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -215,11 +212,11 @@ class AboutIndividualMeet extends StatelessWidget {
                                     }
                                   });
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user2",
+                                      .collection('chats')
+                                      .where('user2',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user1", isEqualTo: uid)
+                                      .where('user1', isEqualTo: uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -236,21 +233,21 @@ class AboutIndividualMeet extends StatelessWidget {
                                             .toString(),
                                         name);
                                     Map<String, dynamic> chatRoomInfoMap = {
-                                      "user1": FirebaseAuth
+                                      'user1': FirebaseAuth
                                           .instance.currentUser!.uid
                                           .toString(),
-                                      "user2": doc.id,
-                                      "user1Nickname": FirebaseAuth
+                                      'user2': doc.id,
+                                      'user1Nickname': FirebaseAuth
                                           .instance.currentUser!.displayName,
-                                      "user2Nickname": name,
-                                      "user1_image": FirebaseAuth
+                                      'user2Nickname': name,
+                                      'user1_image': FirebaseAuth
                                           .instance.currentUser!.photoURL,
-                                      "user2_image": photoUrl,
-                                      "lastMessage": "",
-                                      "lastMessageSendBy": "",
-                                      "lastMessageSendTs": DateTime.now(),
-                                      "unreadMessage": 0,
-                                      "chatId": chatID
+                                      'user2_image': photoUrl,
+                                      'lastMessage': '',
+                                      'lastMessageSendBy': '',
+                                      'lastMessageSendTs': DateTime.now(),
+                                      'unreadMessage': 0,
+                                      'chatId': chatID
                                     };
                                     await DatabaseService().createChatRoom(
                                         getChatRoomIdByUsernames(
@@ -267,24 +264,24 @@ class AboutIndividualMeet extends StatelessWidget {
                                       chatID,
                                       'to${meet.id}',
                                       {
-                                        "message": "Принял приглашение",
-                                        "type": "text",
-                                        "isRead": false,
-                                        "sendBy": FirebaseAuth
+                                        'message': 'Принял приглашение',
+                                        'type': 'text',
+                                        'isRead': false,
+                                        'sendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "sendByID": FirebaseAuth
+                                        'sendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
-                                        "ts": DateTime.now()
+                                        'ts': DateTime.now()
                                             .millisecondsSinceEpoch
                                       },
                                     ).then((value) {
                                       Map<String, dynamic> lastMessageInfoMap =
                                           {
-                                        "lastMessage": "Принял приглашение",
-                                        "lastMessageSendTs": DateTime.now(),
-                                        "lastMessageSendBy": FirebaseAuth
+                                        'lastMessage': 'Принял приглашение',
+                                        'lastMessageSendTs': DateTime.now(),
+                                        'lastMessageSendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "lastMessageSendByID": FirebaseAuth
+                                        'lastMessageSendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
                                       };
 
@@ -296,23 +293,23 @@ class AboutIndividualMeet extends StatelessWidget {
                                       chatID,
                                       'to${meet.id}',
                                       {
-                                        "message": "Принял приглашение",
-                                        "type": "text",
-                                        "isRead": false,
-                                        "sendBy": FirebaseAuth
+                                        'message': 'Принял приглашение',
+                                        'type': 'text',
+                                        'isRead': false,
+                                        'sendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "sendByID": FirebaseAuth
+                                        'sendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
-                                        "ts": DateTime.now()
+                                        'ts': DateTime.now()
                                       },
                                     ).then((value) {
                                       Map<String, dynamic> lastMessageInfoMap =
                                           {
-                                        "lastMessage": "Принял приглашение",
-                                        "lastMessageSendTs": DateTime.now(),
-                                        "lastMessageSendBy": FirebaseAuth
+                                        'lastMessage': 'Принял приглашение',
+                                        'lastMessageSendTs': DateTime.now(),
+                                        'lastMessageSendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "lastMessageSendByID": FirebaseAuth
+                                        'lastMessageSendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
                                       };
 
