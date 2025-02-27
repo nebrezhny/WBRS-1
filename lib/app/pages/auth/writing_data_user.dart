@@ -550,24 +550,17 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           });
                         }
 
-                        currentUser = firebaseAuth.currentUser;
-
-                        if (currentUser != null) {
-                          try {
-                            displayName = currentUser.displayName;
-                            email = currentUser.email;
-                          } on Exception catch (_) {}
-                        } else {
-                          displayName = 'Error';
-                          email = 'test4@test.ru';
-                        }
-
                         if (city.text.isNotEmpty &&
                             age.text.isNotEmpty &&
+                            rost.text.isNotEmpty &&
+                            profilePic.isNotEmpty &&
+                            hobbi.text.isNotEmpty &&
+                            about.text.isNotEmpty &&
                             rost.text.isNotEmpty) {
                           DatabaseService().savingUserDataAfterRegister(
                               displayName,
                               email,
+                              profilePic,
                               int.parse(age.text),
                               rost.text,
                               city.text,
@@ -597,9 +590,12 @@ class _AboutUserWritingState extends State<AboutUserWriting> {
                           setState(() {});
 
                           //showSnackbar(context, Colors.green, "Успешно!");
+                        } else {
+                          showSnackbar(
+                              context, Colors.red, 'Заполните все поля.');
                         }
                       },
-                      child: const Text('Пройти тест для определения группы'))
+                      child: const Text('Пройти тест для определения группы', style: TextStyle(color: Colors.white), textAlign: TextAlign.center,)),
                 ],
               ),
             ),

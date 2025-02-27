@@ -157,7 +157,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () async {
                     await launchUrl(
                             Uri.parse(
-                                'https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=02&bank=100000000008&sum=100&crc=C752'),
+                                'https://qr.nspk.ru/BS2A002KUIKV3G1Q8JGRDS9N32P84DCB?type=01&bank=100000000008&crc=5D81'),
                             mode: LaunchMode.externalApplication)
                         .then((value) {
                       if (value) {

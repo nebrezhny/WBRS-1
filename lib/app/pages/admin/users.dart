@@ -70,6 +70,10 @@ class Users extends StatelessWidget {
                       return ListView.builder(
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
+                          TextEditingController controller =
+                              TextEditingController(
+                                  text: snapshot.data!.docs[index]['balance']
+                                      .toString());
                           return GestureDetector(
                             onTap: () => nextScreen(
                                 context,
@@ -159,6 +163,14 @@ class Users extends StatelessWidget {
                                       Text(snapshot.data!.docs[index]['city']),
                                     ],
                                   ),
+                                  TextField(
+                                      controller: controller,
+                                      onSubmitted: (value) {
+                                        firebaseFirestore
+                                            .collection('users')
+                                            .doc(snapshot.data!.docs[index].id)
+                                            .update({'balance': value});
+                                      })
                                 ],
                               ),
                             ),

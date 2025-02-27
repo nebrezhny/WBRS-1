@@ -65,7 +65,8 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
     addTransaction();
 
     signature = md5
-        .convert(utf8.encode('WBRS:1:${widget.count}:Grebat-kopat3102-'))
+        .convert(
+            utf8.encode('WBRS:${widget.sum}:${widget.count}:Grebat-kopat3102-'))
         .toString();
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -147,7 +148,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
         },
       )
       ..loadRequest(Uri.parse(
-          'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=1&InvoiceID=${widget.count}&Description=test&SignatureValue=$signature'));
+          'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=${widget.sum}&InvoiceID=${widget.count}&Description=test&SignatureValue=$signature'));
 
     // setBackgroundColor is not currently supported on macOS.
     if (kIsWeb || !Platform.isMacOS) {
@@ -212,6 +213,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .update({'balance': balance});
+    globalBalance = balance;
   }
 
   @override
@@ -245,7 +247,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
               0, 'Robokassa', 'Оплата не прошла',
               notificationDetails: const AndroidNotificationDetails(
                   'wbrs', 'wbrs',
-                  importance: Importance.max),
+                  importance: Importance.max, number: 2),
               payload: 'test');
         }
       },

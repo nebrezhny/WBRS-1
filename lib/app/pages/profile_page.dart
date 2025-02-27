@@ -499,7 +499,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 if (snapshot.data != null) {
                                   if (snapshot.data!.docs.length != 0) {
-                                    return ifImageSnapshotNotEmtpry(snapshot);
+                                    return ifImageSnapshotNotEmpty(snapshot);
                                   } else {
                                     return ifImageSnaphotEmpty(snapshot);
                                   }
@@ -549,7 +549,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  ifImageSnapshotNotEmtpry(
+  ifImageSnapshotNotEmpty(
     AsyncSnapshot snapshot,
   ) {
     List urls = [];

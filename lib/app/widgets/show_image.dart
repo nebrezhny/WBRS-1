@@ -33,7 +33,7 @@ class _ShowImageState extends State<ShowImage> {
         actions: [
           Row(
             children: [
-              IconButton(
+              TextButton(
                   onPressed: () {
                     firebaseFirestore
                         .collection('users')
@@ -42,7 +42,8 @@ class _ShowImageState extends State<ShowImage> {
                     firebaseAuth.currentUser!
                         .updatePhotoURL(widget.urls[widget.index]);
                   },
-                  icon: const Icon(Icons.photo_camera_front_sharp)),
+                  child: const Text('Сделать аватаром',
+                      style: TextStyle(color: Colors.white))),
               IconButton(
                   onPressed: () {
                     deleteImage(widget.snapshot, widget.index);

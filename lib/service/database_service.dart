@@ -20,6 +20,7 @@ class DatabaseService {
   Future savingUserDataAfterRegister(
       String fullName,
       String email,
+      String profilePic,
       int age,
       String rost,
       String city,

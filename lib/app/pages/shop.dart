@@ -2,14 +2,13 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/pages/chatscreen.dart';
+import 'package:wbrs/app/widgets/robokassa_webview.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/bottom_nav_bar.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
-import 'package:wbrs/app/widgets/oplata.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
@@ -94,18 +93,41 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                     pinned: true,
                     foregroundColor: Colors.white,
                     actions: [
-                      RichText(
-                          text: TextSpan(
-                              text: 'Ваш баланс: ',
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                              children: [
-                            TextSpan(
-                                text: '$globalBalance Ag',
-                                style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.bold))
-                          ]))
+                      StreamBuilder(
+                          stream: db
+                              .collection('users')
+                              .doc(auth.currentUser!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'Ваш баланс: ',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                      children: [
+                                    TextSpan(
+                                        text: '0 Ag',
+                                        style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontWeight: FontWeight.bold))
+                                  ]));
+                            } else {
+                              globalBalance = snapshot.data!['balance'];
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'Ваш баланс: ',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                      children: [
+                                    TextSpan(
+                                        text: '$globalBalance Ag',
+                                        style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontWeight: FontWeight.bold))
+                                  ]));
+                            }
+                          }),
                     ],
                     centerTitle: false,
                     bottom: TabBar(
@@ -683,30 +705,16 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                 topRight: Radius.circular(20)),
                             color: Colors.white54),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
+                            horizontal: 10, vertical: 10),
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.5,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Выберите сумму для пополнения',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                                TextButton.icon(
-                                  label: const SizedBox.shrink(),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(
-                                    CupertinoIcons.xmark,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ),
-                              ],
+                            const Text(
+                              'Выберите сумму для пополнения',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
                             ),
                             const SizedBox(
                               height: 15,
@@ -735,60 +743,62 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
             ),
             ElevatedButton(
               onPressed: () {
-                showModalBottomSheet(
-                    backgroundColor: Colors.transparent,
-                    constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
-                        maxWidth: MediaQuery.of(context).size.width),
-                    context: context,
-                    builder: (context) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)),
-                            color: Colors.white54),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Выберите сумму для пополнения',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                                TextButton.icon(
-                                  label: const SizedBox.shrink(),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(
-                                    CupertinoIcons.xmark,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            for (int i = 0; i < 4; i++) buyButtonInvisible(i)
+                if (!isUnvisible) {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                          maxWidth: MediaQuery.of(context).size.width),
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)),
+                              color: Colors.white54),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Выберите количество дней',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              for (int i = 0; i < 4; i++) buyButtonInvisible(i)
+                            ],
+                          ),
+                        );
+                      }).then((value) => setState(() {}));
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Режим невидимки'),
+                          content: const Text(
+                              'Вы уверены, что хотите выключить режим невидимки?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Нет')),
+                            TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isUnvisible = false;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Да'))
                           ],
-                        ),
-                      );
-                    });
-                setState(() {
-                  isUnvisible = !isUnvisible;
-                });
-                db
-                    .collection('users')
-                    .doc(auth.currentUser!.uid)
-                    .update({'isUnVisible': isUnvisible});
+                        );
+                      });
+                }
               },
               style: ButtonStyle(
                   backgroundColor: isUnvisible
@@ -850,12 +860,13 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
       ' (экономим 51серебра)',
       ' (экономим 112серебра) ',
     ];
-    List pricesInt = [
+    List<int> pricesInt = [
       24,
       39,
       69,
       128,
     ];
+    List<int> days = [3, 7, 15, 30];
     List lineThrough = [
       0,
       56,
@@ -863,50 +874,71 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
       240,
     ];
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        if (globalBalance >= pricesInt[index]) {
+          setState(() {
+            globalBalance -= pricesInt[index];
+            isUnvisible = true;
+          });
+          db.collection('users').doc(firebaseAuth.currentUser!.uid).update({
+            'balance': globalBalance,
+            'isUnvisible': isUnvisible,
+            'unvisibleEnd': DateTime.now().add(Duration(days: days[index])),
+          });
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Недостаточно средств')),
+          );
+        }
+      },
       style: ButtonStyle(
         minimumSize: WidgetStatePropertyAll(
             Size(MediaQuery.of(context).size.width - 40, 40)),
         foregroundColor: const WidgetStatePropertyAll(Colors.cyan),
         backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent.shade400),
       ),
-      child: index == 0
-          ? const Row(
-              children: [
-                Text(
-                  '3 дня = 24Ag',
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                Text(
-                  '${prices[index]}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  '${lineThrough[index]}Ag',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: Colors.white,
-                      decorationThickness: 3),
-                ),
-                Text(
-                  ' ${pricesInt[index]}Ag',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white),
-                ),
-                Text(
-                  '${bonuses[index]}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+      child: Container(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+        child: index == 0
+            ? const Row(
+                children: [
+                  Text(
+                    '3 дня = 24Ag',
+                    style: TextStyle(color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Text(
+                    '${prices[index]}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    '${lineThrough[index]}Ag',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.lineThrough,
+                        decorationColor: Colors.white,
+                        decorationThickness: 3),
+                  ),
+                  Text(
+                    ' ${pricesInt[index]}Ag',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white),
+                  ),
+                  Text(
+                    '${bonuses[index]}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -929,36 +961,52 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     ];
     List pricesInt = [30, 60, 98, 198, 298, 576];
     return ElevatedButton(
-      onPressed: () {
-        showModalBottomSheet(
-            backgroundColor: grey,
-            context: context,
-            builder: (context) {
-              String sum = '';
-              switch (index) {
-                case 0:
-                  sum = '150';
-                  break;
-                case 1:
-                  sum = '299';
-                  break;
-                case 2:
-                  sum = '490';
-                  break;
-                case 3:
-                  sum = '990';
-                  break;
-                case 4:
-                  sum = '1490';
-                  break;
-                case 5:
-                  sum = '2880';
-                  break;
-              }
-              return OplataPage(
+      onPressed: () async {
+        String sum = '';
+        switch (index) {
+          case 0:
+            sum = '150';
+            break;
+          case 1:
+            sum = '299';
+            break;
+          case 2:
+            sum = '490';
+            break;
+          case 3:
+            sum = '990';
+            break;
+          case 4:
+            sum = '1490';
+            break;
+          case 5:
+            sum = '2880';
+            break;
+        }
+        int count = 0;
+        await firebaseFirestore.collection('transaction').get().then((value) {
+          setState(() {
+            count = value.docs.length + 1;
+          });
+        });
+        await firebaseFirestore
+            .collection('transaction')
+            .doc(count.toString())
+            .set({
+          'id': count.toString(),
+          'sum': sum,
+          'user_email': firebaseAuth.currentUser!.email,
+          'user_id': firebaseAuth.currentUser!.uid,
+          'time': DateTime.now().toString(),
+        });
+        if (context.mounted) {
+          nextScreen(
+              context,
+              RobokassaWebview(
                 sum: sum,
-              );
-            });
+                count: count,
+              ));
+        }
       },
       style: ButtonStyle(
         minimumSize: WidgetStatePropertyAll(

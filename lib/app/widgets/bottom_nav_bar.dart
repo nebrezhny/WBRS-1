@@ -135,9 +135,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             height: MediaQuery.of(context).size.height * 0.05,
           ),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               //nextScreen(context, WebPage());
-              launchUrl(Uri.parse('https://qr.nspk.ru/BS1A005Q3CPJ6B2D8SEAO9MCL1N8FQC9?type=01&bank=100000000008&crc=C752'), mode: LaunchMode.externalApplication);
+              launchUrl(
+                  Uri.parse(
+                      'https://qr.nspk.ru/BS2A002KUIKV3G1Q8JGRDS9N32P84DCB?type=01&bank=100000000008&crc=5D81'),
+                  mode: LaunchMode.externalApplication);
               showSnackbar(context, Colors.lightGreen, 'Спасибо за поддержку!');
             },
             child: Container(
@@ -145,7 +148,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.03,
               color: Colors.orangeAccent.shade400,
-              child: const Text('Поддержать ❤ проект ', textAlign: TextAlign.center,style: TextStyle(fontSize: 16, letterSpacing: 0.3),),
+              child: const Text(
+                'Поддержать ❤ проект ',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, letterSpacing: 0.3),
+              ),
             ),
           ),
         ],
