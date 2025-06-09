@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+  import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/pages/meetings.dart';
@@ -61,7 +61,10 @@ class _EditMeetState extends State<EditMeet> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    nameMeet.dispose();
+    city.dispose();
+    description.dispose();
+    dateAndTime.dispose();
     super.dispose();
   }
 
@@ -74,7 +77,7 @@ class _EditMeetState extends State<EditMeet> {
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -245,14 +248,14 @@ class _EditMeetState extends State<EditMeet> {
                             } else {
                               collectionReference.update({
                                 'name': nameMeet.text
-                                    .split(RegExp(r"(?! )\s{2,}"))
+                                    .split(RegExp(r'(?! )\s{2,}'))
                                     .join(' ')
-                                    .split(RegExp(r"\s+$"))
+                                    .split(RegExp(r'\s+$'))
                                     .join(''),
                                 'city': city.text
-                                    .split(RegExp(r"(?! )\s{2,}"))
+                                    .split(RegExp(r'(?! )\s{2,}'))
                                     .join(' ')
-                                    .split(RegExp(r"\s+$"))
+                                    .split(RegExp(r'\s+$'))
                                     .join(''),
                                 'description': description.text,
                                 'datetime': dateTime,
@@ -274,7 +277,7 @@ class _EditMeetState extends State<EditMeet> {
                             });
                           },
                           child: const Text(
-                            "Сохранить",
+                            'Сохранить',
                             style: TextStyle(
                                 fontSize: 20, color: Colors.orangeAccent),
                           )),
@@ -286,8 +289,7 @@ class _EditMeetState extends State<EditMeet> {
                                 return AlertDialog(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15)),
-                                  backgroundColor:
-                                      Colors.grey.shade700.withOpacity(0.7),
+                                  backgroundColor: grey,
                                   title: const Text(
                                     'Удалить встречу?',
                                     style: TextStyle(color: Colors.white),

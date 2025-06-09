@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -16,12 +18,13 @@ class _CheckInternetPageState extends State<CheckInternetPage> {
   Widget build(BuildContext context) {
     return Stack(children: [
       Image.asset(
-        "assets/fon2.jpg",
+        'assets/fon2.jpg',
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         fit: BoxFit.cover,
       ),
       Scaffold(
+        backgroundColor: Colors.transparent,
         body: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(20),
@@ -31,8 +34,8 @@ class _CheckInternetPageState extends State<CheckInternetPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Text(
                     'Отсутсвует подключение к интернету',
                     textAlign: TextAlign.center,
@@ -50,8 +53,8 @@ class _CheckInternetPageState extends State<CheckInternetPage> {
                     if (result.isNotEmpty &&
                         result[0].rawAddress.isNotEmpty &&
                         3 > 2) {
-                      nextScreenReplace(context, SplashScreen());
-                      throw SocketException('');
+                      nextScreenReplace(context, const SplashScreen());
+                      throw const SocketException('');
                     }
                   } on SocketException catch (_) {
                     showSnackbar(context, Colors.redAccent,
@@ -60,7 +63,7 @@ class _CheckInternetPageState extends State<CheckInternetPage> {
                 },
                 style: const ButtonStyle(
                     backgroundColor:
-                        MaterialStatePropertyAll(Colors.orangeAccent)),
+                        WidgetStatePropertyAll(Colors.orangeAccent)),
                 child: const Text('Повторить попытку'),
               ),
             ],

@@ -2,14 +2,13 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/pages/chatscreen.dart';
+import 'package:wbrs/app/widgets/robokassa_webview.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/bottom_nav_bar.dart';
 import 'package:wbrs/app/widgets/drawer.dart';
-import 'package:wbrs/app/widgets/oplata.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:random_string/random_string.dart';
 
@@ -75,7 +74,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -94,18 +93,41 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                     pinned: true,
                     foregroundColor: Colors.white,
                     actions: [
-                      RichText(
-                          text: TextSpan(
-                              text: 'Ваш баланс: ',
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                              children: [
-                            TextSpan(
-                                text: '$GlobalBalance Ag',
-                                style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.bold))
-                          ]))
+                      StreamBuilder(
+                          stream: db
+                              .collection('users')
+                              .doc(auth.currentUser!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'Ваш баланс: ',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                      children: [
+                                    TextSpan(
+                                        text: '0 Ag',
+                                        style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontWeight: FontWeight.bold))
+                                  ]));
+                            } else {
+                              globalBalance = snapshot.data!['balance'];
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'Ваш баланс: ',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                      children: [
+                                    TextSpan(
+                                        text: '$globalBalance Ag',
+                                        style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontWeight: FontWeight.bold))
+                                  ]));
+                            }
+                          }),
                     ],
                     centerTitle: false,
                     bottom: TabBar(
@@ -158,14 +180,14 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
             ],
           ),
           sold
-              ? Text("Количество: $price",
+              ? Text('Количество: $price',
                   style: const TextStyle(fontSize: 16, color: Colors.white))
               : const SizedBox.shrink(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               !sold
-                  ? Text("$price Ag",
+                  ? Text('$price Ag',
                       style: const TextStyle(fontSize: 16, color: Colors.white))
                   : const SizedBox.shrink(),
               ElevatedButton(
@@ -178,17 +200,17 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                       userInfo.containsKey('gifts') ? userInfo['gifts'] : {};
 
                   if (!sold) {
-                    if (GlobalBalance < price) {
+                    if (globalBalance < price) {
                       showSnackbar(
-                          context, Colors.redAccent, "Недостаточно серебра");
+                          context, Colors.redAccent, 'Недостаточно серебра');
                       return;
                     }
 
                     setState(() {
-                      GlobalBalance -= price;
+                      globalBalance -= price;
                     });
 
-                    coll.update({'balance': GlobalBalance});
+                    coll.update({'balance': globalBalance});
 
                     if (initGifts.containsKey(url)) {
                       initGifts[url] += 1;
@@ -197,7 +219,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                     }
                     coll.update({'gifts': initGifts});
                     showSnackbar(
-                        context, Colors.green, "Подарок $name добавлен");
+                        context, Colors.green, 'Подарок $name добавлен');
                   } else {
                     var snap = await db
                         .collection('chats')
@@ -218,20 +240,20 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                       if (chat.data()['user1'] == auth.currentUser!.uid) {
                         chatRoomInfoMap.addAll({
                           count: {
-                            "chatId": chat.data()['chatId'],
-                            "id": chat.data()['user2'],
-                            "nickname": chat.data()['user2Nickname'],
-                            "image": chat.data()['user2_image']
+                            'chatId': chat.data()['chatId'],
+                            'id': chat.data()['user2'],
+                            'nickname': chat.data()['user2Nickname'],
+                            'image': chat.data()['user2_image']
                           },
                         });
                         count++;
                       } else {
                         chatRoomInfoMap.addAll({
                           count: {
-                            "chatId": chat.data()['chatId'],
-                            "id": chat.data()['user1'],
-                            "nickname": chat.data()['user1Nickname'],
-                            "image": chat.data()['user1_image']
+                            'chatId': chat.data()['chatId'],
+                            'id': chat.data()['user1'],
+                            'nickname': chat.data()['user1Nickname'],
+                            'image': chat.data()['user1_image']
                           },
                         });
                         count++;
@@ -242,8 +264,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                       List<bool> isSelected =
                           List.filled(chatRoomInfoMap.length, false);
                       showModalBottomSheet(
-                          backgroundColor:
-                              Colors.grey.shade700.withOpacity(0.7),
+                          backgroundColor: grey,
                           context: context,
                           builder: (context) {
                             return StatefulBuilder(
@@ -311,9 +332,9 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                                                           index]
                                                                       [
                                                                       'image'] ==
-                                                                  ""
+                                                                  ''
                                                               ? const NetworkImage(
-                                                                  "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                                                                  'https://cdn-icons-png.flaticon.com/512/149/149071.png',
                                                                 )
                                                               : NetworkImage(
                                                                   chatRoomInfoMap[
@@ -391,17 +412,17 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
 
                                                     Map<String, dynamic>
                                                         messageInfoMap = {
-                                                      "image": url,
-                                                      "name": name,
-                                                      "sendBy": auth
+                                                      'image': url,
+                                                      'name': name,
+                                                      'sendBy': auth
                                                           .currentUser!
                                                           .displayName,
-                                                      "sendByID": FirebaseAuth
+                                                      'sendByID': FirebaseAuth
                                                           .instance
                                                           .currentUser!
                                                           .uid,
-                                                      "ts": DateTime.now(),
-                                                      "isRead": isUserInChat
+                                                      'ts': DateTime.now(),
+                                                      'isRead': isUserInChat
                                                           ? true
                                                           : false
                                                     };
@@ -414,18 +435,18 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                                             messageInfoMap);
 
                                                     messageInfoMap = {
-                                                      "image": url,
-                                                      "message":
-                                                          "${auth.currentUser!.displayName} подарил вам подарок $name! ❤️",
-                                                      "sendBy": auth
+                                                      'image': url,
+                                                      'message':
+                                                          '${auth.currentUser!.displayName} подарил вам подарок $name! ❤️',
+                                                      'sendBy': auth
                                                           .currentUser!
                                                           .displayName,
-                                                      "sendByID": FirebaseAuth
+                                                      'sendByID': FirebaseAuth
                                                           .instance
                                                           .currentUser!
                                                           .uid,
-                                                      "ts": DateTime.now(),
-                                                      "isRead": isUserInChat
+                                                      'ts': DateTime.now(),
+                                                      'isRead': isUserInChat
                                                           ? true
                                                           : false
                                                     };
@@ -472,7 +493,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                                     showSnackbar(
                                                         context,
                                                         Colors.green,
-                                                        "Подарок $name подарен!");
+                                                        'Подарок $name подарен!');
                                                     Navigator.pop(context);
                                                     nextScreenReplace(
                                                         context,
@@ -508,7 +529,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                                             .get();
                                                     Map notificationBody = {
                                                       'message':
-                                                          "${auth.currentUser!.displayName} подарил вам подарок $name ❤️",
+                                                          '${auth.currentUser!.displayName} подарил вам подарок $name ❤️',
                                                     };
                                                     NotificationsService()
                                                         .sendPushMessage(
@@ -521,7 +542,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                                             chatId);
                                                   },
                                                   child:
-                                                      const Text("Подарить")),
+                                                      const Text('Подарить')),
                                             )
                                           : Container()
                                     ],
@@ -540,11 +561,11 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                         WidgetStatePropertyAll(Colors.orangeAccent)),
                 child: sold
                     ? const Text(
-                        "Подарить",
+                        'Подарить',
                         style: TextStyle(color: Colors.white, fontSize: 14),
                       )
                     : const Text(
-                        "Забрать",
+                        'Забрать',
                         style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
               ),
@@ -559,103 +580,103 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
   }
 
   final podarki = <Podarok>[
-    Podarok(name: 'Фольксваген Туарег', price: 12, img: "assets/gifts/1.png"),
-    Podarok(name: 'Кофе и круассан', price: 12, img: "assets/gifts/2.png"),
-    Podarok(name: 'Большой красивый дом', price: 12, img: "assets/gifts/3.png"),
-    Podarok(name: 'Тесла', price: 12, img: "assets/gifts/4.png"),
-    Podarok(name: 'Гелендваген', price: 12, img: "assets/gifts/5.png"),
-    Podarok(name: 'Вино, сыр, виноград', price: 12, img: "assets/gifts/6.png"),
-    Podarok(name: 'Модная киса в шляпе', price: 12, img: "assets/gifts/7.png"),
-    Podarok(name: 'Киса в банте', price: 12, img: "assets/gifts/8.png"),
-    Podarok(name: 'Ты милая, как зайка', price: 12, img: "assets/gifts/9.png"),
-    Podarok(name: 'Букет красные розы', price: 12, img: "assets/gifts/10.png"),
-    Podarok(name: 'Пойдем поедим', price: 12, img: "assets/gifts/11.png"),
-    Podarok(name: 'Маленький щенок', price: 12, img: "assets/gifts/12.png"),
+    Podarok(name: 'Фольксваген Туарег', price: 12, img: 'assets/gifts/1.png'),
+    Podarok(name: 'Кофе и круассан', price: 12, img: 'assets/gifts/2.png'),
+    Podarok(name: 'Большой красивый дом', price: 12, img: 'assets/gifts/3.png'),
+    Podarok(name: 'Тесла', price: 12, img: 'assets/gifts/4.png'),
+    Podarok(name: 'Гелендваген', price: 12, img: 'assets/gifts/5.png'),
+    Podarok(name: 'Вино, сыр, виноград', price: 12, img: 'assets/gifts/6.png'),
+    Podarok(name: 'Модная киса в шляпе', price: 12, img: 'assets/gifts/7.png'),
+    Podarok(name: 'Киса в банте', price: 12, img: 'assets/gifts/8.png'),
+    Podarok(name: 'Ты милая, как зайка', price: 12, img: 'assets/gifts/9.png'),
+    Podarok(name: 'Букет красные розы', price: 12, img: 'assets/gifts/10.png'),
+    Podarok(name: 'Пойдем поедим', price: 12, img: 'assets/gifts/11.png'),
+    Podarok(name: 'Маленький щенок', price: 12, img: 'assets/gifts/12.png'),
     Podarok(
         name: 'Киса упакована в коробку',
         price: 12,
-        img: "assets/gifts/13.png"),
-    Podarok(name: 'Серый красивый дом', price: 12, img: "assets/gifts/14.png"),
-    Podarok(name: 'Мне б такую как ты', price: 12, img: "assets/gifts/15.png"),
+        img: 'assets/gifts/13.png'),
+    Podarok(name: 'Серый красивый дом', price: 12, img: 'assets/gifts/14.png'),
+    Podarok(name: 'Мне б такую как ты', price: 12, img: 'assets/gifts/15.png'),
     Podarok(
-        name: 'Ты - самая прекрасная', price: 12, img: "assets/gifts/16.png"),
-    Podarok(name: 'Букет розовые розы', price: 12, img: "assets/gifts/17.png"),
+        name: 'Ты - самая прекрасная', price: 12, img: 'assets/gifts/16.png'),
+    Podarok(name: 'Букет розовые розы', price: 12, img: 'assets/gifts/17.png'),
     Podarok(
         name: 'Истосковался по такой как ты',
         price: 12,
-        img: "assets/gifts/18.png"),
-    Podarok(name: 'Диадема с рубинами', price: 12, img: "assets/gifts/19.png"),
-    Podarok(name: 'Жду встречи', price: 12, img: "assets/gifts/20.png"),
+        img: 'assets/gifts/18.png'),
+    Podarok(name: 'Диадема с рубинами', price: 12, img: 'assets/gifts/19.png'),
+    Podarok(name: 'Жду встречи', price: 12, img: 'assets/gifts/20.png'),
     Podarok(
         name: 'Береги себя, ты мне нужна!',
         price: 12,
-        img: "assets/gifts/21.png"),
-    Podarok(name: 'Яхта олигарха', price: 12, img: "assets/gifts/22.png"),
+        img: 'assets/gifts/21.png'),
+    Podarok(name: 'Яхта олигарха', price: 12, img: 'assets/gifts/22.png'),
     Podarok(
-        name: 'Водочка с селедочкой', price: 12, img: "assets/gifts/23.png"),
-    Podarok(name: 'Диадема в алмазах', price: 12, img: "assets/gifts/24.png"),
-    Podarok(name: 'Додж челленджер', price: 12, img: "assets/gifts/25.png"),
+        name: 'Водочка с селедочкой', price: 12, img: 'assets/gifts/23.png'),
+    Podarok(name: 'Диадема в алмазах', price: 12, img: 'assets/gifts/24.png'),
+    Podarok(name: 'Додж челленджер', price: 12, img: 'assets/gifts/25.png'),
     Podarok(
         name: 'Классический красивый дом',
         price: 12,
-        img: "assets/gifts/26.png"),
+        img: 'assets/gifts/26.png'),
     Podarok(
-        name: 'Семейный красивый дом', price: 12, img: "assets/gifts/27.png"),
+        name: 'Семейный красивый дом', price: 12, img: 'assets/gifts/27.png'),
     Podarok(
         name: 'Современный красивый дом',
         price: 12,
-        img: "assets/gifts/28.png"),
+        img: 'assets/gifts/28.png'),
     Podarok(
         name: 'Мое почтение женщине со вкусом',
         price: 12,
-        img: "assets/gifts/29.png"),
-    Podarok(name: 'Для такой зайки', price: 12, img: "assets/gifts/30.png"),
-    Podarok(name: 'Инфинити', price: 12, img: "assets/gifts/31.png"),
-    Podarok(name: 'Самой искрометной', price: 12, img: "assets/gifts/32.png"),
-    Podarok(name: 'Кадиллак', price: 12, img: "assets/gifts/33.png"),
-    Podarok(name: 'Кофе корица', price: 12, img: "assets/gifts/34.png"),
-    Podarok(name: 'Кофе и круасан', price: 12, img: "assets/gifts/35.png"),
-    Podarok(name: 'Линкольн', price: 12, img: "assets/gifts/36.png"),
+        img: 'assets/gifts/29.png'),
+    Podarok(name: 'Для такой зайки', price: 12, img: 'assets/gifts/30.png'),
+    Podarok(name: 'Инфинити', price: 12, img: 'assets/gifts/31.png'),
+    Podarok(name: 'Самой искрометной', price: 12, img: 'assets/gifts/32.png'),
+    Podarok(name: 'Кадиллак', price: 12, img: 'assets/gifts/33.png'),
+    Podarok(name: 'Кофе корица', price: 12, img: 'assets/gifts/34.png'),
+    Podarok(name: 'Кофе и круасан', price: 12, img: 'assets/gifts/35.png'),
+    Podarok(name: 'Линкольн', price: 12, img: 'assets/gifts/36.png'),
     Podarok(
-        name: 'Мадам, без вас убого', price: 12, img: "assets/gifts/37.png"),
-    Podarok(name: 'Милый мишка', price: 12, img: "assets/gifts/38.png"),
-    Podarok(name: 'Самой мудрой', price: 12, img: "assets/gifts/39.png"),
-    Podarok(name: 'Мужчине со вкусом', price: 12, img: "assets/gifts/40.png"),
+        name: 'Мадам, без вас убого', price: 12, img: 'assets/gifts/37.png'),
+    Podarok(name: 'Милый мишка', price: 12, img: 'assets/gifts/38.png'),
+    Podarok(name: 'Самой мудрой', price: 12, img: 'assets/gifts/39.png'),
+    Podarok(name: 'Мужчине со вкусом', price: 12, img: 'assets/gifts/40.png'),
     Podarok(
-        name: 'Настоящему джентельмену', price: 12, img: "assets/gifts/41.png"),
+        name: 'Настоящему джентельмену', price: 12, img: 'assets/gifts/41.png'),
     Podarok(
-        name: 'Серьезному джентельмену', price: 12, img: "assets/gifts/42.png"),
-    Podarok(name: 'Настоящему ковбою', price: 12, img: "assets/gifts/43.png"),
+        name: 'Серьезному джентельмену', price: 12, img: 'assets/gifts/42.png'),
+    Podarok(name: 'Настоящему ковбою', price: 12, img: 'assets/gifts/43.png'),
     Podarok(
-        name: 'Настоящему полковнику', price: 12, img: "assets/gifts/44.png"),
-    Podarok(name: 'Настоящему рыцарю', price: 12, img: "assets/gifts/45.png"),
-    Podarok(name: 'Ниссан Скайлайн', price: 12, img: "assets/gifts/46.png"),
-    Podarok(name: 'Ты меня покорила', price: 12, img: "assets/gifts/47.png"),
+        name: 'Настоящему полковнику', price: 12, img: 'assets/gifts/44.png'),
+    Podarok(name: 'Настоящему рыцарю', price: 12, img: 'assets/gifts/45.png'),
+    Podarok(name: 'Ниссан Скайлайн', price: 12, img: 'assets/gifts/46.png'),
+    Podarok(name: 'Ты меня покорила', price: 12, img: 'assets/gifts/47.png'),
     Podarok(
         name: 'Претендуешь - соответствуй',
         price: 12,
-        img: "assets/gifts/48.png"),
+        img: 'assets/gifts/48.png'),
     Podarok(
         name: 'Не разменивайся по пустякам',
         price: 12,
-        img: "assets/gifts/49.png"),
-    Podarok(name: 'Букет белые розы', price: 12, img: "assets/gifts/50.png"),
-    Podarok(name: 'Букет белых роз', price: 12, img: "assets/gifts/51.png"),
-    Podarok(name: 'Букет черные розы', price: 12, img: "assets/gifts/52.png"),
-    Podarok(name: 'Роковой женщине', price: 12, img: "assets/gifts/53.png"),
-    Podarok(name: 'Самой мудрой', price: 12, img: "assets/gifts/54.png"),
-    Podarok(name: 'Самой опасной', price: 12, img: "assets/gifts/55.png"),
+        img: 'assets/gifts/49.png'),
+    Podarok(name: 'Букет белые розы', price: 12, img: 'assets/gifts/50.png'),
+    Podarok(name: 'Букет белых роз', price: 12, img: 'assets/gifts/51.png'),
+    Podarok(name: 'Букет черные розы', price: 12, img: 'assets/gifts/52.png'),
+    Podarok(name: 'Роковой женщине', price: 12, img: 'assets/gifts/53.png'),
+    Podarok(name: 'Самой мудрой', price: 12, img: 'assets/gifts/54.png'),
+    Podarok(name: 'Самой опасной', price: 12, img: 'assets/gifts/55.png'),
     Podarok(
-        name: 'Самой притягательной', price: 12, img: "assets/gifts/56.png"),
-    Podarok(name: 'Серьезному мужчине', price: 12, img: "assets/gifts/57.png"),
-    Podarok(name: 'Коньяк и сигары', price: 12, img: "assets/gifts/58.png"),
-    Podarok(name: 'Королю', price: 12, img: "assets/gifts/59.png"),
-    Podarok(name: 'Текила и лимончик', price: 12, img: "assets/gifts/60.png"),
-    Podarok(name: 'Форд Мустанг', price: 12, img: "assets/gifts/61.png"),
-    Podarok(name: 'Хаммер', price: 12, img: "assets/gifts/62.png"),
-    Podarok(name: 'Чаек с вареньем', price: 12, img: "assets/gifts/63.png"),
+        name: 'Самой притягательной', price: 12, img: 'assets/gifts/56.png'),
+    Podarok(name: 'Серьезному мужчине', price: 12, img: 'assets/gifts/57.png'),
+    Podarok(name: 'Коньяк и сигары', price: 12, img: 'assets/gifts/58.png'),
+    Podarok(name: 'Королю', price: 12, img: 'assets/gifts/59.png'),
+    Podarok(name: 'Текила и лимончик', price: 12, img: 'assets/gifts/60.png'),
+    Podarok(name: 'Форд Мустанг', price: 12, img: 'assets/gifts/61.png'),
+    Podarok(name: 'Хаммер', price: 12, img: 'assets/gifts/62.png'),
+    Podarok(name: 'Чаек с вареньем', price: 12, img: 'assets/gifts/63.png'),
     Podarok(
-        name: 'Чудесного настроения', price: 12, img: "assets/gifts/64.png"),
+        name: 'Чудесного настроения', price: 12, img: 'assets/gifts/64.png'),
   ];
 
   first(context) {
@@ -665,7 +686,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Возможности",
+              'Возможности',
               style: TextStyle(color: Colors.white, fontSize: 17),
             ),
             ElevatedButton(
@@ -684,30 +705,16 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                                 topRight: Radius.circular(20)),
                             color: Colors.white54),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
+                            horizontal: 10, vertical: 10),
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.5,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Выберите сумму для пополнения",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                                TextButton.icon(
-                                  label: const SizedBox.shrink(),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(
-                                    CupertinoIcons.xmark,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ),
-                              ],
+                            const Text(
+                              'Выберите сумму для пополнения',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
                             ),
                             const SizedBox(
                               height: 15,
@@ -721,7 +728,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
               child: const Text(
-                "Пополнить баланс (от 100 руб.)",
+                'Пополнить баланс (от 100 руб.)',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -730,72 +737,75 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
               child: const Text(
-                "Отключить рекламу",
+                'Отключить рекламу',
                 style: TextStyle(color: Colors.white),
               ),
             ),
             ElevatedButton(
               onPressed: () {
-                showModalBottomSheet(
-                    backgroundColor: Colors.transparent,
-                    constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
-                        maxWidth: MediaQuery.of(context).size.width),
-                    context: context,
-                    builder: (context) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)),
-                            color: Colors.white54),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Выберите сумму для пополнения",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                                TextButton.icon(
-                                  label: const SizedBox.shrink(),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(
-                                    CupertinoIcons.xmark,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            for (int i = 0; i < 4; i++) buyButtonInvisible(i)
+                if (!isUnvisible) {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                          maxWidth: MediaQuery.of(context).size.width),
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)),
+                              color: Colors.white54),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Выберите количество дней',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              for (int i = 0; i < 4; i++) buyButtonInvisible(i)
+                            ],
+                          ),
+                        );
+                      }).then((value) => setState(() {}));
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Режим невидимки'),
+                          content: const Text(
+                              'Вы уверены, что хотите выключить режим невидимки?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Нет')),
+                            TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isUnvisible = false;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Да'))
                           ],
-                        ),
-                      );
-                    });
-                // setState(() {
-                //   isUnvisible = !isUnvisible;
-                // });
-                // db.collection('users').doc(auth.currentUser!.uid).update({
-                //   "isUnVisible":isUnvisible
-                // });
+                        );
+                      });
+                }
               },
               style: ButtonStyle(
                   backgroundColor: isUnvisible
                       ? const WidgetStatePropertyAll(Colors.green)
                       : const WidgetStatePropertyAll(Colors.redAccent)),
               child: const Text(
-                "Режим невидимки",
+                'Режим невидимки',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -803,7 +813,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
               height: 15,
             ),
             const Text(
-              "Подарки",
+              'Подарки',
               style: TextStyle(color: Colors.white, fontSize: 17),
             ),
             const SizedBox(
@@ -850,12 +860,13 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
       ' (экономим 51серебра)',
       ' (экономим 112серебра) ',
     ];
-    List pricesInt = [
+    List<int> pricesInt = [
       24,
       39,
       69,
       128,
     ];
+    List<int> days = [3, 7, 15, 30];
     List lineThrough = [
       0,
       56,
@@ -864,11 +875,22 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     ];
     return ElevatedButton(
       onPressed: () {
-        showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return const OplataPage();
-            });
+        if (globalBalance >= pricesInt[index]) {
+          setState(() {
+            globalBalance -= pricesInt[index];
+            isUnvisible = true;
+          });
+          db.collection('users').doc(firebaseAuth.currentUser!.uid).update({
+            'balance': globalBalance,
+            'isUnvisible': isUnvisible,
+            'unvisibleEnd': DateTime.now().add(Duration(days: days[index])),
+          });
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Недостаточно средств')),
+          );
+        }
       },
       style: ButtonStyle(
         minimumSize: WidgetStatePropertyAll(
@@ -876,43 +898,47 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
         foregroundColor: const WidgetStatePropertyAll(Colors.cyan),
         backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent.shade400),
       ),
-      child: index == 0
-          ? const Row(
-              children: [
-                Text(
-                  "3 дня = 24Ag",
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                Text(
-                  "${prices[index]}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "${lineThrough[index]}Ag",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: Colors.white,
-                      decorationThickness: 3),
-                ),
-                Text(
-                  " ${pricesInt[index]}Ag",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white),
-                ),
-                Text(
-                  "${bonuses[index]}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+      child: Container(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+        child: index == 0
+            ? const Row(
+                children: [
+                  Text(
+                    '3 дня = 24Ag',
+                    style: TextStyle(color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Text(
+                    '${prices[index]}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    '${lineThrough[index]}Ag',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.lineThrough,
+                        decorationColor: Colors.white,
+                        decorationThickness: 3),
+                  ),
+                  Text(
+                    ' ${pricesInt[index]}Ag',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white),
+                  ),
+                  Text(
+                    '${bonuses[index]}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -935,12 +961,52 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     ];
     List pricesInt = [30, 60, 98, 198, 298, 576];
     return ElevatedButton(
-      onPressed: () {
-        showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return const OplataPage();
-            });
+      onPressed: () async {
+        String sum = '';
+        switch (index) {
+          case 0:
+            sum = '150';
+            break;
+          case 1:
+            sum = '299';
+            break;
+          case 2:
+            sum = '490';
+            break;
+          case 3:
+            sum = '990';
+            break;
+          case 4:
+            sum = '1490';
+            break;
+          case 5:
+            sum = '2880';
+            break;
+        }
+        int count = 0;
+        await firebaseFirestore.collection('transaction').get().then((value) {
+          setState(() {
+            count = value.docs.length + 1;
+          });
+        });
+        await firebaseFirestore
+            .collection('transaction')
+            .doc(count.toString())
+            .set({
+          'id': count.toString(),
+          'sum': sum,
+          'user_email': firebaseAuth.currentUser!.email,
+          'user_id': firebaseAuth.currentUser!.uid,
+          'time': DateTime.now().toString(),
+        });
+        if (context.mounted) {
+          nextScreen(
+              context,
+              RobokassaWebview(
+                sum: sum,
+                count: count,
+              ));
+        }
       },
       style: ButtonStyle(
         minimumSize: WidgetStatePropertyAll(
@@ -951,11 +1017,11 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
       child: Row(
         children: [
           Text(
-            "${prices[index]}",
+            '${prices[index]}',
             style: const TextStyle(color: Colors.white),
           ),
           Text(
-            "${pricesInt[index]}Ag",
+            '${pricesInt[index]}Ag',
             style: const TextStyle(
                 color: Colors.white,
                 decoration: TextDecoration.lineThrough,
@@ -963,7 +1029,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
                 decorationThickness: 3),
           ),
           Text(
-            "${bonuses[index]}",
+            '${bonuses[index]}',
             style: const TextStyle(color: Colors.white),
           ),
         ],
@@ -985,7 +1051,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
       return initGifts.isEmpty
           ? const Center(
               child: Text(
-              "У вас нет подарков",
+              'У вас нет подарков',
               style: TextStyle(color: Colors.white),
             ))
           : SafeArea(
@@ -1009,7 +1075,7 @@ class _ShopPageState extends State<ShopPage> with TickerProviderStateMixin {
     } else {
       return const Center(
           child: Text(
-        "У вас нет подарков",
+        'У вас нет подарков',
         style: TextStyle(color: Colors.white),
       ));
     }

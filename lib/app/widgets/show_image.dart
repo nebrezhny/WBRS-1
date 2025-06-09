@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/pages/profile_page.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class ShowImage extends StatefulWidget {
@@ -11,32 +10,13 @@ class ShowImage extends StatefulWidget {
   final List initList;
   final List urls;
   final AsyncSnapshot snapshot;
-  final String userName;
-  final String email;
-  final String about;
-  final String age;
-  final String rost;
-  final String city;
-  final String hobbi;
-  final bool deti;
-  final String pol;
-  final String group;
-  const ShowImage(
-      {super.key,
-      required this.urls,
-      required this.index,
-      required this.initList,
-      required this.snapshot,
-      required this.userName,
-      required this.email,
-      required this.about,
-      required this.age,
-      required this.rost,
-      required this.city,
-      required this.hobbi,
-      required this.deti,
-      required this.pol,
-      required this.group});
+  const ShowImage({
+    super.key,
+    required this.urls,
+    required this.index,
+    required this.initList,
+    required this.snapshot,
+  });
 
   @override
   State<ShowImage> createState() => _ShowImageState();
@@ -53,7 +33,7 @@ class _ShowImageState extends State<ShowImage> {
         actions: [
           Row(
             children: [
-              IconButton(
+              TextButton(
                   onPressed: () {
                     firebaseFirestore
                         .collection('users')
@@ -62,7 +42,8 @@ class _ShowImageState extends State<ShowImage> {
                     firebaseAuth.currentUser!
                         .updatePhotoURL(widget.urls[widget.index]);
                   },
-                  icon: const Icon(CupertinoIcons.profile_circled)),
+                  child: const Text('Сделать аватаром',
+                      style: TextStyle(color: Colors.white))),
               IconButton(
                   onPressed: () {
                     deleteImage(widget.snapshot, widget.index);
@@ -70,20 +51,7 @@ class _ShowImageState extends State<ShowImage> {
                   icon: const Icon(Icons.delete)),
               IconButton(
                   onPressed: () {
-                    nextScreenReplace(
-                        context,
-                        ProfilePage(
-                          userName: widget.userName,
-                          email: widget.email,
-                          about: widget.about,
-                          age: widget.age,
-                          rost: widget.rost,
-                          city: widget.city,
-                          hobbi: widget.hobbi,
-                          deti: widget.deti,
-                          pol: widget.pol,
-                          group: widget.group,
-                        ));
+                    Navigator.pop(context);
                   },
                   icon: const Icon(Icons.close)),
             ],
@@ -127,45 +95,47 @@ class _ShowImageState extends State<ShowImage> {
   }
 
   moveToNext() {
-    if (widget.index == widget.urls.length - 1) return;
-    nextScreenReplace(
-        context,
-        ShowImage(
+    if (widget.index == widget.urls.length - 1) {
+      nextScreenReplace(
+          context,
+          ShowImage(
+            index: 0,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
+    } else {
+      nextScreenReplace(
+          context,
+          ShowImage(
             index: widget.index + 1,
             initList: widget.initList,
             urls: widget.urls,
             snapshot: widget.snapshot,
-            userName: widget.userName,
-            email: widget.email,
-            about: widget.about,
-            age: widget.age,
-            rost: widget.rost,
-            city: widget.city,
-            hobbi: widget.hobbi,
-            deti: widget.deti,
-            pol: widget.pol,
-            group: widget.group));
+          ));
+    }
   }
 
   moveToPrevious() {
-    if (widget.index == 0) return;
-    nextScreenReplace(
-        context,
-        ShowImage(
+    if (widget.index == 0) {
+      nextScreenReplace(
+          context,
+          ShowImage(
+            index: widget.urls.length - 1,
+            initList: widget.initList,
+            urls: widget.urls,
+            snapshot: widget.snapshot,
+          ));
+    } else {
+      nextScreenReplace(
+          context,
+          ShowImage(
             index: widget.index - 1,
             initList: widget.initList,
             urls: widget.urls,
             snapshot: widget.snapshot,
-            userName: widget.userName,
-            email: widget.email,
-            about: widget.about,
-            age: widget.age,
-            rost: widget.rost,
-            city: widget.city,
-            hobbi: widget.hobbi,
-            deti: widget.deti,
-            pol: widget.pol,
-            group: widget.group));
+          ));
+    }
   }
 
   deleteImage(snapshot, index) {
@@ -174,7 +144,14 @@ class _ShowImageState extends State<ShowImage> {
         builder: (context) {
           return Container(
             padding: const EdgeInsets.all(20),
-            color: Colors.white,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white,
+                width: 1,
+              ),
+              color: darkGrey,
+            ),
             height: MediaQuery.of(context).size.height * 0.17,
             child: Column(
               children: [
@@ -182,9 +159,9 @@ class _ShowImageState extends State<ShowImage> {
                   style: TextStyle(
                       decorationColor: Colors.white,
                       fontStyle: FontStyle.normal,
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16),
-                  child: Text("Вы уверены, что хотите удалить это фото?"),
+                  child: Text('Вы уверены, что хотите удалить это фото?'),
                 ),
                 const SizedBox(
                   height: 20,

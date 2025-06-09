@@ -1,5 +1,4 @@
-// ignore_for_file: avoid_print
-
+import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,11 +13,12 @@ class AuthService {
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-        return ('No user found for that email.');
+        debugPrint('No user found for that email.');
+
+        return ('Нет пользователя с такой почтой.');
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-        return ('Wrong password provided for that user.');
+        debugPrint('Wrong password provided for that user.');
+        return ('Неверный пароль.');
       }
     }
   }
@@ -32,12 +32,12 @@ class AuthService {
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        return ('The password provided is too weak.');
+        return ('Пароль слишком слабый.');
       } else if (e.code == 'email-already-in-use') {
-        return ('The account already exists for that email.');
+        return ('Такой пользователь уже существует.');
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -45,11 +45,11 @@ class AuthService {
   Future signOut() async {
     try {
       await HelperFunctions.saveUserLoggedInStatus(false);
-      await HelperFunctions.saveUserEmailSF("");
-      await HelperFunctions.saveUserNameSF("");
+      await HelperFunctions.saveUserEmailSF('');
+      await HelperFunctions.saveUserNameSF('');
       await firebaseAuth.signOut();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 }

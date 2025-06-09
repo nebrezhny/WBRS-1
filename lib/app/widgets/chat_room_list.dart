@@ -34,13 +34,10 @@ class _ChatRoomListState extends State<ChatRoomList> {
   @override
   void initState() {
     super.initState();
-
-    _asyncFunction();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -61,10 +58,18 @@ class _ChatRoomListState extends State<ChatRoomList> {
               child: CircularProgressIndicator(),
             );
           } else {
+            String group = '';
+            DocumentSnapshot data = snapshot.data!;
+            id = data.id;
+            nick = data.exists ? data.get('fullName') : 'Удаленный пользователь';
+            photoUrl = data.exists ? data.get('profilePic') : '';
+            if (snapshot.data!.data() != null) {
+              group = snapshot.data!.get('группа');
+            }
             return ListTile(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40.0)),
-              subtitle: widget.snapshot.get("lastMessage") != ""
+              subtitle: widget.snapshot.get('lastMessage') != ''
                   ? Container(
                       padding: const EdgeInsets.only(right: 20),
                       child: Row(
@@ -77,15 +82,15 @@ class _ChatRoomListState extends State<ChatRoomList> {
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),
-                          widget.snapshot.get("lastMessageSendByID") != myUid
-                              ? widget.snapshot.get("unreadMessage") != null
-                                  ? widget.snapshot.get("unreadMessage") != 0
+                          widget.snapshot.get('lastMessageSendByID') != myUid
+                              ? widget.snapshot.get('unreadMessage') != null
+                                  ? widget.snapshot.get('unreadMessage') != 0
                                       ? CircleAvatar(
                                           backgroundColor: Colors.white,
                                           radius: 10,
                                           child: Text(
                                             widget.snapshot
-                                                .get("unreadMessage")
+                                                .get('unreadMessage')
                                                 .toString(),
                                             style: const TextStyle(
                                                 color: Colors.black,
@@ -101,89 +106,27 @@ class _ChatRoomListState extends State<ChatRoomList> {
                       ),
                     )
                   : const Text(
-                      "нет сообщений",
+                      'нет сообщений',
                       style: TextStyle(color: Colors.white),
                     ),
-              title: widget.snapshot.get("user1") == myUid
-                  ? Text(
-                      widget.snapshot.get("user2Nickname"),
-                      style: const TextStyle(color: Colors.white),
-                    )
-                  : Text(
-                      widget.snapshot.get("user1Nickname"),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-              onTap: () async {
-                if (widget.snapshot.get("user1") == myUid) {
-                  nick = widget.snapshot.get("user2Nickname");
-                  id = widget.snapshot.get("user2");
-
-                  photoUrl = widget.snapshot.get("user2_image");
-                } else {
-                  nick = widget.snapshot.get("user1Nickname");
-                  id = widget.snapshot.get("user1");
-                  photoUrl = widget.snapshot.get("user1_image");
-                }
-
-                setState(() {
-                  nextScreen(
-                      context,
-                      ChatScreen(
-                          chatWithUsername: nick,
-                          photoUrl: photoUrl,
-                          id: id,
-                          chatId: widget.snapshot.id));
-                });
-              },
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(100.0),
-                child: widget.snapshot.get("user1") == myUid
-                    ? widget.snapshot.get("user2_image") != ""
-                        ? userImageWithCircle(
-                            widget.snapshot.get("user2_image"),
-                            snapshot.data?.get('группа'),
-                            60.0,
-                            60.0)
-                        : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 60.0, 60.0)
-                    : widget.snapshot.get("user1_image") != ""
-                        ? userImageWithCircle(
-                            widget.snapshot.get("user1_image"),
-                            snapshot.data?.get('группа'),
-                            60.0,
-                            60.0)
-                        : userImageWithCircle(
-                            '', snapshot.data?.get('группа'), 60.0, 60.0),
+              title: Text(
+                nick,
+                style: const TextStyle(color: Colors.white),
               ),
-              tileColor: Colors.white24,
-              contentPadding: const EdgeInsets.all(10.0),
+              onTap: () async {
+                nextScreen(
+                    context,
+                    ChatScreen(
+                        chatWithUsername: nick,
+                        photoUrl: photoUrl,
+                        id: id,
+                        chatId: widget.snapshot.id));
+              },
+              leading: userImageWithCircle(photoUrl,
+                  group,data.exists ? data.get('online') : false, 50.0, 50.0),
+              tileColor: grey,
+              contentPadding: const EdgeInsets.all(15.0),
             );
-          }
-        });
-  }
-
-  getGroup(id) async {
-    return await firebaseFirestore
-        .collection('users')
-        .doc(id)
-        .get()
-        .then((value) {
-      return value.get('группа');
-    });
-  }
-
-  makeImageGroup(photoUrl, id) {
-    return FutureBuilder(
-        future: getGroup(id),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.data != null) {
-            return userImageWithCircle(photoUrl, snapshot.data, 58.0, 58.0);
-          } else {
-            return Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.person, size: 40));
           }
         });
   }

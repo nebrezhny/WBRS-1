@@ -20,7 +20,6 @@ void nextScreen(context, page) {
 void nextScreenReplace(context, page) {
   Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => page));
-
 }
 
 void showSnackbar(context, color, message) {
@@ -33,7 +32,7 @@ void showSnackbar(context, color, message) {
       backgroundColor: color,
       duration: const Duration(seconds: 2),
       action: SnackBarAction(
-        label: "OK",
+        label: 'OK',
         onPressed: () {},
         textColor: Colors.white,
       ),

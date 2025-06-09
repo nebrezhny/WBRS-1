@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wbrs/app/helper/global.dart';
@@ -6,13 +5,13 @@ import 'package:wbrs/app/widgets/circle_user_image.dart';
 
 class HelperFunctions {
   //keys
-  static String userIdKey = "USERKEY";
-  static String photoUrl = "PHOTOURL";
-  static String userLoggedInKey = "LOGGEDINKEY";
-  static String userNameKey = "USERNAMEKEY";
-  static String userEmailKey = "USEREMAILKEY";
-  static String displayNameKey = "USERDISPLAYNAMEKEY";
-  static String userProfilePicKey = "USERPROFILEPICKEY";
+  static String userIdKey = 'USERKEY';
+  static String photoUrl = 'PHOTOURL';
+  static String userLoggedInKey = 'LOGGEDINKEY';
+  static String userNameKey = 'USERNAMEKEY';
+  static String userEmailKey = 'USEREMAILKEY';
+  static String displayNameKey = 'USERDISPLAYNAMEKEY';
+  static String userProfilePicKey = 'USERPROFILEPICKEY';
 
   // saving the data to SF
 
@@ -38,16 +37,6 @@ class HelperFunctions {
     return sf.getBool(userLoggedInKey);
   }
 
-  static Future<String?> getUserEmailFromSF() async {
-    SharedPreferences sf = await SharedPreferences.getInstance();
-    return sf.getString(userEmailKey);
-  }
-
-  static Future<String?> getUserNameFromSF() async {
-    SharedPreferences sf = await SharedPreferences.getInstance();
-    return sf.getString(userNameKey);
-  }
-
   Future<String?> getUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userNameKey);
@@ -56,11 +45,6 @@ class HelperFunctions {
   Future<String?> getUserEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userEmailKey);
-  }
-
-  Future<String?> getUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(userIdKey);
   }
 
   Future<String?> getDisplayName() async {
@@ -74,24 +58,6 @@ class HelperFunctions {
   }
 }
 
-Route createRoute(Widget Function() createPage) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => createPage(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
 getUserGroup() async {
   var doc = await firebaseFirestore
       .collection('users')
@@ -101,77 +67,75 @@ getUserGroup() async {
   return doc.get('группа');
 }
 
-userImageWithCircle(userPhotoUrl, group, [width, height]) {
+userImageWithCircle(userPhotoUrl, group, online, [width, height]) {
   if (width != null) {
     return UserImage(
       userPhotoUrl: userPhotoUrl,
       group: group,
       width: width,
       height: height,
+      online: online,
     );
   } else {
     return UserImage(
       userPhotoUrl: userPhotoUrl,
       group: group,
+      online: online,
     );
   }
 }
 
-String getUserGroupCircle(group) {
-  return "assets/circles/$group.png";
-}
-
 List<Widget> getLikeGroup(myGroup) {
   List spisok = [];
-  if (myGroup == "коричнево-красная" ||
-      myGroup == "коричнево-синяя" ||
-      myGroup == "коричнево-белая" ||
-      myGroup == "коричневая") {
-    spisok = ["Все белые", "Все коричневые", "Сине-белая"];
-  } else if (myGroup == "красно-белая" || myGroup == "красно-синяя") {
+  if (myGroup == 'коричнево-красная' ||
+      myGroup == 'коричнево-синяя' ||
+      myGroup == 'коричнево-белая' ||
+      myGroup == 'коричневая') {
+    spisok = ['Все белые', 'Все коричневые', 'Сине-белая'];
+  } else if (myGroup == 'красно-белая' || myGroup == 'красно-синяя') {
     spisok = [
-      "Чистая синяя",
-      "Сине-коричневая",
+      'Чистая синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "красная") {
+  } else if (myGroup == 'красная') {
     spisok = [
-      "Чистая синяя",
-      "Сине-коричневая",
+      'Чистая синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "красно-коричневая") {
+  } else if (myGroup == 'красно-коричневая') {
     spisok = [
-      "Все белые",
-      "Коричнево-белая",
-      "Сине-белая",
+      'Все белые',
+      'Коричнево-белая',
+      'Сине-белая',
     ];
-  } else if (myGroup == "коричнево-белая") {
+  } else if (myGroup == 'коричнево-белая') {
     spisok = [
-      "Все белые",
-      "Сине-белая",
-      "Все коричневые",
-      "Красно-коричневая",
+      'Все белые',
+      'Сине-белая',
+      'Все коричневые',
+      'Красно-коричневая',
     ];
-  } else if (myGroup == "синяя" || myGroup == "сине-коричневая") {
-    spisok = ["Чисто красная", "Красно-белая", "Сине-красная", "Красно-синяя"];
-  } else if (myGroup == "сине-белая") {
+  } else if (myGroup == 'синяя' || myGroup == 'сине-коричневая') {
+    spisok = ['Чисто красная', 'Красно-белая', 'Сине-красная', 'Красно-синяя'];
+  } else if (myGroup == 'сине-белая') {
     spisok = [
-      "Все коричневые",
-      "Все белые",
-      "Красно-коричневая",
+      'Все коричневые',
+      'Все белые',
+      'Красно-коричневая',
     ];
-  } else if (myGroup == "сине-красная") {
+  } else if (myGroup == 'сине-красная') {
     spisok = [
-      "Чисто синяя",
-      "Сине-коричневая",
+      'Чисто синяя',
+      'Сине-коричневая',
     ];
-  } else if (myGroup == "бело-красная" ||
-      myGroup == "бело-синяя" ||
-      myGroup == "бело-коричневая" ||
-      myGroup == "белая") {
+  } else if (myGroup == 'бело-красная' ||
+      myGroup == 'бело-синяя' ||
+      myGroup == 'бело-коричневая' ||
+      myGroup == 'белая') {
     spisok = [
-      "Все коричневые",
-      "Сине-белая",
-      "Красно-коричневая",
+      'Все коричневые',
+      'Сине-белая',
+      'Красно-коричневая',
     ];
   }
 
@@ -214,7 +178,7 @@ cityDropdown(context, options, onSelected) {
             itemBuilder: (context, index) {
               final option = options.elementAt(index);
               return ListTile(
-                tileColor: Colors.grey.shade700.withOpacity(0.8),
+                tileColor: grey,
                 title: Text(
                   option.trim(),
                   style: const TextStyle(color: Colors.white),

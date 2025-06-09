@@ -1,9 +1,10 @@
-// ignore_for_file: empty_catches
+// ignore_for_file: empty_catches, avoid_print
 
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart';
-import "package:flutter/services.dart" as s;
+import 'package:flutter/services.dart' as s;
 
 class NotificationsService {
   void sendPushMessage(
@@ -21,27 +22,29 @@ class NotificationsService {
             'message': <String, dynamic>{
               'token': token,
               'data': <String, dynamic>{
+                'android_channel_id': 'wbrs',
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'status': 'done',
-                'icon': "@mipmap/launcher_icon",
-                'sound': "default",
+                'icon': '@mipmap/ic_launcher',
+                'sound': 'default',
                 'payload': jsonEncode(body),
+                'unreadMsgCount': unreadMsgCount.toString(),
               },
-              "notification": <String, dynamic>{
-                "title": title,
-                "body": body['message'],
+              'notification': <String, dynamic>{
+                'title': title,
+                'body': body['message'],
               },
             }
           }));
 
       if (res.statusCode == 200) {
-        print('Уведомление успешно отправлено');
+        debugPrint('Уведомление успешно отправлено');
       } else {
-        print('Ошибка при отправке уведомления: ${res.statusCode}');
-        print(res.body);
+        debugPrint('Ошибка при отправке уведомления: ${res.statusCode}');
+        debugPrint(res.body);
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -60,25 +63,30 @@ class NotificationsService {
             'message': <String, dynamic>{
               'token': token,
               'data': <String, dynamic>{
+                'android_channel_id': 'wbrs',
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'status': 'done',
-                'icon': "@mipmap/launcher_icon",
-                'sound': "default",
+                'icon': '@mipmap/ic_launcher',
+                'sound': 'default',
+                'priority': 'high',
+                'time_to_live': '86400',
                 'payload': jsonEncode(body),
               },
-              "notification": <String, dynamic>{
-                "title": title,
-                "body": body['message'],
+              'notification': <String, dynamic>{
+                'title': title,
+                'body': body['message'],
               },
             }
           }));
       if (res.statusCode == 200) {
-        print('Уведомление успешно отправлено');
+        debugPrint('Уведомление успешно отправлено');
       } else {
-        print('Ошибка при отправке уведомления: ${res.statusCode}');
-        print(res.body);
+        debugPrint('Ошибка при отправке уведомления: ${res.statusCode}');
+        debugPrint(res.body);
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }
 
@@ -88,7 +96,7 @@ const List<String> _scopes = [
 
 Future getAccessToken() async {
   final serviceAccountJson =
-      json.decode(await s.rootBundle.loadString("assets/credentials.json"));
+      json.decode(await s.rootBundle.loadString('assets/credentials.json'));
   final credentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
   final client = await clientViaServiceAccount(credentials, _scopes);
 

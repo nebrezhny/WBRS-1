@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/register_page.dart';
@@ -28,20 +29,12 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String email = "";
-  String password = "";
+  String email = '';
+  String password = '';
   bool _isLoading = false;
 
   TextEditingController resetPasswordEmail = TextEditingController();
   AuthService authService = AuthService();
-
-  checkSystem() async {
-    var check = await firebaseFirestore
-        .collection('users')
-        .doc('6DVznuvNT8Yp4Nifz8TeH5mra4w2')
-        .get();
-    return check.id;
-  }
 
   @override
   void initState() {
@@ -51,7 +44,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -66,11 +60,11 @@ class _LoginPageState extends State<LoginPage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon2.jpg",
+            'assets/fon2.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
-            color: Colors.white.withOpacity(0.7),
+            color: grey,
             colorBlendMode: BlendMode.modulate,
           ),
         ),
@@ -94,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               const Text(
-                                "WBRS",
+                                'LRS',
                                 style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
@@ -110,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 40,
                                   ),
                                   Text(
-                                    "Well-built relationships",
+                                    ' Lasting relationships',
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -120,7 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               const SizedBox(height: 10),
                               const Text(
-                                  "Зарегестрируйтесь и знакомьтесь прямо сейчас!",
+                                  'Зарегестрируйтесь и знакомьтесь прямо сейчас!',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w400,
@@ -134,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: textInputDecoration.copyWith(
                                     labelStyle:
                                         const TextStyle(color: Colors.white),
-                                    labelText: "Email",
+                                    labelText: 'Email',
                                     prefixIcon: Icon(
                                       Icons.email,
                                       color: Theme.of(context).primaryColor,
@@ -151,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                                               r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                           .hasMatch(val!)
                                       ? null
-                                      : "Введите корректный email";
+                                      : 'Введите корректный email';
                                 },
                               ),
                               const SizedBox(height: 15),
@@ -175,14 +170,14 @@ class _LoginPageState extends State<LoginPage> {
                                     fillColor: Colors.white,
                                     labelStyle:
                                         const TextStyle(color: Colors.white),
-                                    labelText: "Пароль",
+                                    labelText: 'Пароль',
                                     prefixIcon: Icon(
                                       Icons.lock,
                                       color: Theme.of(context).primaryColor,
                                     )),
                                 validator: (val) {
                                   if (val!.length < 6) {
-                                    return "Пароль должен содержать 6 символов";
+                                    return 'Пароль должен содержать 6 символов';
                                   } else {
                                     return null;
                                   }
@@ -221,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                                               }),
                                             ))),
                                     const SizedBox(width: 10.0),
-                                    const Text("Запомнить меня",
+                                    const Text('Запомнить меня',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -242,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
                                           borderRadius:
                                               BorderRadius.circular(30))),
                                   child: const Text(
-                                    "Вход",
+                                    'Вход',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 16),
                                   ),
@@ -262,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                                             builder: (context) =>
                                                 const AlertDialog(
                                                   content: Text(
-                                                      "Нет соединения с интернетом"),
+                                                      'Нет соединения с интернетом'),
                                                 ));
                                       }
                                     }
@@ -270,15 +265,15 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(
-                                height: 10,
+                                height: 30,
                               ),
                               Text.rich(TextSpan(
-                                text: "Нет аккаунта? ",
+                                text: 'Нет аккаунта? ',
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 14),
                                 children: <TextSpan>[
                                   TextSpan(
-                                      text: "Регистрация",
+                                      text: 'Регистрация',
                                       style: const TextStyle(
                                           color: Colors.white,
                                           decoration: TextDecoration.underline),
@@ -303,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                                                             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                                         .hasMatch(val!)
                                                     ? null
-                                                    : "Введите корректный email";
+                                                    : 'Введите корректный email';
                                               },
                                               controller: resetPasswordEmail,
                                               decoration: const InputDecoration(
@@ -377,12 +372,29 @@ class _LoginPageState extends State<LoginPage> {
             selectedIndex = 1;
             await HelperFunctions.saveUserLoggedInStatus(true);
             if (context.mounted) {
-              await firebaseFirestore
+              DocumentSnapshot data = await firebaseFirestore
                   .collection('users')
                   .doc(firebaseAuth.currentUser!.uid)
-                  .update({'online': value});
-              showSnackbar(context, Colors.green, 'Вы авторизовались');
-              nextScreenReplace(context, const HomePage());
+                  .get();
+
+              if (data.exists) {
+                if (data.get('status') == 'blocked') {
+                  showSnackbar(context, Colors.red, 'Ваш аккаунт заблокирован');
+                  await firebaseAuth.signOut();
+                  nextScreenReplace(context, const LoginPage());
+                } else {
+                  await firebaseFirestore
+                      .collection('users')
+                      .doc(firebaseAuth.currentUser!.uid)
+                      .update({'online': value});
+                  showSnackbar(context, Colors.green, 'Вы авторизовались');
+                  nextScreenReplace(context, const HomePage());
+                }
+              } else {
+                await firebaseAuth.currentUser!.delete();
+                showSnackbar(context, Colors.red, 'Ваш аккаунт удален');
+                nextScreenReplace(context, const LoginPage());
+              }
             }
           } else {
             showSnackbar(context, Colors.red, value);
@@ -402,7 +414,7 @@ class _LoginPageState extends State<LoginPage> {
     _isChecked = value;
     SharedPreferences.getInstance().then(
       (prefs) {
-        prefs.setBool("remember_me", value);
+        prefs.setBool('remember_me', value);
         prefs.setString('email', _emailController.text);
         prefs.setString('password', _passwordController.text);
       },
@@ -415,9 +427,9 @@ class _LoginPageState extends State<LoginPage> {
   void _loadUserEmailPassword() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String email = prefs.getString("email") ?? "";
-      String password = prefs.getString("password") ?? "";
-      bool remeberMe = prefs.getBool("remember_me") ?? false;
+      String email = prefs.getString('email') ?? '';
+      String password = prefs.getString('password') ?? '';
+      bool remeberMe = prefs.getBool('remember_me') ?? false;
       if (remeberMe) {
         setState(() {
           _isChecked = true;

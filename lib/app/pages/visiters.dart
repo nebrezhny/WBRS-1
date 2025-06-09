@@ -22,80 +22,75 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
   var currentUser = firebaseAuth.currentUser;
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       Timestamp time = snapshot.data!.docs[index]['lastVisitTs'];
+      Map visitor = snapshot.data!.docs[index].data() as Map;
       return Card(
-        color: Colors.white.withOpacity(0.25),
+        color: grey,
         child: ListTile(
           onTap: () async {
             var doc = await firebaseFirestore
                 .collection('users')
                 .doc(snapshot.data!.docs[index]['uid'])
                 .get();
-            nextScreen(
-                context,
-                SomebodyProfile(
-                  uid: snapshot.data!.docs[index]['uid'],
-                  photoUrl: snapshot.data!.docs[index]['photoUrl'],
-                  name: snapshot.data!.docs[index]['fullName'],
-                  userInfo: doc.data() as Map,
-                ));
+            if(doc.exists){
+              nextScreen(
+                  context,
+                  SomebodyProfile(
+                    uid: snapshot.data!.docs[index]['uid'],
+                    photoUrl: snapshot.data!.docs[index]['photoUrl'],
+                    name: snapshot.data!.docs[index]['fullName'],
+                    userInfo: doc.data() as Map,
+                  ));
+            } else{
+              showSnackbar(context, Colors.red, 'Пользователь был удален');
+            }
           },
           leading: SizedBox(
             width: 50,
-            child: userImageWithCircle(
-                (snapshot.data!.docs[index]['photoUrl'] == "" ||
-                        snapshot.data!.docs[index]['photoUrl'] == null)
-                    ? "assets/profile.png"
-                    : snapshot.data!.docs[index]['photoUrl'].toString(),
-                snapshot.data!.docs[index]['group'],
-                50.0,
-                50.0),
+            child: userImageWithCircle(visitor['photoUrl'],
+                visitor['group'],
+                visitor.containsKey('online') ? visitor['online'] : false,
+                50.0, 50.0),
           ),
           title: Row(
             children: [
               Text(
-                snapshot.data!.docs[index]['fullName'],
+                visitor['fullName'],
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(
                 width: 10,
               ),
-              int.parse(snapshot.data!.docs[index]['age'].toString()) % 10 == 0
+              int.parse(visitor['age'].toString()) % 10 == 0
                   ? Text(
-                      '${snapshot.data!.docs[index]['age'].toString()} лет',
+                      '${visitor['age'].toString()} лет',
                       style: const TextStyle(color: Colors.white),
                     )
-                  : int.parse(snapshot.data!.docs[index]['age'].toString()) %
+                  : int.parse(visitor['age'].toString()) %
                               10 ==
                           1
                       ? Text(
-                          '${snapshot.data!.docs[index]['age'].toString()} год',
+                          '${visitor['age'].toString()} год',
                           style: const TextStyle(color: Colors.white),
                         )
-                      : int.parse(snapshot.data!.docs[index]['age']
+                      : int.parse(visitor['age']
                                       .toString()) %
                                   10 !=
                               5
                           ? Text(
-                              '${snapshot.data!.docs[index]['age']} года',
+                              '${visitor['age']} года',
                               style: const TextStyle(color: Colors.white),
                             )
                           : Text(
-                              '${snapshot.data!.docs[index]['age']} лет',
+                              '${visitor['age']} лет',
                               style: const TextStyle(color: Colors.white),
                             ),
             ],
           ),
           subtitle: Text(
-            "Последнее посещение: \n${time.toDate().toString().substring(0, 16)}",
+            'Последнее посещение: \n${time.toDate().toString().substring(0, 16)}',
             style: const TextStyle(color: Colors.white),
           ),
           dense: false,
@@ -106,7 +101,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -118,7 +113,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
             centerTitle: true,
             backgroundColor: Colors.transparent,
             title: const Text(
-              "Посетители страницы",
+              'Посетители страницы',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -144,7 +139,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                         child: const Align(
                           alignment: Alignment.center,
                           child: Text(
-                            "Пока на вашей странице не было гостей.",
+                            'Пока на вашей странице не было гостей.',
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ),
@@ -168,7 +163,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                       child: const Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Пока на вашей странице не было гостей.",
+                          'Пока на вашей странице не было гостей.',
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),

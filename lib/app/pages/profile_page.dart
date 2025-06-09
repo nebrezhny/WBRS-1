@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
 
@@ -52,10 +52,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  FirebaseStorage storage = FirebaseStorage.instance;
-  String imageUrl = " ";
+  String imageUrl = ' ';
   TextEditingController? name = TextEditingController();
-  late User? user = firebaseAuth.currentUser;
 
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
@@ -79,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("profilepic${firebaseAuth.currentUser?.uid}.jpg");
+        .child('profilepic${firebaseAuth.currentUser?.uid}.jpg');
 
     await ref.putFile(File(image!.path));
     ref.getDownloadURL().then((value) {
@@ -90,8 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   AuthService authService = AuthService();
-  String password = "";
-  String passwordConfirm = "";
+  String password = '';
+  String passwordConfirm = '';
 
   var currentUser = firebaseAuth.currentUser;
   final formKey = GlobalKey<FormState>();
@@ -102,13 +100,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void dispose() {
+    name!.dispose();
+    imageFileList!.clear();
+    imageFileList = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
           decoration: const BoxDecoration(boxShadow: []),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -124,11 +130,17 @@ class _ProfilePageState extends State<ProfilePage> {
               IconButton(
                 onPressed: () {
                   showModalBottomSheet(
+                      backgroundColor: darkGrey,
                       context: context,
                       builder: (context) {
                         return Container(
                           height: MediaQuery.of(context).size.height,
                           padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20))),
                           child: Container(
                             padding: EdgeInsets.only(
                                 bottom:
@@ -142,15 +154,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                     obscureText: true,
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
-                                            color: Colors.black),
-                                        labelText: "Введите пароль",
+                                            color: Colors.white),
+                                        labelText: 'Введите пароль',
                                         prefixIcon: Icon(
                                           Icons.lock,
                                           color: Theme.of(context).primaryColor,
                                         )),
                                     validator: (val) {
                                       if (val!.length < 6) {
-                                        return "Пароль должен содержать 6 символов";
+                                        return 'Пароль должен содержать 6 символов';
                                       } else {
                                         return null;
                                       }
@@ -169,18 +181,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                     obscureText: true,
                                     decoration: textInputDecoration.copyWith(
                                         labelStyle: const TextStyle(
-                                            color: Colors.black),
-                                        labelText: "Повторите пароль",
+                                            color: Colors.white),
+                                        labelText: 'Повторите пароль',
                                         prefixIcon: Icon(
                                           Icons.lock,
                                           color: Theme.of(context).primaryColor,
                                         )),
                                     validator: (val) {
                                       if (val!.length < 6) {
-                                        return "Пароль должен содержать 6 символов";
+                                        return 'Пароль должен содержать 6 символов';
                                       } else {
                                         if (val != password) {
-                                          return "Пароли не совпадают!";
+                                          return 'Пароли не совпадают!';
                                         }
                                         return null;
                                       }
@@ -204,16 +216,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                             nextScreenReplace(
                                                 context, const LoginPage());
                                             showSnackbar(context, Colors.green,
-                                                "Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.");
+                                                'Пароль успешно изменен! Пожалуйста авторизуйтесь повторно.');
                                           } on Exception catch (e) {
-                                            print(e);
+                                            showSnackbar(context, Colors.red,
+                                                e.toString());
                                           }
                                         }
                                       },
                                       child: const Text(
-                                        "Сменить пароль",
-                                        style: TextStyle(
-                                            color: Colors.orangeAccent),
+                                        'Сменить пароль',
+                                        style: TextStyle(color: Colors.white),
                                       )),
                                 ]),
                               ),
@@ -229,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              "Профиль",
+              'Профиль',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 27,
@@ -248,12 +260,24 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                           Stack(
                             children: [
-                              userImageWithCircle(
-                                  (currentUser!.photoURL == "" ||
-                                          currentUser!.photoURL == null)
-                                      ? "assets/profile.png"
-                                      : currentUser!.photoURL.toString(),
-                                  widget.group),
+                              StreamBuilder(
+                                  stream: firebaseFirestore
+                                      .collection('users')
+                                      .doc(currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return userImageWithCircle(
+                                          snapshot.data!['profilePic'],
+                                          widget.group,
+                                          snapshot.data!['online']);
+                                    } else {
+                                      return userImageWithCircle(
+                                          '',
+                                          widget.group,
+                                          false);
+                                    }
+                                  }),
                             ],
                           ),
                           const SizedBox(
@@ -272,6 +296,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.white, fontSize: 18))
                             ],
                           ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Ваша баланс: ',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18),
+                            ),
+                            Text(globalBalance.toString(),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 18))
+                          ],
+                        ),
                           const SizedBox(
                             height: 20,
                           ),
@@ -307,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.white
-                                                    .withOpacity(0.5),
+                                                    .withValues(alpha: 0.5),
                                                 spreadRadius: 3,
                                                 blurRadius:
                                                     7, // changes position of shadow
@@ -337,7 +377,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               color: Colors.white,
                                             ))),
                                     const Text(
-                                      "Мои гости",
+                                      'Мои гости',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -360,8 +400,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           color: Colors.orangeAccent,
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.white.withOpacity(0.5),
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.5),
                                               spreadRadius: 3,
                                               blurRadius:
                                                   7, // changes position of shadow
@@ -371,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               Radius.circular(50.0))),
                                       child: IconButton(
                                         onPressed: () {
-                                          global.GlobalPol = widget.pol;
+                                          global.globalPol = widget.pol;
                                           nextScreenReplace(
                                               context,
                                               ProfilePageEdit(
@@ -393,7 +433,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                     const Text(
-                                      "Изменить профиль",
+                                      'Изменить профиль',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -412,7 +452,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.white
-                                                    .withOpacity(0.5),
+                                                    .withValues(alpha: 0.5),
                                                 spreadRadius: 3,
                                                 blurRadius:
                                                     7, // changes position of shadow
@@ -439,7 +479,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               color: Colors.white,
                                             ))),
                                     const Text(
-                                      "Люди",
+                                      'Люди',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w300,
@@ -478,7 +518,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 if (snapshot.data != null) {
                                   if (snapshot.data!.docs.length != 0) {
-                                    return ifImageSnapshotNotEmtpry(snapshot);
+                                    return ifImageSnapshotNotEmpty(snapshot);
                                   } else {
                                     return ifImageSnaphotEmpty(snapshot);
                                   }
@@ -528,7 +568,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  ifImageSnapshotNotEmtpry(
+  ifImageSnapshotNotEmpty(
     AsyncSnapshot snapshot,
   ) {
     List urls = [];
@@ -563,23 +603,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 300,
                   child: InkWell(
                       onTap: () {
-                        nextScreenReplace(
+                        nextScreen(
                             context,
                             ShowImage(
                               urls: urls,
                               initList: initList,
                               index: index,
                               snapshot: snapshot,
-                              userName: widget.userName,
-                              group: widget.group,
-                              email: widget.email,
-                              about: widget.about,
-                              age: widget.age,
-                              rost: widget.rost,
-                              city: widget.city,
-                              hobbi: widget.hobbi,
-                              deti: widget.deti,
-                              pol: widget.pol,
                             ));
                       },
                       child: Container(
@@ -592,7 +622,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               fit: BoxFit.cover),
                         ),
                         width: 100,
-                        child: SizedBox(),
+                        child: const SizedBox(),
                       )),
                 );
               },
@@ -605,9 +635,9 @@ class _ProfilePageState extends State<ProfilePage> {
               imageFileList!.clear();
             },
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+                backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
             child: const Text(
-              "Добавить фотографии",
+              'Добавить фотографии',
               style: TextStyle(color: Colors.white, fontSize: 16),
             )),
       ],
@@ -618,7 +648,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: [
         const Text(
-          "Нет фотографий",
+          'Нет фотографий',
           style: TextStyle(color: Colors.white),
         ),
         ElevatedButton(
@@ -626,9 +656,9 @@ class _ProfilePageState extends State<ProfilePage> {
             selectImages();
           },
           style: const ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.orangeAccent)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent)),
           child: const Text(
-            "Добавить фотографии",
+            'Добавить фотографии',
             style: TextStyle(color: Colors.black),
           ),
         )
@@ -651,7 +681,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .collection('images')
-        .add({"url": downloadUrl});
+        .add({'url': downloadUrl});
   }
 
   ifGiftsSnapshotNotEmtpry(
@@ -685,7 +715,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Align(
                               alignment: Alignment.bottomRight,
                               child: Container(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(25),
@@ -693,7 +723,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   child: Text(
                                     countList[index].toString(),
-                                    style: TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   )),
                             )
                           ],
@@ -711,7 +741,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return const Column(
       children: [
         Text(
-          "Нет подарков",
+          'Нет подарков',
           style: TextStyle(color: Colors.white),
         ),
       ],

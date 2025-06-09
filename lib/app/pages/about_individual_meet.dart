@@ -13,7 +13,7 @@ import '../../service/database_service.dart';
 import '../../service/notifications.dart';
 import 'edit_meet.dart';
 
-class AboutIndividualMeet extends StatefulWidget {
+class AboutIndividualMeet extends StatelessWidget {
   final AsyncSnapshot snapshot;
   final int index;
   final DocumentSnapshot doc;
@@ -21,49 +21,38 @@ class AboutIndividualMeet extends StatefulWidget {
       {super.key,
       required this.snapshot,
       required this.index,
-      required this.doc});
-
-  @override
-  State<AboutIndividualMeet> createState() => _AboutIndividualMeetState();
-}
-
-class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
-  String myUid = firebaseAuth.currentUser!.uid;
+      required this.doc // Pass myUid as a required parameter
+      });
 
   getChatRoomIdByUsernames(String a, String b) {
     if (a.isNotEmpty && b.isNotEmpty) {
       if (a.substring(0, 1).codeUnitAt(0) <= b.substring(0, 1).codeUnitAt(0)) {
-        return "$a\_$b";
+        return '$a\_$b';
       } else {
-        return "$b\_$a";
+        return '$b\_$a';
       }
     } else {
-      return "abrakadabra";
+      return 'abrakadabra';
     }
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    bool isMeAdmin = widget.doc.id == myUid;
+    String myUid = firebaseAuth.currentUser!.uid;
+    bool isMeAdmin = doc.id == myUid;
     addNotification() async {
       Map notification = {
         'isChat': false,
-        'chatId': widget.doc.id,
+        'chatId': doc.id,
         'message':
             '${firebaseAuth.currentUser!.displayName} принял приглашение в группу',
       };
-      String token = "";
-      var meet = widget.snapshot.data.docs[widget.index];
+      String token = '';
+      var meet = snapshot.data.docs[index];
 
-      var doc =
+      var data =
           await firebaseFirestore.collection('TOKENS').doc(meet['admin']).get();
-      token = doc.get('token');
+      token = data.get('token');
       NotificationsService()
           .sendPushMessageGroup(token, notification, meet['name'], 1, meet.id);
     }
@@ -71,7 +60,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon.jpg",
+          'assets/fon.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -87,16 +76,14 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                   ? IconButton(
                       onPressed: () {
                         nextScreenReplace(
-                            context,
-                            EditMeet(
-                                meet: widget.snapshot.data.docs[widget.index]));
+                            context, EditMeet(meet: snapshot.data.docs[index]));
                       },
                       icon: const Icon(Icons.edit_calendar_outlined))
                   : const SizedBox()
             ],
             backgroundColor: Colors.transparent,
             title: Text(
-              widget.snapshot.data.docs[widget.index]['name'],
+              snapshot.data.docs[index]['name'],
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -107,6 +94,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if(doc.exists)
                 Card(
                   child: ListTile(
                     onTap: () {
@@ -116,29 +104,29 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                       nextScreen(
                           context,
                           SomebodyProfile(
-                              uid: widget.doc.get('uid'),
-                              photoUrl: widget.doc.get('profilePic'),
-                              name: widget.doc.get('fullName'),
-                              userInfo: widget.doc.data() as Map));
+                              uid: doc.get('uid'),
+                              photoUrl: doc.get('profilePic'),
+                              name: doc.get('fullName'),
+                              userInfo: doc.data() as Map));
                     },
-                    title: Text(widget.doc.get('fullName')),
+                    title: Text(doc.get('fullName')),
                     leading: ClipRRect(
                         borderRadius: BorderRadius.circular(100),
-                        child: userImageWithCircle(widget.doc.get('profilePic'),
-                            widget.doc.get('группа'), 58.0, 58.0)),
+                        child: userImageWithCircle(doc.get('profilePic'),
+                            doc.get('группа'),false, 58.0, 58.0)),
                     subtitle: Row(
                       children: [
-                        widget.doc.get('age') % 10 == 0
-                            ? Text('${widget.doc.get('age')} лет')
-                            : widget.doc.get('age') % 10 == 1
-                                ? Text('${widget.doc.get('age')} год')
-                                : widget.doc.get('age') % 10 != 5
-                                    ? Text('${widget.doc.get('age')} года')
-                                    : Text('${widget.doc.get('age')} лет'),
+                        doc.get('age') % 10 == 0
+                            ? Text('${doc.get('age')} лет')
+                            : doc.get('age') % 10 == 1
+                                ? Text('${doc.get('age')} год')
+                                : doc.get('age') % 10 != 5
+                                    ? Text('${doc.get('age')} года')
+                                    : Text('${doc.get('age')} лет'),
                         const SizedBox(
                           width: 20,
                         ),
-                        Text("Город ${widget.doc.get('city')}")
+                        Text("Город ${doc.get('city')}")
                       ],
                     ),
                   ),
@@ -156,21 +144,21 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                   height: 10,
                 ),
                 Text(
-                  "Описание: ${widget.snapshot.data.docs[widget.index]['description']}",
+                  "Описание: ${snapshot.data.docs[index]['description']}",
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Дата и время: ${widget.snapshot.data.docs[widget.index]['datetime']}',
+                  'Дата и время: ${snapshot.data.docs[index]['datetime']}',
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Город: ${widget.snapshot.data.docs[widget.index]['city']}',
+                  'Город: ${snapshot.data.docs[index]['city']}',
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(
@@ -178,7 +166,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                 ),
                 isMeAdmin
                     ? const SizedBox.shrink()
-                    : widget.snapshot.data.docs[widget.index]['users']
+                    : snapshot.data.docs[index]['users']
                             .contains(firebaseAuth.currentUser!.uid)
                         ? const Center(
                             child: Text(
@@ -191,8 +179,7 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                 onPressed: () async {
                                   DocumentReference meet = firebaseFirestore
                                       .collection('meets')
-                                      .doc(widget
-                                          .snapshot.data.docs[widget.index].id);
+                                      .doc(snapshot.data.docs[index].id);
                                   List users = await meet
                                       .get()
                                       .then((value) => value['users']);
@@ -212,11 +199,11 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                   String name = userDoc.get('fullName');
                                   String photoUrl = userDoc.get('profilePic');
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user1",
+                                      .collection('chats')
+                                      .where('user1',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user2", isEqualTo: uid)
+                                      .where('user2', isEqualTo: uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -226,11 +213,11 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                     }
                                   });
                                   await firebaseFirestore
-                                      .collection("chats")
-                                      .where("user2",
+                                      .collection('chats')
+                                      .where('user2',
                                           isEqualTo: FirebaseAuth
                                               .instance.currentUser!.uid)
-                                      .where("user1", isEqualTo: uid)
+                                      .where('user1', isEqualTo: uid)
                                       .get()
                                       .then((QuerySnapshot snapshot) {
                                     if (snapshot.docs.isEmpty) {
@@ -247,21 +234,21 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                             .toString(),
                                         name);
                                     Map<String, dynamic> chatRoomInfoMap = {
-                                      "user1": FirebaseAuth
+                                      'user1': FirebaseAuth
                                           .instance.currentUser!.uid
                                           .toString(),
-                                      "user2": widget.doc.id,
-                                      "user1Nickname": FirebaseAuth
+                                      'user2': doc.id,
+                                      'user1Nickname': FirebaseAuth
                                           .instance.currentUser!.displayName,
-                                      "user2Nickname": name,
-                                      "user1_image": FirebaseAuth
+                                      'user2Nickname': name,
+                                      'user1_image': FirebaseAuth
                                           .instance.currentUser!.photoURL,
-                                      "user2_image": photoUrl,
-                                      "lastMessage": "",
-                                      "lastMessageSendBy": "",
-                                      "lastMessageSendTs": DateTime.now(),
-                                      "unreadMessage": 0,
-                                      "chatId": chatID
+                                      'user2_image': photoUrl,
+                                      'lastMessage': '',
+                                      'lastMessageSendBy': '',
+                                      'lastMessageSendTs': DateTime.now(),
+                                      'unreadMessage': 0,
+                                      'chatId': chatID
                                     };
                                     await DatabaseService().createChatRoom(
                                         getChatRoomIdByUsernames(
@@ -278,24 +265,24 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                       chatID,
                                       'to${meet.id}',
                                       {
-                                        "message": "Принял приглашение",
-                                        "type": "text",
-                                        "isRead": false,
-                                        "sendBy": FirebaseAuth
+                                        'message': 'Принял приглашение',
+                                        'type': 'text',
+                                        'isRead': false,
+                                        'sendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "sendByID": FirebaseAuth
+                                        'sendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
-                                        "ts": DateTime.now()
+                                        'ts': DateTime.now()
                                             .millisecondsSinceEpoch
                                       },
                                     ).then((value) {
                                       Map<String, dynamic> lastMessageInfoMap =
                                           {
-                                        "lastMessage": "Принял приглашение",
-                                        "lastMessageSendTs": DateTime.now(),
-                                        "lastMessageSendBy": FirebaseAuth
+                                        'lastMessage': 'Принял приглашение',
+                                        'lastMessageSendTs': DateTime.now(),
+                                        'lastMessageSendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "lastMessageSendByID": FirebaseAuth
+                                        'lastMessageSendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
                                       };
 
@@ -307,23 +294,23 @@ class _AboutIndividualMeetState extends State<AboutIndividualMeet> {
                                       chatID,
                                       'to${meet.id}',
                                       {
-                                        "message": "Принял приглашение",
-                                        "type": "text",
-                                        "isRead": false,
-                                        "sendBy": FirebaseAuth
+                                        'message': 'Принял приглашение',
+                                        'type': 'text',
+                                        'isRead': false,
+                                        'sendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "sendByID": FirebaseAuth
+                                        'sendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
-                                        "ts": DateTime.now()
+                                        'ts': DateTime.now()
                                       },
                                     ).then((value) {
                                       Map<String, dynamic> lastMessageInfoMap =
                                           {
-                                        "lastMessage": "Принял приглашение",
-                                        "lastMessageSendTs": DateTime.now(),
-                                        "lastMessageSendBy": FirebaseAuth
+                                        'lastMessage': 'Принял приглашение',
+                                        'lastMessageSendTs': DateTime.now(),
+                                        'lastMessageSendBy': FirebaseAuth
                                             .instance.currentUser!.displayName,
-                                        "lastMessageSendByID": FirebaseAuth
+                                        'lastMessageSendByID': FirebaseAuth
                                             .instance.currentUser!.uid,
                                       };
 

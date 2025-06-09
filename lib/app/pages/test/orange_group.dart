@@ -39,8 +39,8 @@ class _OrangePageState extends State<OrangePage> {
   ];
 
   final List<String> questions = [
-    "стеснительны и застенчивы",
-    "теряетесь в новой обстановке",
+    'стеснительны и застенчивы',
+    'теряетесь в новой обстановке',
     'затрудняетесь установить контакт с незнакомыми людьми',
     'не верите в свои силы',
     'легко переносите одиночество',
@@ -72,7 +72,7 @@ class _OrangePageState extends State<OrangePage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon.jpg",
+            'assets/fon.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
@@ -85,7 +85,7 @@ class _OrangePageState extends State<OrangePage> {
               iconTheme: const IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
               title: const Text(
-                "Ответьте на вопросы",
+                'Ответьте на вопросы',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -113,101 +113,101 @@ class _OrangePageState extends State<OrangePage> {
                             int max = 0;
                             int max2 = 0;
                             setState(() {
-                              BlueGroup = counter;
+                              blueGroup = counter;
 
-                              if (BrownGroup > max) {
-                                max = BrownGroup;
+                              if (brownGroup > max) {
+                                max = brownGroup;
                               }
 
-                              if (RedGroup > max) {
-                                max = RedGroup;
+                              if (redGroup > max) {
+                                max = redGroup;
                               }
 
-                              if (WhiteGroup > max) {
-                                max = WhiteGroup;
+                              if (whiteGroup > max) {
+                                max = whiteGroup;
                               }
 
-                              if (BlueGroup > max) {
-                                max = BlueGroup;
+                              if (blueGroup > max) {
+                                max = blueGroup;
                               }
 
-                              if (BrownGroup > max2 && BrownGroup != max) {
-                                max2 = BrownGroup;
+                              if (brownGroup > max2 && brownGroup != max) {
+                                max2 = brownGroup;
                               }
 
-                              if (RedGroup > max2 && RedGroup != max) {
-                                max2 = RedGroup;
+                              if (redGroup > max2 && redGroup != max) {
+                                max2 = redGroup;
                               }
 
-                              if (WhiteGroup > max2 && WhiteGroup != max) {
-                                max2 = WhiteGroup;
+                              if (whiteGroup > max2 && whiteGroup != max) {
+                                max2 = whiteGroup;
                               }
 
-                              if (BlueGroup > max2 && BlueGroup != max) {
-                                max2 = BlueGroup;
+                              if (blueGroup > max2 && blueGroup != max) {
+                                max2 = blueGroup;
                               }
 
-                              if (max == BrownGroup) {
+                              if (max == brownGroup) {
                                 if (max2 > 0) {
-                                  if (max2 == RedGroup) {
-                                    Group = "коричнево-красная";
+                                  if (max2 == redGroup) {
+                                    group = 'коричнево-красная';
                                   }
-                                  if (max2 == BlueGroup) {
-                                    Group = "коричнево-синяя";
+                                  if (max2 == blueGroup) {
+                                    group = 'коричнево-синяя';
                                   }
-                                  if (max2 == WhiteGroup) {
-                                    Group = "коричнево-белая";
+                                  if (max2 == whiteGroup) {
+                                    group = 'коричнево-белая';
                                   }
                                 } else {
-                                  Group = "коричневая";
+                                  group = 'коричневая';
                                 }
                               }
 
-                              if (max == RedGroup) {
+                              if (max == redGroup) {
                                 if (max2 > 0) {
-                                  if (max2 == BrownGroup) {
-                                    Group = "красно-коричневая";
+                                  if (max2 == brownGroup) {
+                                    group = 'красно-коричневая';
                                   }
-                                  if (max2 == BlueGroup) {
-                                    Group = "красно-синяя";
+                                  if (max2 == blueGroup) {
+                                    group = 'красно-синяя';
                                   }
-                                  if (max2 == WhiteGroup) {
-                                    Group = "красно-белая";
+                                  if (max2 == whiteGroup) {
+                                    group = 'красно-белая';
                                   }
                                 } else {
-                                  Group = "красная";
+                                  group = 'красная';
                                 }
                               }
 
-                              if (max == BlueGroup) {
+                              if (max == blueGroup) {
                                 if (max2 > 0) {
-                                  if (max2 == RedGroup) {
-                                    Group = "сине-красная";
+                                  if (max2 == redGroup) {
+                                    group = 'сине-красная';
                                   }
-                                  if (max2 == BrownGroup) {
-                                    Group = "сине-коричневая";
+                                  if (max2 == brownGroup) {
+                                    group = 'сине-коричневая';
                                   }
-                                  if (max2 == WhiteGroup) {
-                                    Group = "сине-белая";
+                                  if (max2 == whiteGroup) {
+                                    group = 'сине-белая';
                                   }
                                 } else {
-                                  Group = "синяя";
+                                  group = 'синяя';
                                 }
                               }
 
-                              if (max == WhiteGroup) {
+                              if (max == whiteGroup) {
                                 if (max2 > 0) {
-                                  if (max2 == RedGroup) {
-                                    Group = "бело-красная";
+                                  if (max2 == redGroup) {
+                                    group = 'бело-красная';
                                   }
-                                  if (max2 == BlueGroup) {
-                                    Group = "бело-синяя";
+                                  if (max2 == blueGroup) {
+                                    group = 'бело-синяя';
                                   }
-                                  if (max2 == BrownGroup) {
-                                    Group = "бело-коричневая";
+                                  if (max2 == brownGroup) {
+                                    group = 'бело-коричневая';
                                   }
                                 } else {
-                                  Group = "белая";
+                                  group = 'белая';
                                 }
                               }
                               firebaseFirestore
@@ -215,7 +215,7 @@ class _OrangePageState extends State<OrangePage> {
                                   .doc(firebaseAuth.currentUser!.uid)
                                   .update({
                                 'isRegistrationEnd': true,
-                                'группа': Group
+                                'группа': group
                               });
                               setState(() {
                                 selectedIndex = 0;
@@ -223,26 +223,26 @@ class _OrangePageState extends State<OrangePage> {
                               nextScreenReplace(
                                   context,
                                   ProfilePage(
-                                    group: Group,
+                                    group: group,
                                     email: FirebaseAuth
                                         .instance.currentUser!.email
                                         .toString(),
                                     userName: FirebaseAuth
                                         .instance.currentUser!.displayName
                                         .toString(),
-                                    about: GlobalAbout.toString(),
-                                    age: GlobalAge.toString(),
-                                    deti: GlobalDeti,
-                                    rost: GlobalRost.toString(),
-                                    city: GlobalCity.toString(),
-                                    hobbi: GlobalHobbi.toString(),
-                                    pol: GlobalPol.toString(),
+                                    about: globalAbout.toString(),
+                                    age: globalAge.toString(),
+                                    deti: globalDeti,
+                                    rost: globalRost.toString(),
+                                    city: globalCity.toString(),
+                                    hobbi: globalHobbi.toString(),
+                                    pol: globalPol.toString(),
                                   ));
                               showSnackbar(context, Colors.green,
-                                  "Успешно! Ваша группа: $Group}");
+                                  'Успешно! Ваша группа: $group}');
                             });
                           },
-                          child: const Text("Завершить"))
+                          child: const Text('Завершить'))
                     ],
                   ),
                 ))),
@@ -276,7 +276,7 @@ class _OrangePageState extends State<OrangePage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "+",
+                      '+',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),
@@ -294,7 +294,7 @@ class _OrangePageState extends State<OrangePage> {
                             ? Colors.grey
                             : colors[index]),
                     child: const Text(
-                      "-",
+                      '-',
                       style: TextStyle(fontSize: 25),
                     ),
                   ),

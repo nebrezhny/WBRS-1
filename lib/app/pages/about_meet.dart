@@ -22,18 +22,12 @@ class AboutMeet extends StatefulWidget {
 
 class _AboutMeetState extends State<AboutMeet> {
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ChatPage(
       groupId: widget.id,
       groupName: widget.name,
       users: widget.users,
-      is_user_join: widget.is_user_join,
+      isUserJoin: widget.is_user_join,
     );
   }
 }

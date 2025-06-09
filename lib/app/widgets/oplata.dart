@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:wbrs/app/helper/global.dart';
+import 'package:wbrs/app/widgets/robokassa_webview.dart';
+import 'package:wbrs/app/widgets/widgets.dart';
 
 class OplataPage extends StatefulWidget {
-  const OplataPage({super.key});
+  final String sum;
+  const OplataPage({super.key, required this.sum});
 
   @override
   State<OplataPage> createState() => _OplataPageState();
@@ -10,31 +14,70 @@ class OplataPage extends StatefulWidget {
 class _OplataPageState extends State<OplataPage> {
   @override
   Widget build(BuildContext context) {
-    return  const Column(
-      children: [
-        Text('Виды оплат'),
-        ElevatedButton(onPressed: null, child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Оплата картой'),
-            Icon(Icons.credit_card)
-          ],
-        )),
-        ElevatedButton(onPressed: null, child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Оплата наличными'),
-            Icon(Icons.money)
-          ],
-        )),
-        ElevatedButton(onPressed: null, child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('QR-код оплатa'),
-            Icon(Icons.qr_code)
-          ],
-        )),
-      ]
+    return SizedBox(
+      height: 200,
+      child: Column(children: [
+        const Text(
+          'Виды оплат',
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
+        PopScope(
+          child: ElevatedButton(
+              onPressed: () async {
+                int count = 0;
+                await firebaseFirestore
+                    .collection('transaction')
+                    .get()
+                    .then((value) {
+                  setState(() {
+                    count = value.docs.length + 1;
+                  });
+                });
+                await firebaseFirestore
+                    .collection('transaction')
+                    .doc(count.toString())
+                    .set({
+                  'id': count.toString(),
+                  'sum': widget.sum,
+                  'user_email': firebaseAuth.currentUser!.email,
+                  'user_id': firebaseAuth.currentUser!.uid,
+                  'time': DateTime.now().toString(),
+                });
+                if (context.mounted) {
+                  nextScreen(
+                      context,
+                      RobokassaWebview(
+                        sum: widget.sum,
+                        count: count,
+                      ));
+                }
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [Text('Оплата СБП'), Icon(Icons.credit_card)],
+              )),
+        ),
+        ElevatedButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SizedBox(
+                      height: 300,
+                      width: 300,
+                      child: AlertDialog(
+                        backgroundColor: Colors.white,
+                        title: const Text('QR-код для оплаты'),
+                        content: Image.asset('assets/pay/qr.jpeg'),
+                      ),
+                    );
+                  });
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text('QR-код оплатa'), Icon(Icons.qr_code)],
+            )),
+      ]),
     );
   }
 }

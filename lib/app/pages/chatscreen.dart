@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, unnecessary_string_escapes, non_constant_identifier_names, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:io';
 
@@ -30,12 +30,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  String messageId = "";
+  String messageId = '';
   Stream? messageStream;
   late String myName, myProfilePic, myUserName, myEmail;
   String? _image;
   TextEditingController messageTextEdittingController = TextEditingController();
   String group = '';
+  bool online = false;
   bool isNotificationEnable = true;
   List userWOutN = [];
   Map chatInfo = {}, anotherUserInfo = {};
@@ -51,25 +52,26 @@ class _ChatScreenState extends State<ChatScreen> {
         .doc(widget.id)
         .get()
         .then((value) {
+      online = value.get('online');
       return value.get('группа');
     });
+
+    setState(() {});
   }
 
   getChatRoomIdByUsernames(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
+      return '$b\_$a';
     } else {
-      return "$a\_$b";
+      return '$a\_$b';
     }
   }
 
   addMessage(bool sendClicked, String type) async {
-    if (messageTextEdittingController.text != "") {
-      QuerySnapshot querySnap = await firebaseFirestore
-          .collection('users')
-          .where('fullName', isEqualTo: widget.chatWithUsername)
-          .get();
-      String chatWith = querySnap.docs[0]['chatWithId'];
+    if (messageTextEdittingController.text != '') {
+      DocumentSnapshot querySnap =
+          await firebaseFirestore.collection('users').doc(widget.id).get();
+      String chatWith = querySnap.get('chatWithId');
       bool isUserInChat = chatWith == firebaseAuth.currentUser!.uid;
 
       isUserInChat
@@ -80,26 +82,26 @@ class _ChatScreenState extends State<ChatScreen> {
       var lastMessageTs = DateTime.now();
 
       Map<String, dynamic> messageInfoMap = {
-        "type": type,
-        "message": type == "text" ? message : _image,
-        "sendBy": firebaseAuth.currentUser!.displayName,
-        "sendByID": firebaseAuth.currentUser!.uid,
-        "ts": lastMessageTs,
-        "isRead": isUserInChat ? true : false
+        'type': type,
+        'message': type == 'text' ? message : _image,
+        'sendBy': firebaseAuth.currentUser!.displayName,
+        'sendByID': firebaseAuth.currentUser!.uid,
+        'ts': lastMessageTs,
+        'isRead': isUserInChat ? true : false
       };
 
       //messageId
-      if (messageId == "") {
+      if (messageId == '') {
         messageId = randomAlphaNumeric(12);
       }
       DatabaseService()
           .addMessage(widget.chatId, messageId, messageInfoMap)
           .then((value) {
         Map<String, dynamic> lastMessageInfoMap = {
-          "lastMessage": message,
-          "lastMessageSendTs": lastMessageTs,
-          "lastMessageSendBy": firebaseAuth.currentUser!.displayName,
-          "lastMessageSendByID": firebaseAuth.currentUser!.uid,
+          'lastMessage': message,
+          'lastMessageSendTs': lastMessageTs,
+          'lastMessageSendBy': firebaseAuth.currentUser!.displayName,
+          'lastMessageSendByID': firebaseAuth.currentUser!.uid,
         };
 
         DatabaseService()
@@ -107,9 +109,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
         if (sendClicked) {
           // remove the text in the message input field
-          messageTextEdittingController.text = "";
+          messageTextEdittingController.text = '';
           // make message id blank to get regenerated on next message send
-          messageId = "";
+          messageId = '';
         }
       });
 
@@ -131,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
             firebaseAuth.currentUser!.displayName.toString(), 4, widget.chatId);
       }
     }
-    messageTextEdittingController.text = "";
+    messageTextEdittingController.text = '';
   }
 
   Widget chatMessages() {
@@ -158,14 +160,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.72,
                         child: ListView.builder(
-                            itemExtent: 70,
                             padding: const EdgeInsets.only(bottom: 0, top: 16),
                             itemCount: snapshot.data.docs.length,
                             reverse: true,
                             itemBuilder: (context, index) {
                               DocumentSnapshot ds = snapshot.data.docs[index];
                               ds.id;
-                              if (ds["sendByID"] !=
+                              if (ds['sendByID'] !=
                                   firebaseAuth.currentUser!.uid) {
                                 firebaseFirestore
                                     .collection('chats')
@@ -174,35 +175,49 @@ class _ChatScreenState extends State<ChatScreen> {
                                     .doc(ds.id)
                                     .update({'isRead': true});
                               }
-
                               Map newDs = ds.data() as Map;
-
                               if (newDs.containsKey('')) {
                                 return MessageTile(
+                                  avatar: anotherUserInfo.isNotEmpty
+                                      ? userImageWithCircle(
+                                          anotherUserInfo['profilePic'],
+                                          anotherUserInfo['группа'],
+                                          anotherUserInfo['online'],
+                                          50.0,
+                                          50.0)
+                                      : Container(),
                                   chatId: widget.chatId,
-                                  sender: ds["sendBy"],
-                                  name: ds["sendBy"],
+                                  sender: ds['sendBy'],
+                                  name: ds['sendBy'],
                                   message: ds,
                                   sentByMe: firebaseAuth.currentUser!.uid ==
-                                      ds["sendByID"],
-                                  isRead: ds["isRead"],
+                                      ds['sendByID'],
+                                  isRead: ds['isRead'],
                                   isChat: true,
                                 );
                               } else {
                                 var x =
                                     ds.data().toString().contains('deleteFor');
                                 if (x) {
-                                  if (ds["deleteFor"] !=
+                                  if (ds['deleteFor'] !=
                                       firebaseAuth.currentUser!.uid) {
                                     return MessageTile(
+                                      avatar: anotherUserInfo.isNotEmpty
+                                          ? userImageWithCircle(
+                                              anotherUserInfo['profilePic'],
+                                              anotherUserInfo['группа'],
+                                              anotherUserInfo['online'],
+                                              50.0,
+                                              50.0)
+                                          : Container(),
                                       chatId: widget.chatId,
-                                      sender: ds["sendBy"],
-                                      name: ds["sendBy"],
+                                      sender: ds['sendBy'],
+                                      name: ds['sendBy'],
                                       message: ds,
                                       sentByMe: FirebaseAuth
                                               .instance.currentUser!.uid ==
-                                          ds["sendByID"],
-                                      isRead: ds["isRead"],
+                                          ds['sendByID'],
+                                      isRead: ds['isRead'],
                                       isChat: true,
                                     );
                                   } else {
@@ -210,14 +225,22 @@ class _ChatScreenState extends State<ChatScreen> {
                                   }
                                 } else {
                                   return MessageTile(
+                                    avatar: anotherUserInfo.isNotEmpty
+                                        ? userImageWithCircle(
+                                            anotherUserInfo['profilePic'],
+                                            anotherUserInfo['группа'],
+                                            anotherUserInfo['online'],
+                                            50.0,
+                                            50.0)
+                                        : Container(),
                                     chatId: widget.chatId,
-                                    sender: ds["sendBy"],
-                                    name: ds["sendBy"],
+                                    sender: ds['sendBy'],
+                                    name: ds['sendBy'],
                                     message: ds,
                                     sentByMe: FirebaseAuth
                                             .instance.currentUser!.uid ==
-                                        ds["sendByID"],
-                                    isRead: ds["isRead"],
+                                        ds['sendByID'],
+                                    isRead: ds['isRead'],
                                     isChat: true,
                                   );
                                 }
@@ -250,11 +273,11 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  getAndSetMessages() async {
+  void getAndSetMessages() async {
     messageStream = await DatabaseService().getChatRoomMessages(widget.chatId);
   }
 
-  doThisOnLaunch() async {
+  void doThisOnLaunch() async {
     DocumentSnapshot snap =
         await firebaseFirestore.collection('users').doc(widget.id).get();
     setState(() {
@@ -264,7 +287,7 @@ class _ChatScreenState extends State<ChatScreen> {
     getAndSetMessages();
   }
 
-  chatWith_Update(String id) async {
+  void chatWith_Update(String id) async {
     String myId = firebaseAuth.currentUser!.uid;
     await firebaseFirestore
         .collection('users')
@@ -321,7 +344,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final ScrollController _scrollController = ScrollController();
 
-  switchNotification() async {
+  void switchNotification() async {
     String myUID = firebaseAuth.currentUser!.uid;
     setState(() {
       if (!isNotificationEnable) {
@@ -342,7 +365,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Stack(
       children: [
         Image.asset(
-          "assets/fon2.jpg",
+          'assets/fon2.jpg',
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
@@ -364,46 +387,39 @@ class _ChatScreenState extends State<ChatScreen> {
                         ? const Icon(Icons.notifications_on_outlined)
                         : const Icon(Icons.notifications_off_outlined))
               ],
+              titleTextStyle: TextStyle(overflow: TextOverflow.ellipsis,color: Colors.white),
+              titleSpacing: 10,
               title: Row(
                 children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.transparent,
-                        onPressed: () async {
-                          DocumentSnapshot doc = await FirebaseFirestore
-                              .instance
-                              .collection('users')
-                              .doc(widget.id)
-                              .get();
-                          Images = doc.get('images');
-                          CountImages = Images.length;
-                          if (!mounted) return;
-                          nextScreen(
-                              context,
-                              SomebodyProfile(
-                                uid: widget.id,
-                                photoUrl: widget.photoUrl,
-                                name: widget.chatWithUsername,
-                                userInfo: await firebaseFirestore
-                                    .collection('users')
-                                    .doc(widget.id)
-                                    .get()
-                                    .then((val) {
-                                  return val.data() as Map;
-                                }),
-                              ));
-                        },
-                        child: userImageWithCircle(
-                            widget.photoUrl, group, 50.0, 50.0),
-                      )),
+                  FloatingActionButton(
+                    backgroundColor: Colors.transparent,
+                    onPressed: () async {
+                      if (!mounted) return;
+                      nextScreen(
+                          context,
+                          SomebodyProfile(
+                            uid: widget.id,
+                            photoUrl: widget.photoUrl,
+                            name: widget.chatWithUsername,
+                            userInfo: await firebaseFirestore
+                                .collection('users')
+                                .doc(widget.id)
+                                .get()
+                                .then((val) {
+                              return val.data() as Map;
+                            }),
+                          ));
+                    },
+                    child: userImageWithCircle(
+                        widget.photoUrl, group, online, 50.0, 50.0),
+                  ),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Column(
                     children: [
                       Text(widget.chatWithUsername,
-                          style: const TextStyle(color: Colors.white)),
+                          style: const TextStyle(color: Colors.white, fontSize: 16),overflow: TextOverflow.ellipsis,),
                       statusRow(
                           anotherUserInfo.toString().contains('online')
                               ? anotherUserInfo['online']
@@ -443,7 +459,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           width: MediaQuery.of(context).size.width,
                           child: Container(
-                            color: Colors.black.withOpacity(0.8),
+                            color: darkGrey,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             child: ConstrainedBox(
@@ -474,10 +490,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                             color: Colors.white),
                                         decoration: InputDecoration(
                                             border: InputBorder.none,
-                                            hintText: "Введите сообщение",
-                                            hintStyle: TextStyle(
-                                                color: Colors.white
-                                                    .withOpacity(0.6))),
+                                            hintText: 'Введите сообщение',
+                                            hintStyle:
+                                                TextStyle(color: white70)),
                                       )),
                                   GestureDetector(
                                     onTap: () {
@@ -487,9 +502,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                       Icons.send,
                                       color:
                                           messageTextEdittingController.text !=
-                                                  ""
+                                                  ''
                                               ? Colors.white
-                                              : Colors.white.withOpacity(0.6),
+                                              : white70,
                                     ),
                                   ),
                                 ],
@@ -509,7 +524,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  uploadFile(String filePath) async {
+  Future<String> uploadFile(String filePath) async {
     File file = File(filePath);
     var storage = FirebaseStorage.instance;
     String ref = '${widget.id}/${DateTime.now().toString()}.jpg';

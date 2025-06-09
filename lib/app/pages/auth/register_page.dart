@@ -1,8 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:io';
+
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/login_page.dart';
 import 'package:wbrs/app/pages/auth/writing_data_user.dart';
+import 'package:wbrs/app/pages/policy/confidecialnost.dart';
 import 'package:wbrs/service/auth_service.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -18,16 +21,10 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
-  String email = "";
-  String password = "";
-  String fullName = "";
+  String email = '';
+  String password = '';
+  String fullName = '';
   AuthService authService = AuthService();
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +37,11 @@ class _RegisterPageState extends State<RegisterPage> {
             )
           ]),
           child: Image.asset(
-            "assets/fon2.jpg",
+            'assets/fon2.jpg',
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
-            color: Colors.white.withOpacity(0.7),
+            color: grey,
             colorBlendMode: BlendMode.modulate,
             scale: 0.6,
           ),
@@ -66,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             const Text(
-                              "WBRS",
+                              'LRS',
                               style: TextStyle(
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold,
@@ -74,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                              "Well-built relationships",
+                              ' Lasting relationships',
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -82,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                                "Создайте профиль и присоединяйтесь к нам!",
+                                'Создайте профиль и присоединяйтесь к нам!',
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
@@ -95,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Никнэйм",
+                                  labelText: 'Никнэйм',
                                   prefixIcon: Icon(
                                     Icons.person,
                                     color: Theme.of(context).primaryColor,
@@ -109,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 if (val!.isNotEmpty) {
                                   return null;
                                 } else {
-                                  return "Имя не может быть пустым";
+                                  return 'Имя не может быть пустым';
                                 }
                               },
                             ),
@@ -121,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Email",
+                                  labelText: 'Email',
                                   prefixIcon: Icon(
                                     Icons.email,
                                     color: Theme.of(context).primaryColor,
@@ -138,7 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                         .hasMatch(val!)
                                     ? null
-                                    : "Введите корректный email";
+                                    : 'Введите корректный email';
                               },
                             ),
                             const SizedBox(height: 15),
@@ -148,14 +145,14 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoration: textInputDecoration.copyWith(
                                   labelStyle:
                                       const TextStyle(color: Colors.white),
-                                  labelText: "Пароль",
+                                  labelText: 'Пароль',
                                   prefixIcon: Icon(
                                     Icons.lock,
                                     color: Theme.of(context).primaryColor,
                                   )),
                               validator: (val) {
                                 if (val!.length < 6) {
-                                  return "Пароль должен содержать 6 символов";
+                                  return 'Пароль должен содержать 6 символов';
                                 } else {
                                   return null;
                                 }
@@ -180,7 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         borderRadius:
                                             BorderRadius.circular(30))),
                                 child: const Text(
-                                  "Зарегистрироваться",
+                                  'Зарегистрироваться',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 16),
                                 ),
@@ -192,13 +189,36 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(
                               height: 10,
                             ),
+                            Text.rich(
+                                textAlign: TextAlign.center,
+                                TextSpan(
+                                    text:
+                                        "Нажимая кнопку 'зарегистрироваться', вы подтверждаете , что согласны с ",
+                                    style: const TextStyle(color: Colors.white),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text:
+                                              'политикой конфиденциальности и пользовательским соглашением',
+                                          style: const TextStyle(
+                                              color: Colors.blue,
+                                              decoration:
+                                                  TextDecoration.underline),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              nextScreen(
+                                                  context, const Politica());
+                                            }),
+                                    ])),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             Text.rich(TextSpan(
-                              text: "Уже есть аккаунт? ",
+                              text: 'Уже есть аккаунт? ',
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 14),
                               children: <TextSpan>[
                                 TextSpan(
-                                    text: "Войти",
+                                    text: 'Войти',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         decoration: TextDecoration.underline),
@@ -234,10 +254,15 @@ class _RegisterPageState extends State<RegisterPage> {
           firebaseAuth.currentUser?.updateDisplayName(fullName);
           nextScreenReplace(context, const AboutUserWriting());
         } else {
-          showSnackbar(context, Colors.red, value);
+          try {
+            final result = await InternetAddress.lookup('example.com');
+          } on Exception catch (e) {
+            return showSnackbar(context, Colors.red, 'Нет интернет соединения');
+          }
           setState(() {
             _isLoading = false;
           });
+          showSnackbar(context, Colors.red, value);
         }
       });
     }
