@@ -65,6 +65,15 @@ class _ProfilesListState extends State<ProfilesList> {
   }
 
   @override
+  void dispose() {
+    imageCache.clear();
+    usersStream = const Stream.empty();
+    super.dispose();
+
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -90,6 +99,9 @@ class _ProfilesListState extends State<ProfilesList> {
                   fontSize: 27,
                   fontWeight: FontWeight.bold),
             ),
+            actions: [
+              Text('Ваш баланс:\n ${globalBalance.toString()} серебра\n на подарки', style: TextStyle(color: Colors.white, height: 1.1), textAlign: TextAlign.center,)
+            ],
           ),
           drawer: const MyDrawer(),
           body: isLoading
@@ -211,6 +223,7 @@ Widget _buildUserCardContent(Map user, BuildContext context) {
           group: user['группа'],
           width: 70.ceilToDouble(),
           height: 70.ceilToDouble(),
+          online: user['online'],
         ),
         Container(
           key: Key(user['uid']),

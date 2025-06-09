@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,25 +30,12 @@ import 'app/pages/chatscreen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
 
-updateUserStatus(value) async {
-  await firebaseFirestore
-      .collection('users')
-      .doc(firebaseAuth.currentUser!.uid)
-      .update({'online': value});
-  if (!value) {
-    await firebaseFirestore
-        .collection('users')
-        .doc(firebaseAuth.currentUser!.uid)
-        .update({'lastOnlineTS': DateTime.now()});
-  }
-}
-
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message ${message.messageId}');
 }
 
 listenNotify(context) async {
-  const AndroidInitializationSettings('@mipmap/launcher_icon');
+  const AndroidInitializationSettings('@mipmap/ic_launcher');
   const DarwinInitializationSettings();
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -141,7 +129,7 @@ void main() async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/launcher_icon');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
   const DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
     requestAlertPermission: true,
@@ -167,6 +155,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isSignedIn = false;
   bool _isRegistrationEnd = false;
   bool _loading = true;
+  bool _hasInternet = true;
 
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
@@ -177,6 +166,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // ignore: prefer_typing_uninitialized_variables
   var doc;
 
+  updateUserStatus(value) async {
+    if(!_isRegistrationEnd) return;
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .update({'online': value});
+    if (!value) {
+      await firebaseFirestore
+          .collection('users')
+          .doc(firebaseAuth.currentUser!.uid)
+          .update({'lastOnlineTS': DateTime.now()});
+    }
+  }
+
   @override
   void dispose() {
     //WidgetsBinding.instance.removeObserver(this);
@@ -185,6 +188,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(_isRegistrationEnd);
     if (state != AppLifecycleState.resumed) {
       updateUserStatus(false);
     } else {
@@ -213,7 +217,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   initNotify() {
-    const AndroidInitializationSettings('@mipmap/launcher_icon');
+    const AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -255,6 +259,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 
+  Future<String> getAndroidVersion() async {
+    const channel = MethodChannel('app_info');
+    try {
+      final version = await channel.invokeMethod('getVersion');
+      return version as String;
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
   getUserInfo() async {
     doc = await firebaseFirestore
         .collection('users')
@@ -273,7 +287,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return true;
       }
     } on SocketException catch (_) {
-      nextScreenReplace(context, const CheckInternetPage());
+      setState(() {
+        _hasInternet = false;
+        print(_hasInternet);
+      });
       return false;
     }
   }
@@ -292,7 +309,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           nextScreenReplace(context, const LoginPage());
         }
       } else {
-        await firebaseAuth.currentUser!.delete();
+        if(firebaseAuth.currentUser != null){
+          await firebaseAuth.currentUser!.delete();
+        }
         showSnackbar(context, Colors.red, 'Ваш аккаунт удален');
         nextScreenReplace(context, const LoginPage());
       }
@@ -301,6 +320,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       if (value != null) {
         setState(() {
           _isSignedIn = value;
+          if(firebaseAuth.currentUser == null){
+            _isSignedIn = false;
+          }
         });
       }
     });
@@ -312,11 +334,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         .doc(firebaseAuth.currentUser!.uid)
         .get();
 
-    _isRegistrationEnd = await collection.get('isRegistrationEnd');
+    if(collection.data()!.containsKey('isRegistrationEnd')){
+      _isRegistrationEnd = await collection.get('isRegistrationEnd');
 
-    if (_isRegistrationEnd != false) {
+      if (_isRegistrationEnd) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    } else{
       setState(() {
-        _isRegistrationEnd = true;
         _loading = false;
       });
     }
@@ -353,11 +380,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             },
             home: _isSignedIn
                 ? _loading
-                    ? const SplashScreen()
-                    : _isRegistrationEnd
-                        ? const HomePage()
-                        : const FirstGroupRed()
-                : const LoginPage(),
+                ? const SplashScreen()
+                : _isRegistrationEnd
+                ? const HomePage()
+                : const FirstGroupRed()
+                : const LoginPage()
           );
         });
       });

@@ -96,15 +96,13 @@ class _GreenPageState extends State<GreenPage> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Column(
                     children: [
-                      SizedBox(
-                        child: ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: colors.length,
-                            itemBuilder: (_, int index) {
-                              return QuestionBuilder(index);
-                            }),
-                      ),
+                      ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: colors.length,
+                          itemBuilder: (_, int index) {
+                            return QuestionBuilder(index);
+                          }),
                       const SizedBox(
                         height: 30,
                       ),

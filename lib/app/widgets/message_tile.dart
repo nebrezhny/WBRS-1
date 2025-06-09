@@ -408,7 +408,7 @@ class _MessageTileState extends State<MessageTile> {
                     },
                     child: widget.avatar ?? const SizedBox.shrink()),
             const SizedBox(
-              width: 10,
+              width: 5,
             ),
             Container(
               constraints: BoxConstraints(maxWidth: size.width * 0.74),
@@ -556,9 +556,6 @@ class _MessageTileState extends State<MessageTile> {
                       )
                     ],
                   )
-                  // widget.isRead
-                  //     ? const FaIcon(FontAwesomeIcons.check)
-                  //     : const FaIcon(FontAwesomeIcons.check),
                 ],
               ),
             ),

@@ -137,7 +137,7 @@ class About_App extends StatelessWidget {
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                         Text(
-                          '1.0',
+                          '1.0.4',
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         )
                       ],

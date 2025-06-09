@@ -24,6 +24,7 @@ class _CheckInternetPageState extends State<CheckInternetPage> {
         fit: BoxFit.cover,
       ),
       Scaffold(
+        backgroundColor: Colors.transparent,
         body: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(20),

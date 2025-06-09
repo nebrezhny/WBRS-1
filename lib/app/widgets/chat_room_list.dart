@@ -34,8 +34,6 @@ class _ChatRoomListState extends State<ChatRoomList> {
   @override
   void initState() {
     super.initState();
-
-    _asyncFunction();
   }
 
   @override
@@ -61,6 +59,10 @@ class _ChatRoomListState extends State<ChatRoomList> {
             );
           } else {
             String group = '';
+            DocumentSnapshot data = snapshot.data!;
+            id = data.id;
+            nick = data.exists ? data.get('fullName') : 'Удаленный пользователь';
+            photoUrl = data.exists ? data.get('profilePic') : '';
             if (snapshot.data!.data() != null) {
               group = snapshot.data!.get('группа');
             }
@@ -107,84 +109,24 @@ class _ChatRoomListState extends State<ChatRoomList> {
                       'нет сообщений',
                       style: TextStyle(color: Colors.white),
                     ),
-              title: widget.snapshot.get('user1') == myUid
-                  ? Text(
-                      widget.snapshot.get('user2Nickname'),
-                      style: const TextStyle(color: Colors.white),
-                    )
-                  : Text(
-                      widget.snapshot.get('user1Nickname'),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-              onTap: () async {
-                if (widget.snapshot.get('user1') == myUid) {
-                  nick = widget.snapshot.get('user2Nickname');
-                  id = widget.snapshot.get('user2');
-
-                  photoUrl = widget.snapshot.get('user2_image');
-                } else {
-                  nick = widget.snapshot.get('user1Nickname');
-                  id = widget.snapshot.get('user1');
-                  photoUrl = widget.snapshot.get('user1_image');
-                }
-
-                setState(() {
-                  nextScreen(
-                      context,
-                      ChatScreen(
-                          chatWithUsername: nick,
-                          photoUrl: photoUrl,
-                          id: id,
-                          chatId: widget.snapshot.id));
-                });
-              },
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(100.0),
-                child: widget.snapshot.get('user1') == myUid
-                    ? widget.snapshot.get('user2_image') != ''
-                        ? userImageWithCircle(
-                            widget.snapshot.get('user2_image'),
-                            group,
-                            50.0,
-                            50.0)
-                        : userImageWithCircle('', group, 50.0, 50.0)
-                    : widget.snapshot.get('user1_image') != ''
-                        ? userImageWithCircle(
-                            widget.snapshot.get('user1_image'),
-                            group,
-                            50.0,
-                            50.0)
-                        : userImageWithCircle('', group, 50.0, 50.0),
+              title: Text(
+                nick,
+                style: const TextStyle(color: Colors.white),
               ),
+              onTap: () async {
+                nextScreen(
+                    context,
+                    ChatScreen(
+                        chatWithUsername: nick,
+                        photoUrl: photoUrl,
+                        id: id,
+                        chatId: widget.snapshot.id));
+              },
+              leading: userImageWithCircle(photoUrl,
+                  group,data.exists ? data.get('online') : false, 50.0, 50.0),
               tileColor: grey,
               contentPadding: const EdgeInsets.all(15.0),
             );
-          }
-        });
-  }
-
-  getGroup(id) async {
-    return await firebaseFirestore
-        .collection('users')
-        .doc(id)
-        .get()
-        .then((value) {
-      return value.get('группа');
-    });
-  }
-
-  makeImageGroup(photoUrl, id) {
-    return FutureBuilder(
-        future: getGroup(id),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.data != null) {
-            return userImageWithCircle(photoUrl, snapshot.data, 58.0, 58.0);
-          } else {
-            return Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.person, size: 40));
           }
         });
   }

@@ -227,6 +227,7 @@ class _ChatPageState extends State<ChatPage> {
                               child: userImageWithCircle(
                                   userInfo[index].imageUrl,
                                   userInfo[index].group,
+                                  userInfo[index].userInfo['online'],
                                   60.0,
                                   60.0))),
                     ),
@@ -267,7 +268,7 @@ class _ChatPageState extends State<ChatPage> {
                               horizontal: 30, vertical: 15),
                           child: listUsers(),
                         ),
-                        ElevatedButton(
+                        if (isUserJoin) ElevatedButton(
                             onPressed: () {
                               getOutFromChat();
                             },
@@ -333,42 +334,40 @@ class _ChatPageState extends State<ChatPage> {
                             },
                             icon: const Icon(Icons.edit_calendar_outlined))
                         : const SizedBox(),
-                    isUserJoin
-                        ? IconButton(
-                            onPressed: () async {
-                              if (userInfo.isEmpty) {
-                                for (int i = 0; i < widget.users.length; i++) {
-                                  DocumentSnapshot doc = await firebaseFirestore
-                                      .collection('users')
-                                      .doc(widget.users[i])
-                                      .get();
-                                  if (doc.exists) {
-                                    try {
-                                      UserInfo someUserInfo = UserInfo(
-                                          doc.get('fullName'),
-                                          doc.get('age').toString(),
-                                          doc.get('city'),
-                                          doc.get('profilePic'),
-                                          doc.get('группа'),
-                                          doc.get('uid'),
-                                          doc.data() as Map);
-                                      userInfo.add(someUserInfo);
-                                    } on Exception catch (e) {
-                                      if (context.mounted) {
-                                        showSnackbar(context, Colors.red, e);
-                                      }
-                                    }
+                    IconButton(
+                        onPressed: () async {
+                          if (userInfo.isEmpty) {
+                            for (int i = 0; i < widget.users.length; i++) {
+                              DocumentSnapshot doc = await firebaseFirestore
+                                  .collection('users')
+                                  .doc(widget.users[i])
+                                  .get();
+                              if (doc.exists) {
+                                try {
+                                  UserInfo someUserInfo = UserInfo(
+                                      doc.get('fullName'),
+                                      doc.get('age').toString(),
+                                      doc.get('city'),
+                                      doc.get('profilePic'),
+                                      doc.get('группа'),
+                                      doc.get('uid'),
+                                      doc.data() as Map);
+                                  userInfo.add(someUserInfo);
+                                } on Exception catch (e) {
+                                  if (context.mounted) {
+                                    showSnackbar(context, Colors.red, e);
                                   }
                                 }
                               }
-                              if (context.mounted) {
-                                if (!awaitUsers) {
-                                  showUsers();
-                                }
-                              }
-                            },
-                            icon: const Icon(Icons.people))
-                        : const SizedBox()
+                            }
+                          }
+                          if (context.mounted) {
+                            if (!awaitUsers) {
+                              showUsers();
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.people))
                   ],
                   backgroundColor: Colors.orangeAccent,
                 ),
@@ -597,7 +596,11 @@ class _ChatPageState extends State<ChatPage> {
                   return MessageTile(
                     avatar: userInfo.isNotEmpty
                         ? userImageWithCircle(
-                            senderData.imageUrl, senderData.group, 50.0, 50.0)
+                            senderData.imageUrl,
+                            senderData.group,
+                            senderData.userInfo['online'],
+                            50.0,
+                            50.0)
                         : Container(),
                     name: snapshot.data.docs[index]['name'],
                     sender: snapshot.data.docs[index]['sender'],

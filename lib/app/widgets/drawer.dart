@@ -117,7 +117,8 @@ class _MyDrawerState extends State<MyDrawer> {
                                       : FirebaseAuth
                                           .instance.currentUser!.photoURL
                                           .toString(),
-                                  group),
+                                  group,
+                                  false),
                           const SizedBox(
                             height: 15,
                           ),

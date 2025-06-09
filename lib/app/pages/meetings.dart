@@ -140,7 +140,7 @@ class _MeetingPageState extends State<MeetingPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: width * 0.75,
+                        width: width * 0.74,
                         child: Autocomplete<String>(
                           optionsMaxHeight:
                               MediaQuery.of(context).size.height * 0.2,
@@ -238,6 +238,7 @@ class _MeetingPageState extends State<MeetingPage> {
                             }
                           });
                         },
+                        padding: EdgeInsets.zero,
                         icon: const Icon(Icons.search),
                         iconSize: 20,
                         splashRadius: 1,
@@ -356,8 +357,8 @@ class _MeetingPageState extends State<MeetingPage> {
                             width: double.infinity,
                             child: Text(
                               "${snapshot.data.docs[index]['city']}, ${snapshot.data.docs[index]['name']}",
-                              overflow: TextOverflow.fade,
-                              softWrap: false,
+                              overflow: TextOverflow.visible,
+                              softWrap: true,
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 14),
                             ),

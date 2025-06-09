@@ -66,7 +66,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
 
     signature = md5
         .convert(
-            utf8.encode('WBRS:${widget.sum}:${widget.count}:Grebat-kopat3102-'))
+            utf8.encode('WBRS:0.1:${widget.count}:Grebat-kopat3102-'))
         .toString();
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -148,7 +148,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
         },
       )
       ..loadRequest(Uri.parse(
-          'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=${widget.sum}&InvoiceID=${widget.count}&Description=test&SignatureValue=$signature'));
+          'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=WBRS&OutSum=0.1&InvoiceID=${widget.count}&Description=test&SignatureValue=$signature'));
 
     // setBackgroundColor is not currently supported on macOS.
     if (kIsWeb || !Platform.isMacOS) {
@@ -234,6 +234,7 @@ class _RobokassaWebviewState extends State<RobokassaWebview>
         if (document.findAllElements('Code').first.innerText == '0') {
           resultCode = document.findAllElements('Code').elementAt(1).innerText;
         }
+        print(resultCode);
         if (resultCode == '100') {
           addSilver();
           AndroidFlutterLocalNotificationsPlugin().show(

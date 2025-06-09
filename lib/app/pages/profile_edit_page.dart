@@ -858,8 +858,6 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                         }
                                                       }
 
-                                                      currentUser.delete();
-
                                                       db
                                                           .collection('users')
                                                           .doc(currentUser.uid)
@@ -868,8 +866,13 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
                                                           .delete();
 
                                                       AuthService().signOut();
-                                                      nextScreenReplace(context,
-                                                          const LoginPage());
+
+                                                      Navigator.pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(builder: (context) => LoginPage()),
+                                                            (route) => false,
+                                                      );
+
                                                     },
                                                     child: const Text('Да')),
                                                 const SizedBox(

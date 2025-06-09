@@ -15,10 +15,10 @@ class AuthService {
       if (e.code == 'user-not-found') {
         debugPrint('No user found for that email.');
 
-        return ('No user found for that email.');
+        return ('Нет пользователя с такой почтой.');
       } else if (e.code == 'wrong-password') {
         debugPrint('Wrong password provided for that user.');
-        return ('Wrong password provided for that user.');
+        return ('Неверный пароль.');
       }
     }
   }
@@ -32,9 +32,9 @@ class AuthService {
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        return ('The password provided is too weak.');
+        return ('Пароль слишком слабый.');
       } else if (e.code == 'email-already-in-use') {
-        return ('The account already exists for that email.');
+        return ('Такой пользователь уже существует.');
       }
     } catch (e) {
       debugPrint(e.toString());

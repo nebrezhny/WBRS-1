@@ -36,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _image;
   TextEditingController messageTextEdittingController = TextEditingController();
   String group = '';
+  bool online = false;
   bool isNotificationEnable = true;
   List userWOutN = [];
   Map chatInfo = {}, anotherUserInfo = {};
@@ -51,8 +52,11 @@ class _ChatScreenState extends State<ChatScreen> {
         .doc(widget.id)
         .get()
         .then((value) {
+      online = value.get('online');
       return value.get('группа');
     });
+
+    setState(() {});
   }
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -171,7 +175,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                     .doc(ds.id)
                                     .update({'isRead': true});
                               }
-
                               Map newDs = ds.data() as Map;
                               if (newDs.containsKey('')) {
                                 return MessageTile(
@@ -179,6 +182,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       ? userImageWithCircle(
                                           anotherUserInfo['profilePic'],
                                           anotherUserInfo['группа'],
+                                          anotherUserInfo['online'],
                                           50.0,
                                           50.0)
                                       : Container(),
@@ -202,6 +206,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? userImageWithCircle(
                                               anotherUserInfo['profilePic'],
                                               anotherUserInfo['группа'],
+                                              anotherUserInfo['online'],
                                               50.0,
                                               50.0)
                                           : Container(),
@@ -224,6 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         ? userImageWithCircle(
                                             anotherUserInfo['profilePic'],
                                             anotherUserInfo['группа'],
+                                            anotherUserInfo['online'],
                                             50.0,
                                             50.0)
                                         : Container(),
@@ -381,39 +387,39 @@ class _ChatScreenState extends State<ChatScreen> {
                         ? const Icon(Icons.notifications_on_outlined)
                         : const Icon(Icons.notifications_off_outlined))
               ],
+              titleTextStyle: TextStyle(overflow: TextOverflow.ellipsis,color: Colors.white),
+              titleSpacing: 10,
               title: Row(
                 children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.transparent,
-                        onPressed: () async {
-                          if (!mounted) return;
-                          nextScreen(
-                              context,
-                              SomebodyProfile(
-                                uid: widget.id,
-                                photoUrl: widget.photoUrl,
-                                name: widget.chatWithUsername,
-                                userInfo: await firebaseFirestore
-                                    .collection('users')
-                                    .doc(widget.id)
-                                    .get()
-                                    .then((val) {
-                                  return val.data() as Map;
-                                }),
-                              ));
-                        },
-                        child: userImageWithCircle(
-                            widget.photoUrl, group, 50.0, 50.0),
-                      )),
+                  FloatingActionButton(
+                    backgroundColor: Colors.transparent,
+                    onPressed: () async {
+                      if (!mounted) return;
+                      nextScreen(
+                          context,
+                          SomebodyProfile(
+                            uid: widget.id,
+                            photoUrl: widget.photoUrl,
+                            name: widget.chatWithUsername,
+                            userInfo: await firebaseFirestore
+                                .collection('users')
+                                .doc(widget.id)
+                                .get()
+                                .then((val) {
+                              return val.data() as Map;
+                            }),
+                          ));
+                    },
+                    child: userImageWithCircle(
+                        widget.photoUrl, group, online, 50.0, 50.0),
+                  ),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Column(
                     children: [
                       Text(widget.chatWithUsername,
-                          style: const TextStyle(color: Colors.white)),
+                          style: const TextStyle(color: Colors.white, fontSize: 16),overflow: TextOverflow.ellipsis,),
                       statusRow(
                           anotherUserInfo.toString().contains('online')
                               ? anotherUserInfo['online']

@@ -1,4 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:io';
+
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/auth/login_page.dart';
@@ -61,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             const Text(
-                              'WBRS',
+                              'LRS',
                               style: TextStyle(
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold,
@@ -69,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                              'Well-built relationships',
+                              ' Lasting relationships',
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -252,10 +254,15 @@ class _RegisterPageState extends State<RegisterPage> {
           firebaseAuth.currentUser?.updateDisplayName(fullName);
           nextScreenReplace(context, const AboutUserWriting());
         } else {
-          showSnackbar(context, Colors.red, value);
+          try {
+            final result = await InternetAddress.lookup('example.com');
+          } on Exception catch (e) {
+            return showSnackbar(context, Colors.red, 'Нет интернет соединения');
+          }
           setState(() {
             _isLoading = false;
           });
+          showSnackbar(context, Colors.red, value);
         }
       });
     }

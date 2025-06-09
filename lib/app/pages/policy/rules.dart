@@ -67,7 +67,7 @@ class _RuleState extends State<Rule> {
               child: Column(
                 children: [
                   const Text(
-                    'WBRS version 1.0',
+                    'LRS version 1.0',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 16,
@@ -80,13 +80,13 @@ class _RuleState extends State<Rule> {
                   TextButton(
                       onPressed: () {
                         try {
-                          launchUrl(Uri.parse('mailto:supp.wbrs@ya.ru'));
+                          launchUrl(Uri.parse('mailto:supp.lrs@ya.ru'));
                         } on Exception catch (e) {
                           showSnackbar(context, Colors.red, e);
                         }
                       },
                       child: const Text(
-                        'supp.wbrs@ya.ru',
+                        'supp.lrs@ya.ru',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       )),

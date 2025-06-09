@@ -94,6 +94,7 @@ class AboutIndividualMeet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if(doc.exists)
                 Card(
                   child: ListTile(
                     onTap: () {
@@ -112,7 +113,7 @@ class AboutIndividualMeet extends StatelessWidget {
                     leading: ClipRRect(
                         borderRadius: BorderRadius.circular(100),
                         child: userImageWithCircle(doc.get('profilePic'),
-                            doc.get('группа'), 58.0, 58.0)),
+                            doc.get('группа'),false, 58.0, 58.0)),
                     subtitle: Row(
                       children: [
                         doc.get('age') % 10 == 0

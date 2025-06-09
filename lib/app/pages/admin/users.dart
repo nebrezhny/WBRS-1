@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/pages/auth/somebody_profile.dart';
@@ -6,8 +7,19 @@ import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../../widgets/bottom_nav_bar.dart';
 
-class Users extends StatelessWidget {
+class Users extends StatefulWidget {
   const Users({super.key});
+
+  @override
+  State<Users> createState() => _UsersState();
+}
+
+class _UsersState extends State<Users> {
+  TextEditingController search = TextEditingController();
+  Stream users = firebaseFirestore
+      .collection('users')
+      .orderBy('email', descending: false)
+      .snapshots();
 
   @override
   Widget build(BuildContext context) {
@@ -56,15 +68,30 @@ class Users extends StatelessWidget {
             appBar: AppBar(
               iconTheme: const IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
+              title: TextField(
+                controller: search,
+                onSubmitted: (value) {
+                  setState(() {
+                    if (value.contains('@')) {
+                      users = firebaseFirestore
+                          .collection('users')
+                          .where('email', isGreaterThanOrEqualTo: value)
+                          .snapshots();
+                    } else {
+                      users = firebaseFirestore
+                          .collection('users')
+                          .where('fullName', isGreaterThanOrEqualTo: value)
+                          .snapshots();
+                    }
+                  });
+                },
+              ),
             ),
             bottomNavigationBar: const MyBottomNavigationBar(),
             body: Container(
               padding: const EdgeInsets.all(5),
               child: StreamBuilder(
-                  stream: firebaseFirestore
-                      .collection('users')
-                      .orderBy('email', descending: false)
-                      .snapshots(),
+                  stream: users,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.builder(
@@ -97,6 +124,21 @@ class Users extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
+                                      SizedBox(
+                                        width: 50,
+                                        child: TextField(
+                                            textAlign: TextAlign.center,
+                                            controller: controller,
+                                            onSubmitted: (value) {
+                                              firebaseFirestore
+                                                  .collection('users')
+                                                  .doc(snapshot
+                                                      .data!.docs[index].id)
+                                                  .update({
+                                                'balance': int.parse(value)
+                                              });
+                                            }),
+                                      ),
                                       snapshot.data!.docs[index]['status'] ==
                                               'blocked'
                                           ? const Icon(
@@ -123,12 +165,15 @@ class Users extends StatelessWidget {
                                               ),
                                             ),
                                       UserImage(
-                                          userPhotoUrl: snapshot
-                                              .data!.docs[index]['profilePic'],
-                                          group: snapshot.data!.docs[index]
-                                              ['группа'],
-                                          width: 50,
-                                          height: 50),
+                                        userPhotoUrl: snapshot.data!.docs[index]
+                                            ['profilePic'],
+                                        group: snapshot.data!.docs[index]
+                                            ['группа'],
+                                        width: 50,
+                                        height: 50,
+                                        online: snapshot.data!.docs[index]
+                                            ['online'],
+                                      ),
                                       IconButton(
                                         onPressed: () {
                                           showConfirmMessage(() {
@@ -163,14 +208,6 @@ class Users extends StatelessWidget {
                                       Text(snapshot.data!.docs[index]['city']),
                                     ],
                                   ),
-                                  TextField(
-                                      controller: controller,
-                                      onSubmitted: (value) {
-                                        firebaseFirestore
-                                            .collection('users')
-                                            .doc(snapshot.data!.docs[index].id)
-                                            .update({'balance': value});
-                                      })
                                 ],
                               ),
                             ),

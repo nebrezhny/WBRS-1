@@ -2,12 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
 
-class UserImage extends StatelessWidget {
+class UserImage extends StatefulWidget {
   final String? userPhotoUrl;
   final String group;
   final double width;
   final double height;
   final String? uid;
+  final bool online;
 
   const UserImage({
     super.key,
@@ -16,20 +17,58 @@ class UserImage extends StatelessWidget {
     required this.group,
     this.width = 100,
     this.height = 100,
+    required this.online,
   });
 
   @override
+  State<UserImage> createState() => _UserImageState();
+}
+
+class _UserImageState extends State<UserImage> {
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(50),
-      child: Container(
-        width: width,
-        height: height,
-        padding: const EdgeInsets.all(5),
-        decoration: _buildBackgroundDecoration(),
-        child: _buildUserAvatar(context),
-      ),
-    );
+    if (widget.online && false) {
+      return Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(50),
+            child: Container(
+              width: widget.width,
+              height: widget.height,
+              padding: const EdgeInsets.all(5),
+              decoration: _buildBackgroundDecoration(),
+              child: _buildUserAvatar(context),
+            ),
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.green,
+            ),
+            width: 15,
+            height: 15,
+          ),
+        ],
+      );
+    } else {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(50),
+        child: Container(
+          width: widget.width,
+          height: widget.height,
+          padding: const EdgeInsets.all(5),
+          decoration: _buildBackgroundDecoration(),
+          child: _buildUserAvatar(context),
+        ),
+      );
+    }
   }
 
   List<Color> getColorsByGroup(String group) {
@@ -76,29 +115,29 @@ class UserImage extends StatelessWidget {
         begin: Alignment.center,
         end: const Alignment(0.56, 0.56),
         stops: const [0.9, 0.4],
-        colors: getColorsByGroup(group),
+        colors: getColorsByGroup(widget.group),
       ),
     );
   }
 
   Widget _buildUserAvatar(context) {
-    if (userPhotoUrl != '' && userPhotoUrl != null) {
+    if (widget.userPhotoUrl != '' && widget.userPhotoUrl != null) {
       return CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 50, // Учитываем padding
         child: CachedNetworkImage(
-            cacheKey: uid,
+            cacheKey: widget.uid,
             imageBuilder: (context, imageProvider, {bool? loadProgress}) {
               return ClipOval(
                 child: Image(
                   image: imageProvider,
                   fit: BoxFit.cover,
-                  width: width, // Задайте желаемый размер
-                  height: height, // Задайте желаемый размер
+                  width: widget.width, // Задайте желаемый размер
+                  height: widget.height, // Задайте желаемый размер
                 ),
               );
             },
-            imageUrl: userPhotoUrl!,
+            imageUrl: widget.userPhotoUrl!,
             placeholder: (context, url) => Container(
                   decoration:
                       BoxDecoration(shape: BoxShape.circle, color: grey),

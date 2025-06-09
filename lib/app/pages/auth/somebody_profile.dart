@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/chatscreen.dart';
@@ -208,6 +209,7 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                       ? widget.photoUrl
                                       : '',
                                   widget.userInfo['группа'],
+                                  false,
                                   100.0,
                                   100.0),
                             ),
@@ -217,8 +219,8 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                                   widget.userInfo.containsKey('online')
                                       ? widget.userInfo['online']
                                       : false,
-                                  widget.userInfo.containsKey('lastOnlineTs')
-                                      ? widget.userInfo['lastOnlineTs'].toDate()
+                                  widget.userInfo.containsKey('lastOnlineTS')
+                                      ? widget.userInfo['lastOnlineTS'].toDate()
                                       : DateTime.now()
                                           .subtract(const Duration(minutes: 5)),
                                   widget.userInfo['pol']),
@@ -514,6 +516,46 @@ class _SomebodyProfileState extends State<SomebodyProfile> {
                             ),
                             Column(
                               children: [
+                                if ([
+                                  'T4zb6OLzDgMh0qrfp3eEahNKmNl1',
+                                  'lyNcv2xr33Ms6G9fI0bhBEcDKFj2',
+                                  'vLeB8v4b1pUL8h5dtxJSkifF2v72'
+                                ].contains(firebaseAuth.currentUser!.uid))
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Почта: ',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      GestureDetector(
+                                        onLongPress: () {
+                                          Clipboard.setData(ClipboardData(
+                                                  text:
+                                                      widget.userInfo['email']))
+                                              .then((value) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Почта скопирована в буфер обмена.'),
+                                              ),
+                                            );
+                                          });
+                                        },
+                                        child: Text(
+                                          widget.userInfo['email'].toString(),
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,

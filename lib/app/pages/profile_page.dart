@@ -101,10 +101,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    super.dispose();
     name!.dispose();
     imageFileList!.clear();
     imageFileList = null;
+    super.dispose();
   }
 
   @override
@@ -269,10 +269,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                     if (snapshot.hasData) {
                                       return userImageWithCircle(
                                           snapshot.data!['profilePic'],
-                                          widget.group);
+                                          widget.group,
+                                          snapshot.data!['online']);
                                     } else {
                                       return userImageWithCircle(
-                                          currentUser!.photoURL, widget.group);
+                                          '',
+                                          widget.group,
+                                          false);
                                     }
                                   }),
                             ],
@@ -293,6 +296,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.white, fontSize: 18))
                             ],
                           ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Ваша баланс: ',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18),
+                            ),
+                            Text(globalBalance.toString(),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 18))
+                          ],
+                        ),
                           const SizedBox(
                             height: 20,
                           ),

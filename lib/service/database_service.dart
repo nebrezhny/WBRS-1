@@ -1,5 +1,3 @@
-// ignore_for_file: equal_keys_in_map, unnecessary_string_escapes, non_constant_identifier_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../app/helper/global.dart';
@@ -29,14 +27,12 @@ class DatabaseService {
       String about,
       String pol) async {
     firebaseAuth.currentUser!.updateDisplayName(fullName);
-    // ignore: deprecated_member_use
     firebaseAuth.currentUser!.updateEmail(email);
     return await userCollection.doc(firebaseAuth.currentUser!.uid).set({
       'fullName': fullName,
       'email': email,
-      'chats': [],
       'balance': 27,
-      'profilePic': firebaseAuth.currentUser!.photoURL,
+      'profilePic': profilePic,
       'uid': uid,
       'age': age,
       'rost': rost,
@@ -50,7 +46,7 @@ class DatabaseService {
       'pol': pol,
       'группа': '',
       'isUnVisible': false,
-      'lastOnlineTS': DateTime.now().millisecondsSinceEpoch,
+      'lastOnlineTS': DateTime.now(),
       'online': true,
       'status': 'active'
     });

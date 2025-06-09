@@ -67,18 +67,20 @@ getUserGroup() async {
   return doc.get('группа');
 }
 
-userImageWithCircle(userPhotoUrl, group, [width, height]) {
+userImageWithCircle(userPhotoUrl, group, online, [width, height]) {
   if (width != null) {
     return UserImage(
       userPhotoUrl: userPhotoUrl,
       group: group,
       width: width,
       height: height,
+      online: online,
     );
   } else {
     return UserImage(
       userPhotoUrl: userPhotoUrl,
       group: group,
+      online: online,
     );
   }
 }

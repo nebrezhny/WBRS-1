@@ -9,8 +9,20 @@ import '../auth/somebody_profile.dart';
 import '../chat_page.dart';
 import '../filter_pages/cities.dart';
 
-class Meets extends StatelessWidget {
+class Meets extends StatefulWidget {
   const Meets({super.key});
+
+  @override
+  State<Meets> createState() => _MeetsState();
+}
+
+class _MeetsState extends State<Meets> {
+
+  TextEditingController search = TextEditingController(text: '');
+  CollectionReference meets = firebaseFirestore
+      .collection('meets');
+  Stream _meetsStream = Stream.empty();
+  bool _search = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,86 +73,106 @@ class Meets extends StatelessWidget {
               backgroundColor: Colors.transparent,
             ),
             bottomNavigationBar: const MyBottomNavigationBar(),
-            body: Container(
-              padding: const EdgeInsets.all(5),
-              child: StreamBuilder(
-                  stream: firebaseFirestore
-                      .collection('meets')
-                      .orderBy('name', descending: false)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              nextScreen(
-                                  context,
-                                  EditMeet(
-                                      description: snapshot.data!.docs[index]
-                                          ['description'],
-                                      city: snapshot.data!.docs[index]['city'],
-                                      datetime: snapshot.data!.docs[index]
-                                          ['datetime'],
-                                      users: snapshot.data!.docs[index]
-                                          ['users'],
-                                      id: snapshot.data!.docs[index].id));
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(15),
-                              margin: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: grey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.5,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    child: TextField(
+                      controller: search,
+                      onEditingComplete: () {
+                        setState(() {
+                          _meetsStream = meets.where('name', isGreaterThanOrEqualTo: search.text).snapshots();
+                          _search = true;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Начните поиск'
+                      ),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.7,),
+                    child: StreamBuilder(
+                        stream: _search ? _meetsStream : meets.orderBy('timeStamp', descending: true).snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView.builder(
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    nextScreen(
+                                        context,
+                                        EditMeet(
+                                            description: snapshot.data!.docs[index]
+                                                ['description'],
+                                            city: snapshot.data!.docs[index]['city'],
+                                            datetime: snapshot.data!.docs[index]
+                                                ['datetime'],
+                                            users: snapshot.data!.docs[index]
+                                                ['users'],
+                                            id: snapshot.data!.docs[index].id));
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(15),
+                                    margin: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: grey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Row(
                                       children: [
-                                        Text(
-                                            snapshot.data!.docs[index]['name']),
-                                        Text(snapshot.data!.docs[index]
-                                            ['description']),
-                                        Text(snapshot.data!.docs[index]
-                                            ['datetime']),
-                                        Text(
-                                            snapshot.data!.docs[index]['city']),
+                                        SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width / 1.5,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Text(
+                                                  snapshot.data!.docs[index]['name']),
+                                              Text(snapshot.data!.docs[index]
+                                                  ['description']),
+                                              Text(snapshot.data!.docs[index]
+                                                  ['datetime']),
+                                              Text(
+                                                  snapshot.data!.docs[index]['city']),
+                                            ],
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            showConfirmMessage(() {
+                                              firebaseFirestore
+                                                  .collection('meets')
+                                                  .doc(snapshot.data!.docs[index].id)
+                                                  .delete();
+                                            }, 'удалить');
+                                          },
+                                          icon: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            color: Colors.red,
+                                            size: 40,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
-                                  IconButton(
-                                    onPressed: () {
-                                      showConfirmMessage(() {
-                                        firebaseFirestore
-                                            .collection('meets')
-                                            .doc(snapshot.data!.docs[index].id)
-                                            .delete();
-                                      }, 'удалить');
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete_outline_rounded,
-                                      color: Colors.red,
-                                      size: 40,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),
+                                );
+                              },
+                            );
+                          } else {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                        }),
+                  ),
+                ],
+              ),
             ),
           ),
         )
@@ -186,6 +218,7 @@ class EditMeet extends StatelessWidget {
         Theme(
           data: ThemeData(brightness: Brightness.dark),
           child: Scaffold(
+            resizeToAvoidBottomInset: true,
             backgroundColor: Colors.transparent,
             appBar: AppBar(),
             body: SingleChildScrollView(
@@ -630,8 +663,9 @@ class _UsersEditState extends State<UsersEdit> {
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(200),
                             child: userImageWithCircle(
-                                userInfo[index].image_url,
+                                userInfo[index].imageUrl,
                                 userInfo[index].group,
+                                false,
                                 60.0,
                                 60.0))),
                   ),

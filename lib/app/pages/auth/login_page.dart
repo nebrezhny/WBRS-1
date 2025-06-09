@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               const Text(
-                                'WBRS',
+                                'LRS',
                                 style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 40,
                                   ),
                                   Text(
-                                    'Well-built relationships',
+                                    ' Lasting relationships',
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -115,6 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 10),
                               const Text(
                                   'Зарегестрируйтесь и знакомьтесь прямо сейчас!',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w400,

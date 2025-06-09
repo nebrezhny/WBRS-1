@@ -25,6 +25,7 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
   Widget build(BuildContext context) {
     Widget visitersList(AsyncSnapshot snapshot, int index) {
       Timestamp time = snapshot.data!.docs[index]['lastVisitTs'];
+      Map visitor = snapshot.data!.docs[index].data() as Map;
       return Card(
         color: grey,
         child: ListTile(
@@ -33,51 +34,57 @@ class _MyVisitersPageState extends State<MyVisitersPage> {
                 .collection('users')
                 .doc(snapshot.data!.docs[index]['uid'])
                 .get();
-            nextScreen(
-                context,
-                SomebodyProfile(
-                  uid: snapshot.data!.docs[index]['uid'],
-                  photoUrl: snapshot.data!.docs[index]['photoUrl'],
-                  name: snapshot.data!.docs[index]['fullName'],
-                  userInfo: doc.data() as Map,
-                ));
+            if(doc.exists){
+              nextScreen(
+                  context,
+                  SomebodyProfile(
+                    uid: snapshot.data!.docs[index]['uid'],
+                    photoUrl: snapshot.data!.docs[index]['photoUrl'],
+                    name: snapshot.data!.docs[index]['fullName'],
+                    userInfo: doc.data() as Map,
+                  ));
+            } else{
+              showSnackbar(context, Colors.red, 'Пользователь был удален');
+            }
           },
           leading: SizedBox(
             width: 50,
-            child: userImageWithCircle(snapshot.data!.docs[index]['photoUrl'],
-                snapshot.data!.docs[index]['group'], 50.0, 50.0),
+            child: userImageWithCircle(visitor['photoUrl'],
+                visitor['group'],
+                visitor.containsKey('online') ? visitor['online'] : false,
+                50.0, 50.0),
           ),
           title: Row(
             children: [
               Text(
-                snapshot.data!.docs[index]['fullName'],
+                visitor['fullName'],
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(
                 width: 10,
               ),
-              int.parse(snapshot.data!.docs[index]['age'].toString()) % 10 == 0
+              int.parse(visitor['age'].toString()) % 10 == 0
                   ? Text(
-                      '${snapshot.data!.docs[index]['age'].toString()} лет',
+                      '${visitor['age'].toString()} лет',
                       style: const TextStyle(color: Colors.white),
                     )
-                  : int.parse(snapshot.data!.docs[index]['age'].toString()) %
+                  : int.parse(visitor['age'].toString()) %
                               10 ==
                           1
                       ? Text(
-                          '${snapshot.data!.docs[index]['age'].toString()} год',
+                          '${visitor['age'].toString()} год',
                           style: const TextStyle(color: Colors.white),
                         )
-                      : int.parse(snapshot.data!.docs[index]['age']
+                      : int.parse(visitor['age']
                                       .toString()) %
                                   10 !=
                               5
                           ? Text(
-                              '${snapshot.data!.docs[index]['age']} года',
+                              '${visitor['age']} года',
                               style: const TextStyle(color: Colors.white),
                             )
                           : Text(
-                              '${snapshot.data!.docs[index]['age']} лет',
+                              '${visitor['age']} лет',
                               style: const TextStyle(color: Colors.white),
                             ),
             ],
