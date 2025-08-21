@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_string/random_string.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/pages/auth/somebody_profile.dart';
-import 'package:wbrs/app/pages/shop.dart';
+import 'package:wbrs/presentations/screens/list_of_users/show/somebody_profile.dart';
+import 'package:wbrs/presentations/screens/shop/shop.dart';
 import 'package:wbrs/service/database_service.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 

@@ -13,20 +13,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
-import 'package:wbrs/app/pages/auth/login_page.dart';
-import 'package:wbrs/app/pages/home_page.dart';
-import 'package:wbrs/app/pages/profile_page.dart';
+import 'package:wbrs/presentations/screens/auth/login_screen/login_page.dart';
+import 'package:wbrs/presentations/screens/home/home_page.dart';
+import 'package:wbrs/presentations/screens/profile/profile_page.dart';
+import 'package:wbrs/presentations/screens/test/red_group.dart';
 import 'package:wbrs/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:wbrs/app/widgets/check_internet.dart';
 import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
-import 'package:wbrs/app/pages/test/red_group.dart';
 
-import 'app/pages/about_meet.dart';
-import 'app/pages/chatscreen.dart';
+import 'presentations/screens/list_of_meets/show/about_meet.dart';
+import 'presentations/screens/chat_screen/chatscreen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
 
@@ -355,6 +354,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return LayoutBuilder(builder: (context, constraints) {
       return OrientationBuilder(builder: (context, orientation) {
         return Sizer(builder: (context, orientation, deviceType) {
+          // return MaterialApp.router(
+          //   routerConfig: router,
+          // );
           return MaterialApp(
             theme: ThemeData(
                 fontFamily: 'Roboto',

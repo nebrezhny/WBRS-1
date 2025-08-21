@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/pages/filter_pages/cities.dart';
-import 'package:wbrs/app/pages/profiles_list.dart';
+import 'package:wbrs/presentations/screens/list_of_users/profiles_list.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 class FilterPage extends StatefulWidget {

@@ -192,6 +192,7 @@ cityDropdown(context, options, onSelected) {
 }
 
 statusRow(bool online, DateTime lastOnlineTs, String pol) {
+  print(lastOnlineTs);
   int diff = lastOnlineTs.difference(DateTime.now()).inMinutes.abs();
   String compareDate = diff > 60
       ? diff / 60 > 24

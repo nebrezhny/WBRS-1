@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wbrs/app/helper/global.dart';
-import 'package:wbrs/app/pages/auth/somebody_profile.dart';
+import 'package:wbrs/presentations/screens/list_of_users/show/somebody_profile.dart';
 import 'package:wbrs/app/widgets/circle_user_image.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 

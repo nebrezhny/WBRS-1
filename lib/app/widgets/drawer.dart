@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
-import 'package:wbrs/app/pages/about_app.dart';
+import 'package:wbrs/presentations/screens/about_app/about_app.dart';
 import 'package:wbrs/app/pages/admin/panel.dart';
-import 'package:wbrs/app/pages/home_page.dart';
-import 'package:wbrs/app/pages/meetings.dart';
-import 'package:wbrs/app/pages/shop.dart';
-import 'package:wbrs/app/pages/test/red_group.dart';
-import 'package:wbrs/app/pages/visiters.dart';
+import 'package:wbrs/presentations/screens/home/home_page.dart';
+import 'package:wbrs/presentations/screens/list_of_meets/meetings.dart';
+import 'package:wbrs/presentations/screens/shop/shop.dart';
+import 'package:wbrs/presentations/screens/list_of_visiters/visiters.dart';
 import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
-import '../pages/auth/login_page.dart';
-import '../pages/profile_page.dart';
-import '../pages/profiles_list.dart';
+import '../../presentations/screens/auth/login_screen/login_page.dart';
+import '../../presentations/screens/profile/profile_page.dart';
+import '../../presentations/screens/list_of_users/profiles_list.dart';
+import '../../presentations/screens/test/red_group.dart';
 import '../../service/auth_service.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -205,6 +205,7 @@ class _MyDrawerState extends State<MyDrawer> {
                         .collection('users')
                         .doc(firebaseAuth.currentUser!.uid)
                         .collection('visiters')
+                        .orderBy('lastVisitTs', descending: true)
                         .snapshots();
                     nextScreenReplace(
                         context,

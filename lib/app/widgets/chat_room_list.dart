@@ -4,7 +4,7 @@ import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../helper/helper_function.dart';
-import '../pages/chatscreen.dart';
+import '../../presentations/screens/chat_screen/chatscreen.dart';
 
 class ChatRoomList extends StatefulWidget {
   final QueryDocumentSnapshot snapshot;
