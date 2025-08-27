@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
-import 'package:wbrs/presentations/screens/about_app/about_app.dart';
+import 'package:wbrs/presentation/screens/about_app/about_app.dart';
 import 'package:wbrs/app/pages/admin/panel.dart';
-import 'package:wbrs/presentations/screens/home/home_page.dart';
-import 'package:wbrs/presentations/screens/list_of_meets/meetings.dart';
-import 'package:wbrs/presentations/screens/shop/shop.dart';
-import 'package:wbrs/presentations/screens/list_of_visiters/visiters.dart';
+import 'package:wbrs/presentation/screens/home/home_page.dart';
+import 'package:wbrs/presentation/screens/list_of_meets/meetings.dart';
+import 'package:wbrs/presentation/screens/shop/shop.dart';
+import 'package:wbrs/presentation/screens/list_of_visiters/visiters.dart';
 import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
-import '../../presentations/screens/auth/login_screen/login_page.dart';
-import '../../presentations/screens/profile/profile_page.dart';
-import '../../presentations/screens/list_of_users/profiles_list.dart';
-import '../../presentations/screens/test/red_group.dart';
+import '../../presentation/screens/auth/login_screen/login_page.dart';
+import '../../presentation/screens/profile/profile_page.dart';
+import '../../presentation/screens/list_of_users/profiles_list.dart';
+import '../../presentation/screens/test/red_group.dart';
 import '../../service/auth_service.dart';
 
 class MyDrawer extends StatefulWidget {

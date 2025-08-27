@@ -5,8 +5,8 @@ import 'package:wbrs/app/helper/helper_function.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../../widgets/bottom_nav_bar.dart';
-import '../../../presentations/screens/list_of_users/show/somebody_profile.dart';
-import '../../../presentations/screens/meet_chat_screen/chat_page.dart';
+import '../../../presentation/screens/list_of_users/show/somebody_profile.dart';
+import '../../../presentation/screens/meet_chat_screen/chat_page.dart';
 import '../filter_pages/cities.dart';
 
 class Meets extends StatefulWidget {

@@ -13,10 +13,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wbrs/app/helper/helper_function.dart';
-import 'package:wbrs/presentations/screens/auth/login_screen/login_page.dart';
-import 'package:wbrs/presentations/screens/home/home_page.dart';
-import 'package:wbrs/presentations/screens/profile/profile_page.dart';
-import 'package:wbrs/presentations/screens/test/red_group.dart';
+import 'package:wbrs/presentation/screens/auth/login_screen/login_page.dart';
+import 'package:wbrs/presentation/screens/home/home_page.dart';
+import 'package:wbrs/presentation/screens/profile/profile_page.dart';
+import 'package:wbrs/presentation/screens/test/red_group.dart';
 import 'package:wbrs/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +24,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
-import 'presentations/screens/list_of_meets/show/about_meet.dart';
-import 'presentations/screens/chat_screen/chatscreen.dart';
+import 'presentation/screens/list_of_meets/show/about_meet.dart';
+import 'presentation/screens/chat_screen/chatscreen.dart';
 import 'firebase_options.dart';
 import 'app/helper/global.dart';
 

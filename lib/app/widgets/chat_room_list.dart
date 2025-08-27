@@ -4,7 +4,7 @@ import 'package:wbrs/app/helper/global.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
 import '../helper/helper_function.dart';
-import '../../presentations/screens/chat_screen/chatscreen.dart';
+import '../../presentation/screens/chat_screen/chatscreen.dart';
 
 class ChatRoomList extends StatefulWidget {
   final QueryDocumentSnapshot snapshot;
@@ -18,18 +18,6 @@ class _ChatRoomListState extends State<ChatRoomList> {
   List chats = [];
   var myUid = firebaseAuth.currentUser!.uid;
   late DocumentSnapshot otherUser;
-
-  _asyncFunction() async {
-    await firebaseFirestore
-        .collection('users')
-        .doc(widget.snapshot.get('user1') == myUid
-            ? widget.snapshot.get('user2')
-            : widget.snapshot.get('user1'))
-        .get()
-        .then((value) {
-      otherUser = value;
-    });
-  }
 
   @override
   void initState() {

@@ -3,10 +3,10 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wbrs/presentations/screens/home/home_page.dart';
-import 'package:wbrs/presentations/screens/list_of_meets/meetings.dart';
-import 'package:wbrs/presentations/screens/profile/profile_page.dart';
-import 'package:wbrs/presentations/screens/list_of_users/profiles_list.dart';
+import 'package:wbrs/presentation/screens/home/home_page.dart';
+import 'package:wbrs/presentation/screens/list_of_meets/meetings.dart';
+import 'package:wbrs/presentation/screens/profile/profile_page.dart';
+import 'package:wbrs/presentation/screens/list_of_users/profiles_list.dart';
 import 'package:wbrs/app/widgets/splash.dart';
 import 'package:wbrs/app/widgets/widgets.dart';
 
